@@ -1,4 +1,4 @@
-=== Plugin Name ===
+=== WPCB ===
 Contributors: Thomas Doki-Thonon
 Donate link: http://wpcb.fr/don
 Tags: wp-e-commerce, atos, sips, carte bancaire, cyber plus, sogenactif, sherlock's, webaffaires, elysnet, mercanet, wpcb
