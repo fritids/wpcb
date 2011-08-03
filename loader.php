@@ -4,7 +4,7 @@ Plugin Name:WP e-Commerce Atos SIPS
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB ATOS SIPS (Mercanet,...) (Plugin requis : WP e-Commerce)
 Version: 1.0
-Author: thomas@6www.net
+Author: Thomas Doki-Thonon
 Author URI: http://6www.net
 */
 
