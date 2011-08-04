@@ -1,5 +1,5 @@
 === Plugin Name ===
-Contributors: Thomas Doki-Thonon
+Contributors: 6WWW
 Donate link: http://wpcb.fr/boutique
 Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, merc@net
 Requires at least: 2.7
@@ -22,14 +22,10 @@ Atos SIPS est la technologie utilisée par de nombreuses banques françaises :
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
-1. Upload `wpcb` to the `/wp-content/plugins/` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Place `[atos]` in one page page
-4. Read the documentation on : http://wpcb.fr/doc (en Français)
+1. Envoyer `wpcb` vers le dossier `/wp-content/plugins/`
+2. Activer le plugin dans le menu 'Extensions' de Wordpress
+3. Placer `[atos]` sur une (et une seule!) page
+4. Lisez la documention sur : http://wpcb.fr/doc
 
 == Frequently Asked Questions ==
 
