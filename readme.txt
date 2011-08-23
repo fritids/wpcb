@@ -6,19 +6,19 @@ Requires at least: 2.7
 Tested up to: 3.2.1
 Stable tag: 1.0.1
 
-Module de paiement Atos SIPS (majorit des banques franÃ§aises) pour le plugin WP e-Commerce
+Module de paiement Atos SIPS (majoritÃ©Â des banques franÃ§Âaises) pour le plugin WP e-Commerce
 
 == Description ==
 
-Module de paiement Atos SIPS (majorit des banques franÃ§aises) pour le plugin WP e-Commerce.
-Atos SIPS est la technologie utilise par de nombreuses banques franÃ§aises :
+Module de paiement Atos SIPS (majoritÂÃ© des banques franÃ§aises) pour le plugin WP e-Commerce.
+Atos SIPS est la technologie utilisÂÃ©e par de nombreuses banques franÃ§aises :
 
-    * Banque Populaire (CyberPlus âtm)
-    * Socit Gnrale (Sogenactif âtm)
-    * Crdit Lyonnais (Sherlockâ tm)
-    * Crdit du Nord (Webaffaires âtm)
-    * CCF (Elysnet âtm)
-    * BNP (Mercanet âtm)
+    * Banque Populaire (CyberPlus, tm)
+    * SocÃ©iÂtÃ©Â GÃ©ÂnÃ©Ârale (Sogenactif, tm)
+    * CrÂÃ©dit Lyonnais (Sherlock, tm)
+    * CrÃ©Âdit du Nord (Webaffaires, tm)
+    * CCF (Elysnet, tm)
+    * BNP (Mercanet, tm)
 
 == Installation ==
 
@@ -33,19 +33,19 @@ Si vous avez une question ou si vous constatez des bugs dans l'utilisation de WP
 
 == Screenshots ==
 
-1. Rglages du module
-2. Choix de la mthode de paiement
-3. Les cartes bancaires qui redirigent vers l'espace scuris Atos SIPS
+1. RÂÃ©glages du module
+2. Choix de la mÂÃ©thode de paiement
+3. Les cartes bancaires qui redirigent vers l'espace sÂÃ©curisÃ©Â Atos SIPS
 
 == Changelog ==
 
 = 1.0.1 =
-* Mises ˆ jour mineures
+* Mises ÂˆÃ  jour mineures
 
 = 1.0 =
-* Premire version
+* PremiÂÃ¨re version
 
 == Upgrade Notice ==
 
 = 1.0 =
-Signaler vos bugs sur (http://wpcb.fr/support)
+Signalez vos bugs sur (http://wpcb.fr/support)
