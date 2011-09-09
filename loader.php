@@ -178,7 +178,7 @@ if (!class_exists('atosLoader')) {
 						update_option('atos_merchantid','005009461440411'); 
 						update_option('atos_normal_return_url',site_url());
 						update_option('atos_cancel_return_url',site_url());
-						update_option('atos_gateway_image',plugins_url('wp-e-commerce-atos/logo/LogoMercanetBnpParibas.gif'));
+						update_option('atos_gateway_image',plugins_url('wpcb/logo/LogoMercanetBnpParibas.gif'));
 						update_option('atos_pathfile',__ServerRoot__.'/cgi-bin/pathfile');
 						update_option('atos_path_bin',__ServerRoot__.'/cgi-bin/request');
 						update_option('atos_path_bin_response',__ServerRoot__.'/cgi-bin/response');
