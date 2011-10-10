@@ -21,8 +21,9 @@ $nzshpcrt_gateways[$num] = array(
 
 
 class wpsc_merchant_atos extends wpsc_merchant {
-	function submit($seperator, $sessionid){
+	function submit(){
 	global $wpdb,$purchase_log;
+	$sessionid=$this->cart_data['session_id'];
 	// Trouver la page où le shortcode [atos] se situe.
 	// Bug si plusieurs fois le shortcode [atos], à résoudre
 	$atos_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[atos]%' AND `post_status`='publish'");
@@ -164,70 +165,6 @@ else
 	return $output;
 }
 
-
-if (!class_exists('atosLoader')) {
-	class atosLoader {
-		function atosLoader() {
-			register_activation_hook( __file__, array(&$this, 'activate' ));
-			register_deactivation_hook( __file__, array(&$this, 'deactivate' ));
-			if(get_option('atos_msg')) {
-				add_action( 'admin_notices', create_function('', 'echo \'<div id="message" class="error"><p><strong>'.get_option('atos_msg').'</strong></p></div>\';') );
-				delete_option('atos_msg');
-			}
-		}
-		// activate the plugin
-		function activate() {
-			$wpecommercePluginDir = dirname(dirname(__file__)).'/wp-e-commerce';
-			if(file_exists($wpecommercePluginDir)) {
-					//On déplace un pointeur vers automatic_response.php à l'extérieur du dossier de plugin car sinon ça ne marche pas, bug à résoudre:
-					if(!copy(dirname(__file__).'/Pointeur_automatic_response.php',__WPRoot__.'/Pointeur_automatic_response.php'))
-					{update_option('atos_msg', 'Déplacer manuellement le pointeur (Pointeur_automatic_response_url) à l\'exterieur du dossier du plugin');}
-					else
-					{
-						// Set default values for options :
-						update_option('atos_merchantid','005009461440411'); 
-						update_option('atos_normal_return_url',site_url());
-						update_option('atos_cancel_return_url',site_url());
-						update_option('atos_gateway_image',plugins_url('wpcb/logo/LogoMercanetBnpParibas.gif'));
-						update_option('atos_pathfile',__ServerRoot__.'/cgi-bin/pathfile');
-						update_option('atos_path_bin',__ServerRoot__.'/cgi-bin/request');
-						update_option('atos_path_bin_response',__ServerRoot__.'/cgi-bin/response');
-						update_option('atos_logfile',__ServerRoot__.'/cgi-bin/logfile.txt');
-						update_option('atos_test','off');
-						update_option('atos_advert','advert.jpg');
-						update_option('atos_logo_id2','logo_id2.jpg');
-						update_option('atos_payment_means','CB,2,VISA,2,MASTERCARD,2');
-						update_option('atos_debug','on');
-					}
-			}
-			else
-			{update_option('atos_msg', 'Le plugin WP-eCommerce doit être installé. ('.$wpecommercePluginDir.')');}
-		}
-		/**
-		* deactivate the plugin
-		*/
-		function deactivate() {
-			// Supprimer le pointeur de la racine de Wordpress
-			unlink( __WPRoot__.'/PointeurPointeur_automatic_response.php');
-			// Supprimer les options enregistrées par le plugin
-			delete_option('atos_merchantid');
-			delete_option('atos_normal_return_url');
-			delete_option('atos_cancel_return_url');
-			delete_option('atos_gateway_image');
-			delete_option('atos_pathfile');
-			delete_option('atos_path_bin');
-			delete_option('atos_path_bin_response');
-			delete_option('atos_logfile');
-			delete_option('atos_test');
-			delete_option('atos_msg');
-			delete_option('atos_advert');
-			delete_option('atos_logo_id2');
-			delete_option('atos_payment_means');
-			delete_option('atos_debug');
-		}
-	}
-	$atosLoad = new atosLoader();
-}
 
 function shortcode_atos_handler( $atts, $content=null, $code="" ) {
 	global $wpdb, $purchase_log;
