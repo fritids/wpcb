@@ -3,8 +3,8 @@
 Plugin Name:WP e-Commerce Atos SIPS
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB ATOS SIPS (Mercanet,...) (Plugin requis : WP e-Commerce)
-Version: 1.0.1
-Author: Thomas Doki-Thonon
+Version: 1.0.3
+Author: thomas@6www.net
 Author URI: http://6www.net
 */
 
@@ -13,11 +13,65 @@ define('__ServerRoot__',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
 
 
 $nzshpcrt_gateways[$num] = array(
-'name' => 'Atos','api_version' => 1.0,'class_name' => 'wpsc_merchant_atos',
-'has_recurring_billing' => true,'display_name' => 'Atos','wp_admin_cannot_cancel' => false,
-'requirements' => array(),'form' => 'form_atos','internalname' => 'wpsc_merchant_atos','function' => 'gateway_atos','submit_function' => 'submit_atos',
+'name' => 'Atos',
+'api_version' => 1.0,
+'has_recurring_billing' => true,
+'display_name' => 'Atos',
+'wp_admin_cannot_cancel' => false,
+'requirements' => array(),
+'form' => 'form_atos',
+'internalname' => 'wpsc_merchant_atos',
+'class_name' => 'wpsc_merchant_atos',
+'function' => 'gateway_atos',
+'submit_function' => 'submit_atos',
 'image' => get_option('atos_gateway_image')
 );
+
+
+	
+
+function submit_atos(){
+	if($_POST['atos_merchantid']!=null) {update_option('atos_merchantid',$_POST['atos_merchantid']);}
+	if($_POST['atos_normal_return_url']!=null) {update_option('atos_normal_return_url',$_POST['atos_normal_return_url']);}
+	if($_POST['atos_cancel_return_url']!=null) {update_option('atos_cancel_return_url',$_POST['atos_cancel_return_url']);}
+	if($_POST['atos_gateway_image']!=null) {update_option('atos_gateway_image',$_POST['atos_gateway_image']);}
+	if($_POST['atos_pathfile']!=null) {update_option('atos_pathfile',$_POST['atos_pathfile']);}
+	if($_POST['atos_path_bin']!=null) {update_option('atos_path_bin',$_POST['atos_path_bin']);}
+	if($_POST['atos_path_bin_response']!=null) {update_option('atos_path_bin_response',$_POST['atos_path_bin_response']);}
+	if($_POST['atos_logfile']!=null) {update_option('atos_logfile',$_POST['atos_logfile']);}
+	if(!empty($_POST["atos_test"])) {update_option('atos_test','on');} else { 	update_option('atos_test','off'); 	}
+	if($_POST['atos_advert']!=null) {update_option('atos_advert',$_POST['atos_advert']);}
+	if($_POST['atos_logo_id2']!=null) {update_option('atos_logo_id2',$_POST['atos_logo_id2']);}
+	if($_POST['atos_payment_means']!=null) {update_option('atos_payment_means',$_POST['atos_payment_means']);}
+	if(!empty($_POST["atos_debug"])) {update_option('atos_debug','on');} else { 	update_option('atos_debug','off'); 	}
+	return true;
+}
+
+
+function gateway_atos($seperator, $sessionid){
+	global $wpdb,$purchase_log;
+	// Trouver la page où le shortcode [atos] se situe.
+	// Bug si plusieurs fois le shortcode [atos], à résoudre
+	$atos_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[atos]%' AND `post_status`='publish'");
+	if ('on'==get_option('atos_test'))
+		{
+		// Mode test, on considère que la CB a été acceptée automatiquement.
+		// Affiche la page de la fin de transaction et on met à jour la base de donnée avec un vente réussie
+		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
+		transaction_results($sessionid,true);
+		$action='test';
+		}
+	else // Affiche les icônes des cartes bancaires :
+		{
+			$action='CB';
+		}
+	wp_redirect(site_url('?p='.$atos_checkout_page->ID.'&sessionid='.$sessionid.'&action='.$action));
+	exit;
+}
+
+	
+	
+
 
 function form_atos() {
 	global $wpdb;
@@ -116,44 +170,6 @@ else
 	return $output;
 }
 
-function submit_atos(){
-	if($_POST['atos_merchantid']!=null) {update_option('atos_merchantid',$_POST['atos_merchantid']);}
-	if($_POST['atos_normal_return_url']!=null) {update_option('atos_normal_return_url',$_POST['atos_normal_return_url']);}
-	if($_POST['atos_cancel_return_url']!=null) {update_option('atos_cancel_return_url',$_POST['atos_cancel_return_url']);}
-	if($_POST['atos_gateway_image']!=null) {update_option('atos_gateway_image',$_POST['atos_gateway_image']);}
-	if($_POST['atos_pathfile']!=null) {update_option('atos_pathfile',$_POST['atos_pathfile']);}
-	if($_POST['atos_path_bin']!=null) {update_option('atos_path_bin',$_POST['atos_path_bin']);}
-	if($_POST['atos_path_bin_response']!=null) {update_option('atos_path_bin_response',$_POST['atos_path_bin_response']);}
-	if($_POST['atos_logfile']!=null) {update_option('atos_logfile',$_POST['atos_logfile']);}
-	if(!empty($_POST["atos_test"])) {update_option('atos_test','on');} else { 	update_option('atos_test','off'); 	}
-	if($_POST['atos_advert']!=null) {update_option('atos_advert',$_POST['atos_advert']);}
-	if($_POST['atos_logo_id2']!=null) {update_option('atos_logo_id2',$_POST['atos_logo_id2']);}
-	if($_POST['atos_payment_means']!=null) {update_option('atos_payment_means',$_POST['atos_payment_means']);}
-	if(!empty($_POST["atos_debug"])) {update_option('atos_debug','on');} else { 	update_option('atos_debug','off'); 	}
-	return true;
-}
-
-
-function gateway_atos($seperator, $sessionid){
-	global $wpdb,$purchase_log;
-	// Trouver la page où le shortcode [atos] se situe.
-	// Bug si plusieurs fois le shortcode [atos], à résoudre
-	$atos_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[atos]%' AND `post_status`='publish'");
-	if ('on'==get_option('atos_test'))
-		{
-		// Mode test, on considère que la CB a été acceptée automatiquement.
-		// Affiche la page de la fin de transaction et on met à jour la base de donnée avec un vente réussie
-		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
-		transaction_results($sessionid,true);
-		$action='test';
-		}
-	else // Affiche les icônes des cartes bancaires :
-		{
-			$action='CB';
-		}
-	wp_redirect(site_url('?p='.$atos_checkout_page->ID.'&sessionid='.$sessionid.'&action='.$action));
-	exit;
-}
 
 if (!class_exists('atosLoader')) {
 	class atosLoader {
@@ -178,7 +194,7 @@ if (!class_exists('atosLoader')) {
 						update_option('atos_merchantid','005009461440411'); 
 						update_option('atos_normal_return_url',site_url());
 						update_option('atos_cancel_return_url',site_url());
-						update_option('atos_gateway_image',plugins_url('wp-e-commerce-atos/logo/LogoMercanetBnpParibas.gif'));
+						update_option('atos_gateway_image',plugins_url('wpcb/logo/LogoMercanetBnpParibas.gif'));
 						update_option('atos_pathfile',__ServerRoot__.'/cgi-bin/pathfile');
 						update_option('atos_path_bin',__ServerRoot__.'/cgi-bin/request');
 						update_option('atos_path_bin_response',__ServerRoot__.'/cgi-bin/response');
