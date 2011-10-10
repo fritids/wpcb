@@ -9,7 +9,8 @@ Module de paiement Atos SIPS (majoritée des banques françaises) pour le plugin
 
 == Description ==
 Module de paiement Atos SIPS (majoritée des banques françaises) pour le plugin WP e-Commerce.
-Atos SIPS est la technologie utilisée par de nombreuses banques françaises :
+Atos SIPS est la technologie utilisée par de nombreuses banques françaises :
+
 * Banque Populaire (CyberPlus, tm)
 * Société Générale (Sogenactif, tm)
 * Crédit Lyonnais (Sherlock, tm)
