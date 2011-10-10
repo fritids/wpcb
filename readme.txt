@@ -28,7 +28,7 @@ Atos SIPS est la technologie utilisée par de nombreuses banques françaises :
 Si vous avez une question ou si vous constatez des bugs dans l'utilisation de WPCB, consultez le forum : http://wpcb.fr/support
 
 == Screenshots ==
-1. Réglages du module
+1. Réglages du module
 2. Choix de la méthode de paiement
 3. Les cartes bancaires qui redirigent vers l'espace sécurisé Atos SIPS
 
