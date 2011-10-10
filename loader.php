@@ -19,7 +19,9 @@ $nzshpcrt_gateways[$num] = array(
 'image' => get_option('atos_gateway_image')
 );
 
-function form_atos() {
+class wpsc_merchant_cheque_virement extends wpsc_merchant {
+	var $name = 'wpcb';
+	function form_atos() {
 	global $wpdb;
 	
 	$output='<tr><td>Url de l\'image affichée lors du choix de la méthode de paiement</td><td>';
@@ -154,6 +156,11 @@ function gateway_atos($seperator, $sessionid){
 	wp_redirect(site_url('?p='.$atos_checkout_page->ID.'&sessionid='.$sessionid.'&action='.$action));
 	exit;
 }
+
+	
+	
+}
+
 
 if (!class_exists('atosLoader')) {
 	class atosLoader {
