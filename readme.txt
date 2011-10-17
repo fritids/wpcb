@@ -4,12 +4,13 @@ Donate link: http://wpcb.fr/boutique
 Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, merc@net
 Requires at least: 2.7
 Tested up to: 3.2.1
-Stable tag: 1.0.4
+Stable tag: 1.1
 Module de paiement Atos SIPS (majoritée des banques françaises) pour le plugin WP e-Commerce
 
 == Description ==
 Module de paiement Atos SIPS (majoritée des banques françaises) pour le plugin WP e-Commerce.
-Atos SIPS est la technologie utilisée par de nombreuses banques françaises :
+Atos SIPS est la technologie utilisée par de nombreuses banques françaises :
+
 * Banque Populaire (CyberPlus, tm)
 * Société Générale (Sogenactif, tm)
 * Crédit Lyonnais (Sherlock, tm)
@@ -28,11 +29,18 @@ Atos SIPS est la technologie utilisée par de nombreuses banques françaises :
 Si vous avez une question ou si vous constatez des bugs dans l'utilisation de WPCB, consultez le forum : http://wpcb.fr/support
 
 == Screenshots ==
-1. Réglages du module
+1. Réglages du module
 2. Choix de la méthode de paiement
 3. Les cartes bancaires qui redirigent vers l'espace sécurisé Atos SIPS
 
 == Changelog ==
+
+= 1.1 =
+* Internationalized
+* Atos currency_code added to the settings of the plugin
+* Atos language added to the settings of the plugin
+* Atos merchant_country added to the settings of the plugin
+* Atos header_flag added to the settings of the plugin
 
 = 1.0.4 =
 * Update to wpec api v2.0

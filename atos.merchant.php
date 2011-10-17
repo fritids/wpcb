@@ -21,8 +21,9 @@ $nzshpcrt_gateways[$num] = array(
 
 
 class wpsc_merchant_atos extends wpsc_merchant {
-	function submit($seperator, $sessionid){
+	function submit(){
 	global $wpdb,$purchase_log;
+	$sessionid=$this->cart_data['session_id'];
 	// Trouver la page où le shortcode [atos] se situe.
 	// Bug si plusieurs fois le shortcode [atos], à résoudre
 	$atos_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[atos]%' AND `post_status`='publish'");
@@ -48,6 +49,10 @@ class wpsc_merchant_atos extends wpsc_merchant {
 
 function submit_atos(){
 	if($_POST['atos_merchantid']!=null) {update_option('atos_merchantid',$_POST['atos_merchantid']);}
+	if($_POST['atos_currency_code']!=null) {update_option('atos_currency_code',$_POST['atos_currency_code']);}
+	if($_POST['atos_merchant_country']!=null) {update_option('atos_merchant_country',$_POST['atos_merchant_country']);}
+	if($_POST['atos_language']!=null) {update_option('atos_language',$_POST['atos_language']);}
+	if($_POST['atos_header_flag']!=null) {update_option('atos_header_flag',$_POST['atos_header_flag']);}
 	if($_POST['atos_normal_return_url']!=null) {update_option('atos_normal_return_url',$_POST['atos_normal_return_url']);}
 	if($_POST['atos_cancel_return_url']!=null) {update_option('atos_cancel_return_url',$_POST['atos_cancel_return_url']);}
 	if($_POST['atos_gateway_image']!=null) {update_option('atos_gateway_image',$_POST['atos_gateway_image']);}
@@ -70,29 +75,53 @@ function submit_atos(){
 function form_atos() {
 	global $wpdb;
 	
-	$output='<tr><td>Url de l\'image affichée lors du choix de la méthode de paiement</td><td>';
+	$output='<tr><td>'.__('Url of image displayed during payement method choice','wpcb').'</td><td>';
 	$output.='<input name="atos_gateway_image" type="text"';
 	if ($atos_gateway_image = get_option('atos_gateway_image')){$output.='value="'.$atos_gateway_image .'"';}
 	$output.='/></td></tr>';
 	
-	$output.='<tr><td><pre>merchant_id</pre></td><td>'; //Attention pas de .= sur la première ligne !
+	$output.='<tr><td><pre>merchant_id</pre></td><td>'; 
 	$output.='<input name="atos_merchantid" type="text"';
 	if ($atos_merchantid = get_option('atos_merchantid')){$output.='value="'.$atos_merchantid .'"';}
 	$output.='/></td></tr>';
-	$output.='<tr><td colspan=2><span class="small description">cf. dictionnaire des données Atos</span><td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('see dictionnaire des données Atos','wpcb').'</span><td></tr>';
+
+	$output.='<tr><td><pre>currency_code</pre></td><td>';
+	$output.='<input name="atos_currency_code" type="text"';
+	if ($atos_currency_code = get_option('atos_currency_code')){$output.='value="'.$atos_currency_code .'"';}
+	$output.='/></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('978 -> €','wpcb').'</span><td></tr>';
+
+	$output.='<tr><td><pre>merchant_country</pre></td><td>';
+	$output.='<input name="atos_merchant_country" type="text"';
+	if ($atos_merchant_country = get_option('atos_merchant_country')){$output.='value="'.$atos_merchant_country .'"';}
+	$output.='/></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('fr -> France','wpcb').'</span><td></tr>';
+
+	$output.='<tr><td><pre>language</pre></td><td>';
+	$output.='<input name="atos_language" type="text"';
+	if ($atos_language = get_option('atos_language')){$output.='value="'.$atos_language .'"';}
+	$output.='/></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('fr -> French','wpcb').'</span><td></tr>';
+
+	$output.='<tr><td><pre>header_flag</pre></td><td>';
+	$output.='<input name="atos_header_flag" type="text"';
+	if ($atos_header_flag = get_option('atos_header_flag')){$output.='value="'.$atos_header_flag .'"';}
+	$output.='/></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('ex : no','wpcb').'</span><td></tr>';
 
 	$output.='<tr><td>normal_return_url</td><td>';
 	$output.='<input name="atos_normal_return_url" type="text"';
 	if ($atos_normal_return_url = get_option('atos_normal_return_url')){$output.='value="'.$atos_normal_return_url .'"';}
 	$output.='/></td></tr>';
-	$output.='<tr><td colspan=2><span class="small description">cf. dictionnaire des données Atos</span><td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('see dictionnaire des données Atos','wpcb').'</span><td></tr>';
 	
 	// Cancel return url :
 	$output.='<tr><td>cancel_return_url</td><td>';
 	$output.='<input name="atos_cancel_return_url" type="text"';
 	if ($atos_cancel_return_url = get_option('atos_cancel_return_url')){$output.='value="'.$atos_cancel_return_url .'"';}
 	$output.='/></td></tr>';
-	$output.='<tr><td colspan=2><span class="small description">cf. dictionnaire des données Atos</span><td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('see dictionnaire des données Atos','wpcb').'</span><td></tr>';
 
 	$output.='<tr><td><pre>pathfile</pre></td><td>';
 	$output.='<input name="atos_pathfile" type="text"';
@@ -113,121 +142,57 @@ function form_atos() {
 	$output.='<input name="atos_logfile" type="text"';
 	if ($atos_logfile = get_option('atos_logfile')){$output.='value="'.$atos_logfile .'"';}
 	$output.='/></td></tr>';
-	$output.='<tr><td colspan=2><span class="small description">Laisser vide pour ne pas enregistrer de log</span></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('Leave empty to stop saving log','wpcb').'</span></td></tr>';
 
 	$output.='<tr><td><pre>advert</pre></td><td>';
 	$output.='<input name="atos_advert" type="text"';
 	if ($atos_advert = get_option('atos_advert')){$output.='value="'.$atos_advert .'"';}
 	$output.='/></td></tr>';
-	$output.='<tr><td colspan=2><span class="small description">cf. dictionnaire des données Atos</span><td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('see dictionnaire des données Atos','wpcb').'</span><td></tr>';
 
 	$output.='<tr><td><pre>logo_id2</pre></td><td>';
 	$output.='<input name="atos_logo_id2" type="text"';
 	if ($atos_logo_id2 = get_option('atos_logo_id2')){$output.='value="'.$atos_logo_id2 .'"';}
 	$output.='/></td></tr>';
-	$output.='<tr><td colspan=2><span class="small description">cf. dictionnaire des données Atos</span><td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('see dictionnaire des données Atos','wpcb').'</span><td></tr>';
 
 	$output.='<tr><td><pre>payment_means</pre></td><td>';
 	$output.='<input name="atos_payment_means" type="text"';
 	if ($atos_payment_means = get_option('atos_payment_means')){$output.='value="'.$atos_payment_means .'"';}
 	$output.='/></td></tr>';
-	$output.='<tr><td colspan=2><span class="small description">cf. dictionnaire des données Atos</span><td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('see dictionnaire des données Atos','wpcb').'</span><td></tr>';
 
 	$output.='<tr><td>Mode test</td><td>';
 	$output.='<input name="atos_test" type="checkbox"';
 	if ('on'== get_option('atos_test')){$output.='CHECKED';}
 	$output.='/></td></tr>';
-	$output.='<tr><td colspan=2><span class="small description">le paiement CB est automatique validé</span></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('Atos payement is automaticaly accepted for debug purpose.','wpcb').'</span></td></tr>';
 	
-	$output.='<tr><td>Mode debug</td><td>';
+	$output.='<tr><td>Debug</td><td>';
 	$output.='<input name="atos_debug" type="checkbox"';
 	if ('on'== get_option('atos_debug')){$output.='CHECKED';}
 	$output.='/></td></tr>';
-	$output.='<tr><td colspan=2><span class="small description">Affiche des informations de debug et envoie des emails de debug</span></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('Show debug infos.','wpcb').'</span></td></tr>';
 
-	$output.='<tr><td colspan=2>Informations utiles sur votre installation : </td></tr>';
-	$output.='<tr><td>Racine Wordpress</td><td><pre>'.__WPRoot__.'</pre></td></tr>';
-	$output.='<tr><td>Racine Site</td><td><pre>'.__ServerRoot__.'</pre></td></tr>';
+	$output.='<tr><td colspan=2>'.__('Informations on your installation : ','wpcb').'</td></tr>';
+	$output.='<tr><td>'.__('Wordpress root','wpcb').'</td><td><pre>'.__WPRoot__.'</pre></td></tr>';
+	$output.='<tr><td>'.__('Site root','wpcb').'</td><td><pre>'.__ServerRoot__.'</pre></td></tr>';
 	
 
 	$atos_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[atos]%' AND `post_status`='publish'");
 	if ($atos_checkout_page!=NULL)
 	{
-	$output.='<tr><td colspan=2><span class="small description">Le short code [atos] se trouve sur la page : <a href="'.site_url('?page_id='.$atos_checkout_page->ID).'">'.$atos_checkout_page->ID.'</a></span></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('Atos shortcode [atos] is on page :','wpcb').'<a href="'.site_url('?page_id='.$atos_checkout_page->ID).'">'.$atos_checkout_page->ID.'</a></span></td></tr>';
 }
 else
 {
-	$output.='<tr><td colspan=2><span class="small description" style="color:red">Vous devez placer le short code [atos] sur une page de votre site ! </span></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description" style="color:red">'.__('You should place Atos shortcode [atos] somewhere in a page of your site!','wpcb').'</span></td></tr>';
 }
 	
-	$output.='<tr><td colspan=2><span class="small description">Documentation : <a href="http://wpcb.fr/doc">http://wpcb.fr/doc</a></span></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('Documentation','wpcb').' : <a href="http://wpcb.fr/doc">http://wpcb.fr/doc</a></span></td></tr>';
 	return $output;
 }
 
-
-if (!class_exists('atosLoader')) {
-	class atosLoader {
-		function atosLoader() {
-			register_activation_hook( __file__, array(&$this, 'activate' ));
-			register_deactivation_hook( __file__, array(&$this, 'deactivate' ));
-			if(get_option('atos_msg')) {
-				add_action( 'admin_notices', create_function('', 'echo \'<div id="message" class="error"><p><strong>'.get_option('atos_msg').'</strong></p></div>\';') );
-				delete_option('atos_msg');
-			}
-		}
-		// activate the plugin
-		function activate() {
-			$wpecommercePluginDir = dirname(dirname(__file__)).'/wp-e-commerce';
-			if(file_exists($wpecommercePluginDir)) {
-					//On déplace un pointeur vers automatic_response.php à l'extérieur du dossier de plugin car sinon ça ne marche pas, bug à résoudre:
-					if(!copy(dirname(__file__).'/Pointeur_automatic_response.php',__WPRoot__.'/Pointeur_automatic_response.php'))
-					{update_option('atos_msg', 'Déplacer manuellement le pointeur (Pointeur_automatic_response_url) à l\'exterieur du dossier du plugin');}
-					else
-					{
-						// Set default values for options :
-						update_option('atos_merchantid','005009461440411'); 
-						update_option('atos_normal_return_url',site_url());
-						update_option('atos_cancel_return_url',site_url());
-						update_option('atos_gateway_image',plugins_url('wpcb/logo/LogoMercanetBnpParibas.gif'));
-						update_option('atos_pathfile',__ServerRoot__.'/cgi-bin/pathfile');
-						update_option('atos_path_bin',__ServerRoot__.'/cgi-bin/request');
-						update_option('atos_path_bin_response',__ServerRoot__.'/cgi-bin/response');
-						update_option('atos_logfile',__ServerRoot__.'/cgi-bin/logfile.txt');
-						update_option('atos_test','off');
-						update_option('atos_advert','advert.jpg');
-						update_option('atos_logo_id2','logo_id2.jpg');
-						update_option('atos_payment_means','CB,2,VISA,2,MASTERCARD,2');
-						update_option('atos_debug','on');
-					}
-			}
-			else
-			{update_option('atos_msg', 'Le plugin WP-eCommerce doit être installé. ('.$wpecommercePluginDir.')');}
-		}
-		/**
-		* deactivate the plugin
-		*/
-		function deactivate() {
-			// Supprimer le pointeur de la racine de Wordpress
-			unlink( __WPRoot__.'/PointeurPointeur_automatic_response.php');
-			// Supprimer les options enregistrées par le plugin
-			delete_option('atos_merchantid');
-			delete_option('atos_normal_return_url');
-			delete_option('atos_cancel_return_url');
-			delete_option('atos_gateway_image');
-			delete_option('atos_pathfile');
-			delete_option('atos_path_bin');
-			delete_option('atos_path_bin_response');
-			delete_option('atos_logfile');
-			delete_option('atos_test');
-			delete_option('atos_msg');
-			delete_option('atos_advert');
-			delete_option('atos_logo_id2');
-			delete_option('atos_payment_means');
-			delete_option('atos_debug');
-		}
-	}
-	$atosLoad = new atosLoader();
-}
 
 function shortcode_atos_handler( $atts, $content=null, $code="" ) {
 	global $wpdb, $purchase_log;
@@ -238,18 +203,18 @@ function shortcode_atos_handler( $atts, $content=null, $code="" ) {
 	{
 		// cf. Dictionnaire des Données Atos :
 		$parm="merchant_id=".get_option('atos_merchantid');
-		$parm="$parm merchant_country=fr"; // A mettre dans les options, todo
+		$parm="$parm merchant_country=".get_option('atos_merchant_country');
 		$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1") ;
 		$amount=number_format($purchase_log->totalprice,2)*100;
 		$parm="$parm amount=".str_pad($amount,3,"0",STR_PAD_LEFT);
-		$parm="$parm currency_code=978"; // A mettre dans les options, todo
+		$parm="$parm currency_code=".get_option('atos_currency_code');
 		$parm="$parm pathfile=".get_option('atos_pathfile');
 		$parm="$parm normal_return_url=".get_option('atos_normal_return_url');
 		$parm="$parm cancel_return_url=".get_option('atos_cancel_return_url');
 		$parm="$parm automatic_response_url=".site_url('Pointeur_automatic_response.php');
-		$parm="$parm language=fr";// A mettre dans les options, todo
+		$parm="$parm language=".get_option('atos_language');
 		$parm="$parm payment_means=".get_option('atos_payment_means');
-		$parm="$parm header_flag=no";
+		$parm="$parm header_flag=".get_option('atos_header_flag');
 		$parm="$parm order_id=$sessionid";
 		$parm="$parm logo_id2=".get_option('atos_logo_id2');
 		$parm="$parm advert=".get_option('atos_advert');
@@ -261,12 +226,12 @@ function shortcode_atos_handler( $atts, $content=null, $code="" ) {
 		$error = $tableau[2];
 		if (( $code=="") && ($error==""))
 		{
-			$message="<p>Erreur appel request mercanet : executable request non trouve $path_bin</p>";
-			if (get_option('atos_debug')=='on'){ $message.= "<p>Merci de rapporter cette erreur à".$purch_log_email."</p>";}
+			$message="<p>".__('Error calling the atos api : exec request not found','wpcb')."  $path_bin</p>";
+			if (get_option('atos_debug')=='on'){ $message.= "<p>".__('Thank you for reporting this error to:','wpcb')." ".$purch_log_email."</p>";}
 		}
 		elseif ($code != 0) {
-			$message="<p>Erreur appel API de paiement, message erreur : $error</p>";
-			if (get_option('atos_debug')=='on'){ $message.= "<p>Merci de rapporter cette erreur à".$purch_log_email."</p>";}
+			$message="<p>".__('Atos API error : ','wpcb')." $error</p>";
+			if (get_option('atos_debug')=='on'){ $message.= "<p>".__('Thank you for reporting this error to:','wpcb')." ".$purch_log_email."</p>";}
 		}
 		else
 		{
@@ -278,7 +243,7 @@ function shortcode_atos_handler( $atts, $content=null, $code="" ) {
 	elseif ($_GET['action']=='test')
 	{
 		// la page Autoresponse renvoi ici avec en Get l'id de session, donc :
-		$message='<p>Merci pour votre achat en mode test !</p>';
+		$message='<p>'.__('Thank you for your purchase using the test (debug) mode','wpcb').'</p>';
 		if (isset($_GET['sessionid']))
 		{
 			// La mise à jour de la bd est faite dans AutoResponse.php mais on peut le refiare ici au cas ou. Ca ne renvoie pas de second email car email_sent à été mis à 1
@@ -289,7 +254,7 @@ function shortcode_atos_handler( $atts, $content=null, $code="" ) {
 	}
 	else
 	{
-		$message='<p>Accès direct à cette page interdit</p>';
+		$message='<p>'.__('Direct call to this page not allowed','wpcb').'</p>';
 	}
 	return $message;
 }
