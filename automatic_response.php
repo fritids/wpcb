@@ -122,6 +122,7 @@ else
 		if (get_option('atos_debug')=='on'){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
 		$purchase_log = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1",ARRAY_A) ;
+		// redirect ->
 		transaction_results($sessionid,false); // false -> no echo !
 	}
 }

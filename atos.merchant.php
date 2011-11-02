@@ -32,14 +32,14 @@ class wpsc_merchant_atos extends wpsc_merchant {
 		// Mode test, on considère que la CB a été acceptée automatiquement.
 		// Affiche la page de la fin de transaction et on met à jour la base de donnée avec un vente réussie
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
-		transaction_results($sessionid,true);
-		$action='test';
+		// redirection is inside transaction result :
+		transaction_results($sessionid,false);
 		}
 	else // Affiche les icônes des cartes bancaires :
 		{
 			$action='CB';
+			wp_redirect(site_url('?p='.$atos_checkout_page->ID.'&sessionid='.$sessionid.'&action='.$action));
 		}
-	wp_redirect(site_url('?p='.$atos_checkout_page->ID.'&sessionid='.$sessionid.'&action='.$action));
 	exit;
 } // end of submit function
 } // end of class.
@@ -239,18 +239,6 @@ function shortcode_atos_handler( $atts, $content=null, $code="" ) {
 			$message = $tableau[3];
 		}
 		// End of atos
-	}
-	elseif ($_GET['action']=='test')
-	{
-		// la page Autoresponse renvoi ici avec en Get l'id de session, donc :
-		$message='<p>'.__('Thank you for your purchase using the test (debug) mode','wpcb').'</p>';
-		if (isset($_GET['sessionid']))
-		{
-			// La mise à jour de la bd est faite dans AutoResponse.php mais on peut le refiare ici au cas ou. Ca ne renvoie pas de second email car email_sent à été mis à 1
-			$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$_GET['sessionid']);
-			$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$_GET['sessionid']." LIMIT 1",ARRAY_A) ;
-			transaction_results($_GET['sessionid'],true);
-		}
 	}
 	else
 	{
