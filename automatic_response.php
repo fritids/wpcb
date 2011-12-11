@@ -9,7 +9,7 @@ if (!$purch_log_email){$purch_log_email=get_bloginfo('admin_email');}
 // Initialisation du chemin du fichier de log :
 $logfile=get_option('atos_logfile');
 
-$data=$_POST['DATA']; 
+$data=escapeshellcmd($_POST['DATA']);
 $message="message=$data";
 $pathfile="pathfile=".get_option('atos_pathfile');
 $path_bin =get_option('atos_path_bin_response');
