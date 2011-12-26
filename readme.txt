@@ -3,7 +3,7 @@ Contributors: 6WWW
 Donate link: http://wpcb.fr/boutique
 Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, merc@net
 Requires at least: 2.7
-Tested up to: 3.2.1
+Tested up to: 3.3
 Stable tag: 1.1.3
 Module de paiement Atos SIPS (majoritée des banques françaises) pour le plugin WP e-Commerce
 
