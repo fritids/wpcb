@@ -1,9 +1,6 @@
 <?php
-
-
 define('__WPRoot__',dirname(dirname(dirname(dirname(__FILE__)))));
 define('__ServerRoot__',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-
 
 $nzshpcrt_gateways[$num] = array(
 'name' => 'Atos',
