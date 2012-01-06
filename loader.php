@@ -3,7 +3,7 @@
 Plugin Name:WP e-Commerce Atos SIPS
 Plugin URI: http://wpcb.fr
 Description: Credit Card Payement Gateway for ATOS SIPS (Mercanet,...) (WP e-Commerce is required)
-Version: 1.1.2
+Version: 1.1.4
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -82,8 +82,9 @@ if (!class_exists('atosLoader')) {
 						update_option('atos_path_bin_response',__ServerRoot__.'/cgi-bin/response');
 						update_option('atos_logfile',__ServerRoot__.'/cgi-bin/logfile.txt');
 						update_option('atos_test','off');
-						update_option('atos_advert','advert.jpg');
-						update_option('atos_logo_id2','logo_id2.jpg');
+						update_option('atos_advert','advert.gif');
+						update_option('atos_logo_id','logo_id.gif');
+						update_option('atos_logo_id2','logo_id2.gif');
 						update_option('atos_payment_means','CB,2,VISA,2,MASTERCARD,2');
 						update_option('atos_debug','on');
 						}

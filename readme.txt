@@ -1,10 +1,10 @@
-=== Plugin Name ===
+﻿=== Plugin Name ===
 Contributors: 6WWW
 Donate link: http://wpcb.fr/boutique
 Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, merc@net
 Requires at least: 2.7
 Tested up to: 3.2.1
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 Module de paiement Atos SIPS (majoritée des banques françaises) pour le plugin WP e-Commerce
 
 == Description ==
@@ -34,6 +34,9 @@ Si vous avez une question ou si vous constatez des bugs dans l'utilisation de WP
 3. Les cartes bancaires qui redirigent vers l'espace sécurisé Atos SIPS
 
 == Changelog ==
+
+= 1.1.4 =
+* Ajout de la global $wpsc_cart pour vider le panier après vente réussi (bug notifié par Topeur, merci à lui!)
 
 = 1.1.3 =
 * Amélioration de la sécurité importante (Merci à Cyril Lecomte).

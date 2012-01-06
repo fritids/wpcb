@@ -2,7 +2,7 @@
 // This file is beeing copied to root of your website when activating the plugin. So it is not used when in production !
 // To have access to wp variables and functions :
 require_once('wp-load.php');
-global $wpdb, $purchase_log;
+global $wpdb, $purchase_log, $wpsc_cart;
 
 $purch_log_email=get_option('purch_log_email');
 if (!$purch_log_email){$purch_log_email=get_bloginfo('admin_email');}
@@ -66,6 +66,7 @@ if (($code=="") && ($error==""))
  			}
 		if (get_option('atos_debug')=='on'){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);
+		$wpsc_cart->empty_cart();
 	}
 else if ($code!=0)
 	{
@@ -78,6 +79,7 @@ else if ($code!=0)
 		}
 		if (get_option('atos_debug')=='on'){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);
+		$wpsc_cart->empty_cart();
  	}
 else
 	{
@@ -122,8 +124,9 @@ else
 		if (get_option('atos_debug')=='on'){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
 		$purchase_log = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1",ARRAY_A) ;
+		$wpsc_cart->empty_cart();
 		// redirect ->
-		transaction_results($sessionid,false); // false -> no echo !
+		transaction_results($sessionid,false); // false -> no echo ! // The cart is emptied in this function a condition d'avoir la global $wpsc_cart !
 	}
 }
 ?>

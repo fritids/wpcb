@@ -22,7 +22,7 @@ $nzshpcrt_gateways[$num] = array(
 
 class wpsc_merchant_atos extends wpsc_merchant {
 	function submit(){
-	global $wpdb,$purchase_log;
+	global $wpdb,$purchase_log,$wpsc_cart;
 	$sessionid=$this->cart_data['session_id'];
 	// Trouver la page où le shortcode [atos] se situe.
 	// Bug si plusieurs fois le shortcode [atos], à résoudre
@@ -150,6 +150,12 @@ function form_atos() {
 	$output.='/></td></tr>';
 	$output.='<tr><td colspan=2><span class="small description">'.__('see dictionnaire des données Atos','wpcb').'</span><td></tr>';
 
+	$output.='<tr><td><pre>logo_id</pre></td><td>';
+	$output.='<input name="atos_logo_id" type="text"';
+	if ($atos_logo_id = get_option('atos_logo_id')){$output.='value="'.$atos_logo_id .'"';}
+	$output.='/></td></tr>';
+	$output.='<tr><td colspan=2><span class="small description">'.__('see dictionnaire des données Atos','wpcb').'</span><td></tr>';
+	
 	$output.='<tr><td><pre>logo_id2</pre></td><td>';
 	$output.='<input name="atos_logo_id2" type="text"';
 	if ($atos_logo_id2 = get_option('atos_logo_id2')){$output.='value="'.$atos_logo_id2 .'"';}
@@ -195,7 +201,7 @@ else
 
 
 function shortcode_atos_handler( $atts, $content=null, $code="" ) {
-	global $wpdb, $purchase_log;
+	global $wpdb, $purchase_log, $wpsc_cart;
 	$sessionid=$_GET['sessionid'];
 	$purch_log_email=get_option('purch_log_email');
 	if (!$purch_log_email){$purch_log_email=get_bloginfo('admin_email');}
@@ -243,6 +249,8 @@ function shortcode_atos_handler( $atts, $content=null, $code="" ) {
 	else
 	{
 		$message='<p>'.__('Direct call to this page not allowed','wpcb').'</p>';
+		// Add here some code if you want to test some php for wpec !
+		$wpsc_cart->empty_cart();
 	}
 	return $message;
 }
