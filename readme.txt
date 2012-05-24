@@ -1,20 +1,20 @@
-=== Plugin Name ===
+Ôªø=== Plugin Name ===
 Contributors: 6WWW
 Donate link: http://wpcb.fr/boutique
 Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, merc@net
 Requires at least: 2.7
-Tested up to: 3.3
+Tested up to: 3.2.1
 Stable tag: 1.1.3
-Module de paiement Atos SIPS (majoritÈe des banques franÁaises) pour le plugin WP e-Commerce
+Module de paiement Atos SIPS (majorit√©e des banques fran√ßaises) pour le plugin WP e-Commerce
 
 == Description ==
-Module de paiement Atos SIPS (majoritÈe des banques franÁaises) pour le plugin WP e-Commerce.
-Atos SIPS est la technologie utilisÈe par de nombreuses banques franÁaises :
+Module de paiement Atos SIPS (majorit√©e des banques fran√ßaises) pour le plugin WP e-Commerce.
+Atos SIPS est la technologie utilis√©e par de nombreuses banques fran√ßaises :
 
 * Banque Populaire (CyberPlus, tm)
-* SociÈtÈ GÈnÈrale (Sogenactif, tm)
-* CrÈdit Lyonnais (Sherlock, tm)
-* CrÈdit du Nord (Webaffaires, tm)
+* Soci√©t√© G√©n√©rale (Sogenactif, tm)
+* Cr√©dit Lyonnais (Sherlock, tm)
+* Cr√©dit du Nord (Webaffaires, tm)
 * CCF (Elysnet, tm)
 * BNP (Mercanet, tm)
 
@@ -29,20 +29,23 @@ Atos SIPS est la technologie utilisÈe par de nombreuses banques franÁaises :
 Si vous avez une question ou si vous constatez des bugs dans l'utilisation de WPCB, consultez le forum : http://wpcb.fr/support
 
 == Screenshots ==
-1. RÈglages du module
-2. Choix de la mÈthode de paiement
-3. Les cartes bancaires qui redirigent vers l'espace sÈcurisÈ Atos SIPS
+1. R√©glages du module
+2. Choix de la m√©thode de paiement
+3. Les cartes bancaires qui redirigent vers l'espace s√©curis√© Atos SIPS
 
 == Changelog ==
 
+= 1.1.4 =
+* Ajout de la global $wpsc_cart pour vider le panier apr√®s vente r√©ussi (bug notifi√© par Topeur, merci √† lui!)
+
 = 1.1.3 =
-* AmÈlioration de la sÈcuritÈ importante (Merci ‡ Cyril Lecomte).
+* Am√©lioration de la s√©curit√© importante (Merci √† Cyril Lecomte).
 
 = 1.1.2 =
 * Correction d'une erreur de suppression du plugin.
 
 =1.1.1=
-* Le mode test a ÈtÈ amÈliorÈ.
+* Le mode test a √©t√© am√©lior√©.
 
 = 1.1 =
 * Internationalized
@@ -59,14 +62,14 @@ Si vous avez une question ou si vous constatez des bugs dans l'utilisation de WP
 
 = 1.0.2 =
 
-* Mises ‡ jour mineures
+* Mises √† jour mineures
 = 1.0.1 =
 
-* Mises ‡ jour mineures
+* Mises √† jour mineures
 
 = 1.0 =
 
-* PremiËre version
+* Premi√®re version
 
 == Upgrade Notice ==
 
