@@ -28,7 +28,7 @@ Si vous avez une question ou si vous constatez des bugs dans l'utilisation de WP
 3. Les cartes bancaires qui redirigent vers l'espace sécurisé Atos SIPS
 
 == Changelog ==
-
+= 1.1.5 =* Correction d'un bug de vidage de panier* Réorganisation des options* Ajout de la clé API
 = 1.1.3 =
 * Amélioration de la sécurité importante (Merci à Cyril Lecomte).
 
