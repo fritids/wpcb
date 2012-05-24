@@ -1,23 +1,29 @@
 <?php
-// This file is beeing copied to root of your website when activating the plugin. So it is not used when in production !
-// To have access to wp variables and functions :
+//Don't edit:
 require_once('wp-load.php');
 global $wpdb, $purchase_log, $wpsc_cart;
-
+$options = get_option('wpcb_options');
+print_r($options);
+if ($options['demo']){
+	$pathfile=__ServerRoot__."/cgi-bin/demo/pathfile";
+	$path_bin_response=__ServerRoot__."/cgi-bin/demo/response";
+	$logfile=__ServerRoot__."/cgi-bin/demo/logfile.txt";
+}
+else{
+	$pathfile=$options['pathfile'];
+	$path_bin_response=$options['path_bin_response'];
+	$logfile=$options['logfile'];
+}
 $purch_log_email=get_option('purch_log_email');
 if (!$purch_log_email){$purch_log_email=get_bloginfo('admin_email');}
 // Initialisation du chemin du fichier de log :
-$logfile=get_option('atos_logfile');
+
 
 $data=escapeshellcmd($_POST['DATA']);
 $message="message=$data";
-$pathfile="pathfile=".get_option('atos_pathfile');
-$path_bin =get_option('atos_path_bin_response');
-$result=exec("$path_bin $pathfile $message");
-//	Sortie de la fonction : !code!error!v1!v2!v3!...!v29
-//		- code=0	: la fonction retourne les données de la transaction dans les variables v1, v2, ...
-//		- code=-1 	: La fonction retourne un message d'erreur dans la variable error
-//	on separe les differents champs et on les met dans une variable tableau
+$pathfile="pathfile=".$pathfile;
+$result=exec("$path_bin_response $pathfile $message");
+
 $tableau = explode ("!", $result);
 $code = $tableau[1];
 $error = $tableau[2];
@@ -58,13 +64,13 @@ $sessionid=$order_id;
 //  analyse du code retour
 if (($code=="") && ($error==""))
 	{
-		$message="erreur appel response\n executable response non trouve $path_bin\n Session Id : $sessionid";
+		$message="erreur appel response\n executable response non trouve $path_bin_response\n Session Id : $sessionid";
 		if ($logfile){
 			$fp=fopen($logfile,"a");			// Ouverture du fichier de log en append
 			fwrite($fp,$message);
 			fclose ($fp);
  			}
-		if (get_option('atos_debug')=='on'){wp_mail($purch_log_email,'Debug Email',$message);}
+		if ($options['debug']){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);
 		$wpsc_cart->empty_cart();
 	}
@@ -77,13 +83,13 @@ else if ($code!=0)
 			fwrite($fp,$message);
 			fclose ($fp); 
 		}
-		if (get_option('atos_debug')=='on'){wp_mail($purch_log_email,'Debug Email',$message);}
+		if ($options['debug']){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);
 		$wpsc_cart->empty_cart();
  	}
 else
 	{
-	// Ok, Sauvegarde dans la base de donnée du shop.
+	// Ok, Sauvegarde dans la base de donn�e du shop.
 	if ($response_code==00) {
 		$message="merchant_id : $merchant_id\n";
 		$message.="merchant_country : $merchant_country\n";
@@ -121,7 +127,7 @@ else
 			fwrite( $fp,$message);
 			fclose ($fp);
 		}
-		if (get_option('atos_debug')=='on'){wp_mail($purch_log_email,'Debug Email',$message);}
+		if ($options['debug']){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
 		$purchase_log = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1",ARRAY_A) ;
 		$wpsc_cart->empty_cart();
