@@ -1,6 +1,4 @@
 <?php
-define('__WPRoot__',dirname(dirname(dirname(dirname(__FILE__)))));
-define('__ServerRoot__',dirname(dirname(dirname(dirname(dirname(__FILE__))))));
 
 $options = get_option('wpcb_options');
 
