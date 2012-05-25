@@ -1,9 +1,7 @@
 <?php
-//Don't edit:
 require_once('wp-load.php');
 global $wpdb, $purchase_log, $wpsc_cart;
 $options = get_option('wpcb_options');
-print_r($options);
 if ($options['demo']){
 	$pathfile=__ServerRoot__."/cgi-bin/demo/pathfile";
 	$path_bin_response=__ServerRoot__."/cgi-bin/demo/response";
@@ -70,7 +68,7 @@ if (($code=="") && ($error==""))
 			fwrite($fp,$message);
 			fclose ($fp);
  			}
-		if ($options['debug']){wp_mail($purch_log_email,'Debug Email',$message);}
+		if (WP_DEBUG){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);
 		$wpsc_cart->empty_cart();
 	}
@@ -83,7 +81,7 @@ else if ($code!=0)
 			fwrite($fp,$message);
 			fclose ($fp); 
 		}
-		if ($options['debug']){wp_mail($purch_log_email,'Debug Email',$message);}
+		if (WP_DEBUG){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);
 		$wpsc_cart->empty_cart();
  	}
@@ -127,7 +125,7 @@ else
 			fwrite( $fp,$message);
 			fclose ($fp);
 		}
-		if ($options['debug']){wp_mail($purch_log_email,'Debug Email',$message);}
+		if (WP_DEBUG){wp_mail($purch_log_email,'Debug Email',$message);}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
 		$purchase_log = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1",ARRAY_A) ;
 		$wpsc_cart->empty_cart();

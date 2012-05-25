@@ -54,7 +54,7 @@ function wpcb_activate() {
 	$sourceFile = __wpcbDir__. '/wpcb.merchant.php';
 	$destinationFile = __WPRoot__.'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
 	copy($sourceFile, $destinationFile);
-    if(($tmp['chk_default_options_db']=='1')||(!is_array($tmp))) {
+    if(!is_array($tmp)) {
 		delete_option('wpcb_options'); // so we don't have to reset all the 'off' checkboxes too! (don't think this is needed but leave for now)
 		$arr = array(	"merchant_id" => "082584341411111","pathfile" => __ServerRoot__."cgi-bin/demo/pathfile",
 						"path_bin_request" => __ServerRoot__."cgi-bin/demo/request",
@@ -65,8 +65,8 @@ function wpcb_activate() {
 						"header_flag" => "no","logfile" => "/homez.136/littlebii/cgi-bin/demo/log.txt",
 						"advert" => "advert.jpg","logo_id" => "logo_id.jpg","logo_id2" => "logo_id2.jpg",
 						"wpec_gateway_image" => __SiteUrl__."/wp-content/plugins/wpcb/logo/LogoMercanetBnpParibas.gif",
-						"wpec_display_name" => "Cartes bancaires (Visa, Master Card,...)",
-						"debug"=>"1","test"=>"1","demo"=>"1","version"=>$plugin_data['Version']);
+						"wpec_display_name" => "Cartes bancaires (Visa, Master Card,...)","test"=>"1","demo"=>"1","version"=>$plugin_data['Version'],
+						"emailapiKey"=>"salut@yop.com","apiKey"=>"***");
 		update_option('wpcb_options', $arr);
 	}
 }
@@ -91,10 +91,11 @@ function wpcb_render_form() {
 		$sourceFile=$wpcb_Dir.'/automatic_response.php';
 		$destinationFile = __WPRoot__.'/automatic_response.php';			
 		if(!file_exists($destinationFile)) {copy($sourceFile, $destinationFile);}
-		if ($_GET['action']=='copyautomaticresponse'){copy($sourceFile, $destinationFile);}
+		if ( (isset($_GET['action'])) && ($_GET['action']=='copyautomaticresponse')){copy($sourceFile, $destinationFile);}
 		//				<?php copy($sourceFile, $destinationFile);
 		if(file_exists(!$destinationFile)) {
-			echo '<li><span style="color:red;">Copier le fichier automatic_response.php vers '.$destinationFile.' <a href="http://wpcb.fr/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse">en cliquant ici</a></span></li>';
+			$nonce_url=wp_nonce_url(__SiteUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse');
+			echo '<li><span style="color:red;">Copier le fichier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
 		} 
 		else {
 			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien là -> Ok!</span></li>';					
@@ -102,9 +103,10 @@ function wpcb_render_form() {
 		$sourceFile = $wpcb_Dir . '/wpcb.merchant.php';
 		$destinationFile = __WPRoot__.'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
 		if(!file_exists($destinationFile)) {copy($sourceFile, $destinationFile);}
-		if ($_GET['action']=='copywpcbmerchant'){copy($sourceFile, $destinationFile);}
+		if ((isset($_GET['action'])) && ($_GET['action']=='copywpcbmerchant')){copy($sourceFile, $destinationFile);}
 		if(!file_exists($destinationFile)) {
-			echo '<li><span style="color:red;">Copier le fichier '.$wpcb_Dir.'/wpcb.merchant.php vers '.$destinationFile.' <a href="http://wpcb.fr/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant">en cliquant ici</a></span></li>';
+			$nonce_url=wp_nonce_url(__SiteUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant');
+			echo '<li><span style="color:red;">Copier le fichier '.$wpcb_Dir.'/wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
 		} 
 		else {
 			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien là -> Ok!</span></li>';					
@@ -116,16 +118,19 @@ function wpcb_render_form() {
 		else {
 			echo '<li><span style="color:red">You should place wpcb shortcode [wpcb] somewhere in a page of your site!</span></li>';
 		}
-		
+		// API
 		$post_data['apiKey']=$options['apiKey'];
 		$post_data['emailapiKey']=$options['emailapiKey'];
-		$valid=api_curl('http://wpcb.fr/api/wpcb/valid.php',$post_data);
+		$response=wp_remote_post('http://wpcb.fr/api/wpcb/valid.php',array('body' =>$post_data));
+		$valid=unserialize($response['body']);
 		if ($valid[0]){
 			echo '<li><span style="color:green">Your API Key is valid -> Ok!</span></li>';
 		}
 		else {
 			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span></li>';
 		}
+		// END OF API
+		
 	?>
 		
 		</li>
@@ -212,15 +217,14 @@ function wpcb_render_form() {
 					<th scope="row">emailapiKey (Optionel)</th>
 					<td><input type="text" size="57" name="wpcb_options[emailapiKey]" value="<?php echo $options['emailapiKey']; ?>" /></td>
 				</tr>
-				<!-- Checkbox Buttons -->
-				<tr valign="top">
-					<th scope="row">Developpeur</th>
-					<td>
-						<label><input name="wpcb_options[debug]" type="checkbox" value="1" <?php if (isset($options['debug'])) { checked('1', $options['debug']); } ?> /> Mode debug</label><br />
-						<label><input name="wpcb_options[test]" type="checkbox" value="1" <?php if (isset($options['test'])) { checked('1', $options['test']); } ?> /> Mode test</em></label><br />
-<label><input name="wpcb_options[demo]" type="checkbox" value="1" <?php if (isset($options['demo'])) { checked('1', $options['demo']); } ?> /> Mode demo</em></label><br />
+				<!-- Checkbox Buttons -->
+				<tr valign="top">
+					<th scope="row">Developpeur</th>
+					<td>
+						<label><input name="wpcb_options[test]" type="checkbox" value="1" <?php if (isset($options['test'])) { checked('1', $options['test']); } ?> /> Mode test</em></label><br />
+<label><input name="wpcb_options[demo]" type="checkbox" value="1" <?php if (isset($options['demo'])) { checked('1', $options['demo']); } ?> /> Mode demo</em></label><br />
 
-					</td>
+					</td>
 				</tr>
 			</table>
 			<input type="hidden" name="wpcb_options[version]" value="<?php echo $plugin_data['Version']; ?>" />
@@ -234,9 +238,11 @@ function wpcb_render_form() {
 echo '<p>Infos:</p>';
 echo '<li><p>Plugin version : '.$options['version'].'</li>';
 echo '<li><p>Racine wordpress : '.__WPRoot__.'</p></li>';
-echo '<li>Racine site <pre>'.__ServerRoot__.'</pre></li>';
-echo '<li>Developpeur : Copier le fichier automatic_response.php vers '.$destinationFile.' <a href="http://wpcb.fr/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse">en cliquant ici</a></li>';
-echo '<li>Developpeur : Copier le fichier '.$wpcb_Dir.'/wpcb.merchant.php vers '.$destinationFile.' <a href="http://wpcb.fr/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant">en cliquant ici</a></li>';
+echo '<li>Racine site : '.__ServerRoot__.'</li>';
+$nonce_url=wp_nonce_url(__SiteUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse');
+echo '<li>Developpeur : Copier le fichier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+$nonce_url=wp_nonce_url(__SiteUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant');
+echo '<li>Developpeur : Copier le fichier '.$wpcb_Dir.'/wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 ?>
 			<p><a href="http://www.seoh.fr" target="_blank">Référencement avec SEOh</a></p>
 			<p>Additional help : <a href="http://wpcb.fr" target="_blank">http://wpcb.fr</a> (will open in a new tab)</p>
@@ -315,7 +321,7 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 		$parm="$parm order_id=$sessionid";
 		$parm="$parm logo_id2=".$options['logo_id2'];
 		$parm="$parm advert=".$options['advert'];
-		if ($options['debug']){$parm_pretty=str_replace(' ','<br/>',$parm);echo '<p>You see this because you are in debug mode :</p><pre>'.$parm_pretty.'</pre><p>End of debug mode</p>';}
+		if (WP_DEBUG){$parm_pretty=str_replace(' ','<br/>',$parm);echo '<p>You see this because you are in debug mode :</p><pre>'.$parm_pretty.'</pre><p>End of debug mode</p>';}
 		$result=exec("$path_bin_request $parm");
 		$tableau = explode ("!","$result");
 		$code = $tableau[1];
@@ -323,11 +329,11 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 		if (( $code=="") && ($error==""))
 		{
 			$message="<p>".__('Error calling the atos api : exec request not found','wpcb')."  $path_bin_request</p>";
-			if ($options['debug']){ $message.= "<p>".__('Thank you for reporting this error to:','wpcb')." ".$purch_log_email."</p>";}
+			if (WP_DEBUG){ $message.= "<p>".__('Thank you for reporting this error to:','wpcb')." ".$purch_log_email."</p>";}
 		}
 		elseif ($code != 0) {
 			$message="<p>".__('Atos API error : ','wpcb')." $error</p>";
-			if ($options['debug']){ $message.= "<p>".__('Thank you for reporting this error to:','wpcb')." ".$purch_log_email."</p>";}
+			if (WP_DEBUG){ $message.= "<p>".__('Thank you for reporting this error to:','wpcb')." ".$purch_log_email."</p>";}
 		}
 		else
 		{
@@ -351,36 +357,5 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 	return $message;
 }
 add_shortcode( 'wpcb', 'shortcode_wpcb_handler' );
-
-
-function api_curl($path,$post_data= null) {
-	//traverse array and prepare data for posting (key1=value1)
-	if($post_data){
-		foreach ( $post_data as $key => $value) {$post_items[] = $key . '=' . $value;}
-		$post_string = implode ('&', $post_items);
-		//create cURL connection
-		$curl_connection =curl_init($path);
-		//set options
-		curl_setopt($curl_connection, CURLOPT_CONNECTTIMEOUT, 30);
-		curl_setopt($curl_connection, CURLOPT_USERAGENT,"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
-		curl_setopt($curl_connection, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl_connection, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($curl_connection, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($curl_connection, CURLOPT_POSTFIELDS, $post_string);
-		$result = curl_exec($curl_connection);
-		curl_close($curl_connection);
-	}
-	else{
-		$result=false;
-	}
-	$result_a=unserialize($result);
-	return $result_a;
-}
-
-
-
-
-
-
 
 ?>
