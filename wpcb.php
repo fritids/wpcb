@@ -253,26 +253,7 @@ echo '<li>Developpeur : Copier le fichier '.$wpcb_Dir.'/wpcb.merchant.php vers '
 
 // Sanitize and validate input. Accepts an array, return a sanitized array.
 function wpcb_validate_options($input) {
-	 // strip html from textboxes
-	$input['merchant_id'] =  wp_filter_nohtml_kses($input['merchant_id']); // Sanitize textarea input (strip html tags, and escape characters)
-	$input['pathfile'] =  wp_filter_nohtml_kses($input['pathfile']); // Sanitize textbox input (strip html tags, and escape characters)
-	$input['path_bin_request'] =  wp_filter_nohtml_kses($input['path_bin_request']);
-	$input['path_bin_response'] =  wp_filter_nohtml_kses($input['path_bin_response']);
-	$input['logfile'] =  wp_filter_nohtml_kses($input['logfile']);
-	$input['merchant_country'] =  wp_filter_nohtml_kses($input['merchant_country']);
-	$input['currency_code'] =  wp_filter_nohtml_kses($input['currency_code']);
-	$input['normal_return_url'] =  wp_filter_nohtml_kses($input['normal_return_url']);
-	$input['cancel_return_url'] =  wp_filter_nohtml_kses($input['cancel_return_url']);
-	$input['language'] =  wp_filter_nohtml_kses($input['language']);
-	$input['payment_means'] =  wp_filter_nohtml_kses($input['payment_means']);
-	$input['header_flag'] =  wp_filter_nohtml_kses($input['header_flag']);
-	$input['advert'] =  wp_filter_nohtml_kses($input['advert']);
-	$input['logo_id'] =  wp_filter_nohtml_kses($input['logo_id']);
-	$input['logo_id2'] =  wp_filter_nohtml_kses($input['logo_id2']);
-	$input['wpec_gateway_image'] =  wp_filter_nohtml_kses($input['wpec_gateway_image']);
-	$input['wpec_display_name'] =  wp_filter_nohtml_kses($input['wpec_display_name']);
-	$input['apiKey'] =  wp_filter_nohtml_kses($input['apiKey']);
-	$input['emailapiKey'] =  wp_filter_nohtml_kses($input['emailapiKey']);	
+	foreach ($input as $key=>$value){$input[$key]=wp_filter_nohtml_kses($input[$key]);}
 	return $input;
 }
 
