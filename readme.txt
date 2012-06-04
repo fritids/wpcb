@@ -6,7 +6,7 @@ Paiement par cartes bancaires Atos SIPS (majoritée des banques françaises) pou
 = A venir pour les détenteurs d'une clé API =
 * Ajout dans google drive de toutes vos ventes !
 * Ajout de tous vos acheteurs dans votre outil de mailling MailChimp
-== Installation ==1. Envoyer `wpcb` vers le dossier `/wp-content/plugins/`2. Activer le plugin dans le menu 'Extensions' de Wordpress<<<<<<< .mine3. Placer `[wpcb]` sur une (et une seule!) page
+== Installation ==1. Envoyer `wpcb` vers le dossier `/wp-content/plugins/`2. Activer le plugin dans le menu 'Extensions' de Wordpress3. Placer `[wpcb]` sur une (et une seule!) page
 4. Régler les paramètres suivant les indications
 
 == Frequently Asked Questions ==
@@ -15,8 +15,7 @@ Paiement par cartes bancaires Atos SIPS (majoritée des banques françaises) pou
 Si vous avez reçu un set de fichier comme ci-dessous alors oui.
 =======3. Placer `[atos]` sur une (et une seule!) page
 4. Régler vos paramètres personalisé
-
->>>>>>> .r553064<<<<<<< .mine= Que faire des fichiers envoyé par ma banque ? =
+= Que faire des fichiers envoyé par ma banque ? =
 
 Configurer correctement vos dossiers/fichiers obtenus par votre banque (dossier crypté)
 Dans le dossier cgi-bin (non visible depuis Internet) vous devez avoir :
@@ -50,7 +49,7 @@ Le mode demo permet d'utiliser le kit de démo fournit par votre banque. (Ne mar
 = Autre question ? =
 Merci de poser vos questions sur le forum en cliquant à droite sur le bouton vert ->
 
-Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.=======>>>>>>> .r553064<<<<<<< .mine========= Frequently Asked Questions === Que faire des fichiers de la banque ? =
+Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.================ Frequently Asked Questions === Que faire des fichiers de la banque ? =
 
 Configurer correctement vos dossiers/fichiers obtenus par votre banque (dossier crypté)
 Dans le dossier cgi-bin (non visible depuis Internet) vous devez avoir :
@@ -106,7 +105,7 @@ Les prix sont TTC.
 Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Email, Coordonnées postales, etc.'
 
 = Autre question ? =thomas@6www.net
-Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.>>>>>>> .r553064== Screenshots ==1. Réglages du module2. Choix de la méthode de paiement3. Les cartes bancaires qui redirigent vers l'espace sécurisé Atos SIPS== Changelog ==
+Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.== Screenshots ==1. Réglages du module2. Choix de la méthode de paiement3. Les cartes bancaires qui redirigent vers l'espace sécurisé Atos SIPS== Changelog ==
 
 = 1.1.8 =
 * Mise à jour
