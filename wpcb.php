@@ -400,7 +400,7 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 		$parm="$parm logo_id2=".$options['logo_id2'];
 		$parm="$parm advert=".$options['advert'];
 		if (WP_DEBUG){
-			//Va afficher sur la page ou se trouve le shortcode les parametres
+			//Va afficher sur la page ou se trouve le shortcode les parametres.
 			$parm_pretty=str_replace(' ','<br/>',$parm);echo '<p>You see this because you are in debug mode :</p><pre>'.$parm_pretty.'</pre><p>End of debug mode</p>';
 		}
 		$result=exec("$path_bin_request $parm");
