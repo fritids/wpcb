@@ -114,7 +114,7 @@ function wpcb_render_form() {
 		<h2>Options WP e-Commerce Cartes Bancaires par 6WWW</h2>
 		<ol>
 		<?php
-		$sourceFile=__PluginDir__.'/automatic_response.php';
+		$sourceFile=dirname(__FILE__).'/automatic_response.php';
 		$destinationFile = __WPRoot__.'/automatic_response.php';			
 		if (
 		(!file_exists($destinationFile)) || 
@@ -129,7 +129,7 @@ function wpcb_render_form() {
 		else {
 			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
 		}
-		$sourceFile = __PluginDir__.'/wpcb.merchant.php';
+		$sourceFile = dirname(__FILE__).'/wpcb.merchant.php';
 		$destinationFile = __WPRoot__.'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
 		if (
 		(!file_exists($destinationFile)) ||
@@ -139,7 +139,7 @@ function wpcb_render_form() {
 		}
 		if(!file_exists($destinationFile)) {
 			$nonce_url=wp_nonce_url(__WPUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant');
-			echo '<li><span style="color:red;">Copier le fichier '.__PluginDir__.'/wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
+			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
 		} 
 		else {
 			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
@@ -301,7 +301,7 @@ function wpcb_render_form() {
 		$nonce_url=wp_nonce_url(__WPUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse');
 		echo '<li>Developpeur : Copier le fichier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 		$nonce_url=wp_nonce_url(__WPUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant');
-		echo '<li>Developpeur : Copier le fichier '.__PluginDir__.'/wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		echo '<li>Developpeur : Copier le fichier '.dirname(__FILE__).'/wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 		?>
 			<li><a href="http://www.seoh.fr" target="_blank">Référencer votre site e-commerce avec l'agence SEOh</a></li>
 			<li><a href="http://profiles.wordpress.org/6www">Les autres plugins de 6WWW</a></li>
