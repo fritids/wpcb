@@ -13,17 +13,17 @@ Paiement par cartes bancaires Atos SIPS (majoritée des banques françaises) pou
 
 = Est-ce que ma banque est prise en charge ? =
 Si vous avez reçu un set de fichier comme ci-dessous alors oui.
-=======3. Placer `[atos]` sur une (et une seule!) page
+=======3. Placer `[wpcb]` sur une (et une seule!) page
 4. Régler vos paramètres personalisé
 = Que faire des fichiers envoyé par ma banque ? =
 
 Configurer correctement vos dossiers/fichiers obtenus par votre banque (dossier crypté)
 Dans le dossier cgi-bin (non visible depuis Internet) vous devez avoir :
 * parcom.mercanet
-* parcom.005009461540411 (votre numéro de marchand à la place de celui là)
+* parcom.005009461540411 (votre numéro de marchand à la place de celui là) (le contenu du fichier n'a pas a être modifé)
 * log.txt
 * certif.fr.005009461540411 (votre numéro de marchand à la place de celui là)
-* pathfile (à modifier suivant cet exemple)
+* pathfile (à modifier suivant cet exemple !!! )
 * request
 * response
 Note : les fichiers call_request.php, call_response.php et call_auto_response.php dans le package fourni par la banque ne sont pas necessaires car wpcb les remplace.
@@ -44,9 +44,8 @@ http://6www.net/blog/wp-content/uploads/2011/05/snap13-05-2011-12.30.5308-07-201
 Le mode test permet de vérifier automatiquement le paiement sans passer par l'étape de saisie du numéro de carte bancaire. Il vous permet de vérifier que tout se passe bien dans votre processus.
 
 = A quoi sert le mode demo ? =
-Le mode demo permet d'utiliser le kit de démo fournit par votre banque. (Ne marche pas toujorus très bien...)
-
-= Autre question ? =
+Le mode demo permet d'utiliser le kit de démo fournit par votre banque. (Ne marche pas toujours très bien...)
+= Y-a-t-il un mode debug ? =Oui, editer wp-config.php à la racine de votre site et mettez la variable globale WP_DEBUG = true . = Autre question ? =
 Merci de poser vos questions sur le forum en cliquant à droite sur le bouton vert ->
 
 Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.================ Frequently Asked Questions === Que faire des fichiers de la banque ? =
@@ -103,7 +102,7 @@ Numéro de commande : %purchase_id%
 %product_list%%total_shipping%%total_price%
 Les prix sont TTC.
 Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Email, Coordonnées postales, etc.'
-
+= Ou placer le fichier automatic_response.php ? =Ce fichier est automatiquement copié à la racine de votre blog wordpress c'est à dire à coté du fichier wp-config.phpSi cela n'est pas fait, faite le manuellement.= Comment configurer google drive pour recevoir les ventes ? =Télécharger le fichier <a href="https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc">https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc</a>Envoyer ce fichier dans votre google drive et noter votre nouvelle cle de fichier (dans mon fichier, à titre d'exemple, la clé est : 0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc cela se lit dans l'url)Ne changer pas les entetes et attention à ce que ce soit la feuille numéro 1 du classeur !!
 = Autre question ? =thomas@6www.net
 Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.== Screenshots ==1. Réglages du module2. Choix de la méthode de paiement3. Les cartes bancaires qui redirigent vers l'espace sécurisé Atos SIPS== Changelog ==
 = 1.1.8.1 =* Bug si Zend non installé, corrigé

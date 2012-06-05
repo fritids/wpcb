@@ -160,26 +160,43 @@ function wpcb_render_form() {
 			echo '<li><span style="color:green">Votre clé API est valide -> OK!</span></li>';
 		}
 		else {
-			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des fonctions supplémentaires en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
+			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">fonctions supplémentaires</a> en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
 		}
 		// END OF API
 		?>
 		
 		<?php if (WP_ZEND_FRAMEWORK){
-			echo '<li>Zend is installed -> Ok !</li>';
+			echo '<li><span style="color:green">Zend is installed -> Ok !</span></li>';
 			$GoogleConnection=true;
+			$SpreadSheetConnection=true;
 		try {$client = Zend_Gdata_ClientLogin::getHttpClient($options['googleemail'],$options['googlepassword']);}
 		catch (Zend_Gdata_App_AuthException $ae){echo $ae->exception();$GoogleConnection=false;}
 		if ($GoogleConnection){
-			echo '<li>Your google connection is living-> Ok!</li>';
+			echo '<li><span style="color:green">Your google connection is living-> Ok!</span></li>';
+			// Test 
+			$service=Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
+			$client=Zend_Gdata_ClientLogin::getHttpClient($options['googleemail'],$options['googlepassword'], $service);
+			// On va chercher le numéro de la feuille :
+			$query_worksheet = new Zend_Gdata_Spreadsheets_DocumentQuery(); // todo pour pas de client ici ?
+			$query_worksheet->setSpreadsheetKey($options['spreadsheetKey']);
+			$spreadsheetService = new Zend_Gdata_Spreadsheets($client);
+			try {$feed = $spreadsheetService->getWorksheetFeed($query_worksheet);}
+			catch (Zend_Gdata_App_HttpException $ae){echo $ae->exception();$SpreadSheetConnection=false;}
+			if ($SpreadSheetConnection){
+				echo '<li><span style="color:green">Your Spreadsheet can be read -> Ok!</span></li>';
+			}
+			else{
+				echo '<li><span style="color:red">Your Spreadsheet is not reachable</span></li>';
+			}
+			
 		}
 		else {
-			echo '<li>Your google connection is not ok, check email and pass below</li>';
+			echo '<li><span style="color:red">Your google connection is not ok, check email and pass below</span></li>';
 		}
 		// Todo : catch error if spreadsheetKey is wrong
 		}
 		else{
-		echo 'Install Zend first : http://h6e.net/wiki/wordpress/plugins/zend-framework to have acces to new features';	
+		echo '<li><span style="color:red">Install Zend first : http://h6e.net/wiki/wordpress/plugins/zend-framework and buy an api key to have acces to <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">new features</a></span></li>';	
 		}?>
 		
 		
@@ -293,11 +310,12 @@ function wpcb_render_form() {
 		<p style="margin-top:15px;">
 		
 		<?php
-		echo '<p>Infos:</p>';
+		echo '<p>Infos Développeur:</p>';
 		echo '<ul>';
 		echo '<li><p>Plugin version : '.$options['version'].'</li>';
 		echo '<li><p>Racine wordpress : '.__WPRoot__.'</p></li>';
 		echo '<li>Racine site : '.__ServerRoot__.'</li>';
+		echo '<li>Automatic Response : <a href="'.site_url('automatic_response.php').'" target="_blank">'.site_url('automatic_response.php').'</a></li>';
 		$nonce_url=wp_nonce_url(__WPUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse');
 		echo '<li>Developpeur : Copier le fichier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 		$nonce_url=wp_nonce_url(__WPUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant');
@@ -312,6 +330,7 @@ function wpcb_render_form() {
 	
 	// Debug google doc : 
 	if (WP_DEBUG){
+	if ($SpreadSheetConnection){
 	// Create an rand tableau 32 size
 	$tableau_debug=array('NULL','1','2','5566','fr','100','8755900','CB','10-02-2012','11:50','10-02-2012','004','certif','22','978','4974','545','1','22','Comp','CompInfo','return','caddie','Merci','fr','fr','001','8787084074894','my@email.com','1.10.21.192','30',	'direct','data');
 	$tableau=$tableau_debug;
@@ -365,7 +384,7 @@ function wpcb_render_form() {
 	// Insert row in google spreadsheet :
 	$insertedListEntry = $spreadsheetService->insertRow($response,$options['spreadsheetKey'],$worksheetId_PremiereFeuille);	
 
-	
+	}// Fin du test Zend
 	} // Fin du debug
 	
 } // Fin de la fonction des réglages
