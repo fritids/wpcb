@@ -1,4 +1,4 @@
-=== WP e-Commerce Atos SIPS ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWWRequires at least: 2.7Tested up to: 3.3Stable tag: 1.1.8
+=== WP e-Commerce Atos SIPS ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWWRequires at least: 2.7Tested up to: 3.3Stable tag: 1.1.8.1
 
 Paiement par cartes bancaires Atos SIPS (majoritée des banques françaises) pour le plugin WP e-Commerce.== Description ==Paiement par cartes bancaires Atos SIPS (majoritée des banques françaises) pour le plugin WP e-Commerce.Atos SIPS est la technologie utilisée par de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
 * et de nombreuses autres banques basée sur la technologie ATOS SIPS
@@ -106,7 +106,7 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 
 = Autre question ? =thomas@6www.net
 Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.== Screenshots ==1. Réglages du module2. Choix de la méthode de paiement3. Les cartes bancaires qui redirigent vers l'espace sécurisé Atos SIPS== Changelog ==
-
+= 1.1.8.1 =* Bug si Zend non installé, corrigé
 = 1.1.8 =
 * Mise à jour
 = 1.1.5 =* Correction d'un bug de vidage de panier* Réorganisation des options* Ajout de la clé API= 1.1.3 =* Amélioration de la sécurité importante (Merci à Cyril Lecomte).= 1.1.2 =* Correction d'une erreur de suppression du plugin.=1.1.1=* Le mode test a été amélioré.= 1.1 =* Internationalized* Atos currency_code added to the settings of the plugin* Atos language added to the settings of the plugin* Atos merchant_country added to the settings of the plugin* Atos header_flag added to the settings of the plugin= 1.0.4 =* Update to wpec api v2.0= 1.0.3 =* Syntax correction= 1.0.2 =* Mises à jour mineures= 1.0.1 =* Mises à jour mineures= 1.0 =* Première version

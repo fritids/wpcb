@@ -3,7 +3,7 @@
 Plugin Name:WP e-Commerce Atos SIPS
 Plugin URI: http://wpcb.fr
 Description: Credit Card Payement Gateway for ATOS SIPS (Mercanet,...) (WP e-Commerce is required)
-Version: 1.1.8
+Version: 1.1.8.1
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -11,7 +11,7 @@ Author URI: http://6www.net
 if (!defined('__WPRoot__')){define('__WPRoot__',dirname(dirname(dirname(dirname(__FILE__)))));}
 if (!defined('__ServerRoot__')){define('__ServerRoot__',dirname(dirname(dirname(dirname(dirname(__FILE__))))));}
 if (!defined('__WPUrl__')){define('__WPUrl__',site_url());}
-if (!defined('__PluginDir__')){	define('__PluginDir__',dirname(__FILE__));}
+
 
 // Actions lors de la desactivation du plugin :
 register_deactivation_hook( __FILE__, 'wpcb_deactivate' );
@@ -39,6 +39,20 @@ function wpcb_update(){
 	if (version_compare($options['version'],$plugin_data['Version'],"<")){
 		wpcb_activate(); // So that the 2 files wpcb.merchant.php & automatic_response.php are copied again
 	}
+		 // if the ZF plugin is successfully loaded this constant is set to true
+  if (defined('WP_ZEND_FRAMEWORK') && constant('WP_ZEND_FRAMEWORK')) {
+    return true;
+  }
+  // you can also check if ZF is available on the system
+  $paths = explode(PATH_SEPARATOR, get_include_path());
+  foreach ($paths as $path) {
+    if (file_exists("$path/Zend/Loader.php")) {
+      define('WP_ZEND_FRAMEWORK', true);
+      return true;
+    }
+  }
+  // nothing found, you may advice the user to install the ZF plugin
+  define('WP_ZEND_FRAMEWORK', false);
 }
 
 
@@ -54,10 +68,10 @@ function wpcb_delete_plugin_options() {
 register_activation_hook(__FILE__, 'wpcb_activate');
 function wpcb_activate() {
 	$options = get_option('wpcb_options');
-	$sourceFile = __PluginDir__. '/automatic_response.php';
+	$sourceFile = dirname(__FILE__). '/automatic_response.php';
 	$destinationFile = __WPRoot__.'/automatic_response.php';			
 	copy($sourceFile, $destinationFile);
-	$sourceFile = __PluginDir__. '/wpcb.merchant.php';
+	$sourceFile = dirname(__FILE__). '/wpcb.merchant.php';
 	$destinationFile = __WPRoot__.'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
 	copy($sourceFile, $destinationFile);
     if(!is_array($options)) {
@@ -150,8 +164,10 @@ function wpcb_render_form() {
 		}
 		// END OF API
 		?>
-		<?php
-		$GoogleConnection=true;
+		
+		<?php if (WP_ZEND_FRAMEWORK){
+			echo '<li>Zend is installed -> Ok !</li>';
+			$GoogleConnection=true;
 		try {$client = Zend_Gdata_ClientLogin::getHttpClient($options['googleemail'],$options['googlepassword']);}
 		catch (Zend_Gdata_App_AuthException $ae){echo $ae->exception();$GoogleConnection=false;}
 		if ($GoogleConnection){
@@ -161,7 +177,12 @@ function wpcb_render_form() {
 			echo '<li>Your google connection is not ok, check email and pass below</li>';
 		}
 		// Todo : catch error if spreadsheetKey is wrong
-		?>
+		}
+		else{
+		echo 'Install Zend first : http://h6e.net/wiki/wordpress/plugins/zend-framework to have acces to new features';	
+		}?>
+		
+		
 		<li>Remplissez les informations ci dessous. Reportez vous au Dictionnaire Atos fournit par votre banque.</li>
 		</ol>
 		<form method="post" action="options.php">
