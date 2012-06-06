@@ -15,6 +15,9 @@ function wpcb_deactivate(){
 	// On deactivate, remove files :
 	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
 	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php');
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/cheque.merchant.php');
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/virement.merchant.php');
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/simplepaypal.merchant.php');
 }
 
 // Actions lors de la mise en jour du plugin :
@@ -57,8 +60,7 @@ function wpcb_update(){
 register_uninstall_hook(__FILE__, 'wpcb_delete_plugin_options');
 function wpcb_delete_plugin_options() {
 	delete_option('wpcb_options');
-	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
-	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php');
+	wpcb_deactivate(); // Do the delete file
 }
 
 register_activation_hook(__FILE__, 'wpcb_activate');
@@ -70,12 +72,21 @@ function wpcb_activate() {
 	$sourceFile = dirname(__FILE__). '/wpcb.merchant.php';
 	$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
 	copy($sourceFile, $destinationFile);
+	$sourceFile = dirname(__FILE__). '/cheque.merchant.php';
+	$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/cheque.merchant.php';
+	copy($sourceFile, $destinationFile);
+	$sourceFile = dirname(__FILE__). '/virement.merchant.php';
+	$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/virement.merchant.php';
+	copy($sourceFile, $destinationFile);
+	$sourceFile = dirname(__FILE__). '/simplepaypal.merchant.php';
+	$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/simplepaypal.merchant.php';
+	copy($sourceFile, $destinationFile);
     if(!is_array($options)) {
 		delete_option('wpcb_options'); // so we don't have to reset all the 'off' checkboxes too! (don't think this is needed but leave for now)
 		$options = array("merchant_id" => "082584341411111","pathfile" => dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile",
 					"path_bin_request" => dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request",
 					"path_bin_response" => dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/response" ,
-					"merchant_country" => "fr","currency_code" => "978",
+					"merchant_country" => "fr","currency_code" => "978","automatic_response_url"=>site_url()."/automatic_response.php",
 					"normal_return_url" => site_url(),"cancel_return_url" => site_url(),
 					"language" => "fr","payment_means" => "CB,2,VISA,2,MASTERCARD,2",
 					"header_flag" => "no","logfile" => "/homez.136/littlebii/cgi-bin/demo/log.txt",
@@ -84,7 +95,17 @@ function wpcb_activate() {
 					"wpec_display_name" => "Cartes bancaires (Visa, Master Card,...)",
 					"test"=>"0","demo"=>"0","version"=>$plugin_data['Version'],
 					"emailapiKey"=>"salut@yop.com","apiKey"=>"***",
-					"googleemail"=>"salut@gmail.com","googlepassword"=>"***","spreadsheetKey"=>"jLJDjj");
+					"googleemail"=>"salut@gmail.com","googlepassword"=>"***","spreadsheetKey"=>"jLJDjj",
+					"textarea_cheque" => "Merci de libéller vos chèque à l'ordre de Thomas et de les faire parvenir vos chèque à l'adresse postale : Lyon, France.",
+					"textarea_virement" => "Merci d'envoyer vos virement à ce RIB 45461 24161654 (téléchargeable également à l'adresse : http://monsite.com/rib",
+					"business" => $purch_log_email,
+						"return" => site_url(),
+						"cancel_return" =>site_url(),
+						"wpec_gateway_image_paypal" => site_url()."/wp-content/plugins/wp-e-commerce/images/paypal.gif",
+						"wpec_display_name_paypal" => "Paypal",
+						"notify_url" => site_url().'/wp-content/plugins/wp-e-commerce-paypal/ipn.php',
+						"version"=>$plugin_data['Version'],"spreadsheetKeyPaypal"=>"LJhhjdl",
+						"sandbox"=>"0");
 		update_option('wpcb_options',$options);
 	}
 }
@@ -111,14 +132,15 @@ function wpcb_render_form() {
 		<ol>
 		<?php
 		$sourceFile=dirname(__FILE__).'/automatic_response.php';
-		$destinationFile = dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php';			
+		$destinationFile = dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php';
 		if (
 		(!file_exists($destinationFile)) || 
 		( (isset($_GET['action'])) && ($_GET['action']=='copyautomaticresponse')) 
 			){
 				copy($sourceFile, $destinationFile);
+				echo '<li>automatic_response.php has just been copied</li>';
 		}
-		if(file_exists(!$destinationFile)){
+		if(!file_exists($destinationFile)){
 			$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse'));
 			echo '<li><span style="color:red;">Copier le fichier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
 		} 
@@ -140,6 +162,57 @@ function wpcb_render_form() {
 		else {
 			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
 		}
+		// Copy chèques :
+		$sourceFile = dirname(__FILE__).'/cheque.merchant.php';
+		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/cheque.merchant.php';
+		if (
+		(!file_exists($destinationFile)) ||
+		((isset($_GET['action'])) && ($_GET['action']=='copychequemerchant'))
+		){
+			copy($sourceFile, $destinationFile);
+		}
+		if(!file_exists($destinationFile)) {
+			$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copychequemerchant'));
+			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/cheque.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
+		} 
+		else {
+			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
+		}
+		// Fin copy chèque
+		// Copy Virement :
+		$sourceFile = dirname(__FILE__).'/virement.merchant.php';
+		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/virement.merchant.php';
+		if (
+		(!file_exists($destinationFile)) ||
+		((isset($_GET['action'])) && ($_GET['action']=='copyvirementmerchant'))
+		){
+			copy($sourceFile, $destinationFile);
+		}
+		if(!file_exists($destinationFile)) {
+			$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copyvirementmerchant'));
+			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/virement.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
+		} 
+		else {
+			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
+		}
+		// Fin copy Virement
+		// Copy Paypal :
+		$sourceFile = dirname(__FILE__).'/simplepaypal.merchant.php';
+		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/simplepaypal.merchant.php';
+		if (
+		(!file_exists($destinationFile)) ||
+		((isset($_GET['action'])) && ($_GET['action']=='copysimplepaypalmerchant'))
+		){
+			copy($sourceFile, $destinationFile);
+		}
+		if(!file_exists($destinationFile)) {
+			$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copysimplepaypalmerchant'));
+			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/simplepaypal.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
+		} 
+		else {
+			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
+		}
+		// Fin copy Paypal
 		$wpcb_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[wpcb]%' AND `post_status`='publish'");
 		if ($wpcb_checkout_page!=NULL){
 			echo '<li><span style="color:green">Le shortcode [wpcb] est sur la page : <a href="'.site_url('?page_id='.$wpcb_checkout_page->ID).'">'.$wpcb_checkout_page->ID.'</a> -> OK!</span></li>';
@@ -293,12 +366,69 @@ function wpcb_render_form() {
 				<th scope="row">Mot de passe Gmail (Optionel : pour l'ajout des ventes dans Google Drive)</th>
 				<td><input type="password" size="57" name="wpcb_options[googlepassword]" value="<?php echo $options['googlepassword']; ?>" /></td>
 				</tr>
+				<tr>
+				<th scope="row">** Paiement par chèque **</th>
+				</tr>
+				<tr>
+				<th scope="row">Texte à afficher sur la page pour les gens qui choisisse le paiement par chèque</th>
+				<td>
+				<textarea name="wpcb_options[textarea_cheque]" rows="7" cols="50" type='textarea'><?php echo $options['textarea_cheque']; ?></textarea><br /><span style="color:#666666;margin-left:2px;">Texte à afficher sur la page pour les gens qui choisisse le paiement par chèque</span>
+				</td>
+				</tr>
+				<tr>
+				<th scope="row">** Paiement par Virement Bancaire**</th>
+				</tr>
+				<tr>
+				<th scope="row">Texte à afficher sur la page pour les gens qui choisisse le paiement par virement</th>
+				<td>
+				<textarea name="wpcb_options[textarea_virement]" rows="7" cols="50" type='textarea'><?php echo $options['textarea_virement']; ?></textarea><br /><span style="color:#666666;margin-left:2px;">Texte à afficher sur la page pour les gens qui choisisse le paiement par virement</span>
+				</td>
+				</tr>
 				<!-- Checkbox Buttons -->
 				<tr valign="top">
 				<th scope="row">Pour les developpeur</th>
 				<td>
 				<label><input name="wpcb_options[test]" type="checkbox" value="1" <?php if (isset($options['test'])) { checked('1', $options['test']); } ?> /> Mode test</em></label><br />
 <label><input name="wpcb_options[demo]" type="checkbox" value="1" <?php if (isset($options['demo'])) { checked('1', $options['demo']); } ?> /> Mode demo</em></label><br />
+				</td>
+				</tr>
+				<tr>
+				<th scope="row">** Paiement par Paypal**</th>
+				</tr>
+				<tr>
+				<th scope="row">Business (adresse email paypal)</th>
+				<td><input type="text" size="57" name="wpcb_options[business]" value="<?php echo $options['business']; ?>" /></td>
+				</tr>
+				<tr>
+				<th scope="row">Return</th>
+				<td><input type="text" size="57" name="wpcb_options[return]" value="<?php echo $options['return']; ?>" /></td>
+				</tr>
+				<tr>
+				<th scope="row">cancel_return</th>
+				<td><input type="text" size="57" name="wpcb_options[cancel_return]" value="<?php echo $options['cancel_return']; ?>" /></td>
+				</tr>
+				<tr>
+				<th scope="row">wpec_gateway_image_paypal</th>
+				<td><input type="text" size="57" name="wpcb_options[wpec_gateway_image_paypal]" value="<?php echo $options['wpec_gateway_image_paypal']; ?>" /></td>
+				</tr>
+				<tr>
+				<th scope="row">wpec_display_name_paypal</th>
+				<td><input type="text" size="57" name="wpcb_options[wpec_display_name_paypal]" value="<?php echo $options['wpec_display_name_paypal']; ?>" /></td>
+				</tr>
+				<tr>
+				<th scope="row">notify_url</th>
+				<td><input type="text" size="57" name="wpcb_options[notify_url]" value="<?php echo $options['notify_url']; ?>" /></td>
+				</tr>
+				<tr>
+				<tr>
+				<th scope="row">Clé de la feuille de calcul Google Drive (Optionel : pour l'ajout des ventes dans Google Drive)</th>
+				<td><input type="text" size="57" name="wpcb_options[spreadsheetKeyPaypal]" value="<?php echo $options['spreadsheetKeyPaypal']; ?>" /></td>
+				</tr>
+				<!-- Checkbox Buttons -->
+				<tr valign="top">
+				<th scope="row">Pour les developpeur</th>
+				<td>
+				<label><input name="simplepaypal_options[sandbox]" type="checkbox" value="1" <?php if (isset($options['sandbox'])) { checked('1', $options['sandbox']); } ?> /> Sandbox</em></label><br />
 				</td>
 				</tr>
 			</table>
@@ -310,18 +440,42 @@ function wpcb_render_form() {
 		<p style="margin-top:15px;">
 		
 		<?php
-		echo '<p>Infos Développeur:</p>';
+		echo '<p>Développeur :</p>';
 		echo '<ul>';
 		echo '<li><p>Plugin version : '.$options['version'].'</li>';
 		echo '<li><p>Dossier Plugin : '.dirname(__FILE__).'</p></li>';
 		echo '<li><p>Racine wordpress : '.dirname(dirname(dirname(dirname(__FILE__)))).'</p></li>';
-		echo '<li>Automatic Response : <a href="'.site_url('automatic_response.php').'" target="_blank">'.site_url('automatic_response.php').'</a></li>';
 		$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse'));
 		$destinationFile = dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php';
-		echo '<li>Developpeur : Copier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		echo '<li>Copier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 		$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant'));
 		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
-		echo '<li>Developpeur : Copier wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		echo '<li>Copier wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		// Chèque :
+		$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copychequemerchant'));
+		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/cheque.merchant.php';
+		echo '<li>Copier cheque.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		// End of Chèques
+		// Virement :
+		$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copyvirementmerchant'));
+		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/virement.merchant.php';
+		echo '<li>Copier virement.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		// End of Virement
+		// Paypal :
+		$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copysimplepaypalmerchant'));
+		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/simplepaypal.merchant.php';
+		echo '<li>Copier simplepaypal.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		// End of Paypal
+		$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=sandbox'));
+		echo '<li>Tester votre fichier automatic_response.php <a href="'.$nonce_url.'">en cliquant ici</a> (Cela va mettre à jour log.txt et google drive)</li>';
+		echo '<li>'.$options['automatic_response_url'].'</li>';
+		if ((isset($_GET['action'])) && ($_GET['action']=='sandbox')){
+			$post_data['DATA']='Dummy'; //Needed
+			$post_data['sandbox']='NULL!1!2!'.$options['merchant_id'].'!fr!100!8755900!CB!10-02-2012!11:50!10-02-2012!004!certif!22!978!4974!545!1!22!Comp!CompInfo!return!caddie!Merci!fr!fr!001!8787084074894!my@email.com!1.10.21.192!30!direct!data';
+			
+			$response=wp_remote_post($options['automatic_response_url'],array('body' =>$post_data));
+			print_r($response);
+		}
 		?>
 			<li><a href="http://www.seoh.fr" target="_blank">Référencer votre site e-commerce avec l'agence SEOh</a></li>
 			<li><a href="http://profiles.wordpress.org/6www">Les autres plugins de 6WWW</a></li>
@@ -330,70 +484,17 @@ function wpcb_render_form() {
 	</div>
 	<?php	
 	
-	// Debug google doc : 
-	if (WP_DEBUG){
-	if ($SpreadSheetConnection){
-	// Create an rand tableau 32 size
-	$tableau_debug=array('NULL','1','2','5566','fr','100','8755900','CB','10-02-2012','11:50','10-02-2012','004','certif','22','978','4974','545','1','22','Comp','CompInfo','return','caddie','Merci','fr','fr','001','8787084074894','my@email.com','1.10.21.192','30',	'direct','data');
-	$tableau=$tableau_debug;
-	$response=array(
-'code'=>$tableau[1],
-'error'=>$tableau[2],
-'merchantid'=>$tableau[3],
-'merchantcountry'=>$tableau[4],
-'amount'=>$tableau[5],
-'transactionid'=>$tableau[6],
-'paymentmeans'=>$tableau[7],
-'transmissiondate'=>$tableau[8],
-'paymenttime'=>$tableau[9],
-'paymentdate'=>$tableau[10],
-'responsecode'=>$tableau[11],
-'paymentcertificate'=>$tableau[12],
-'authorisationid'=>$tableau[13],
-'currencycode'=>$tableau[14],
-'cardnumber'=>$tableau[15],
-'cvvflag'=>$tableau[16],
-'cvvresponsecode'=>$tableau[17],
-'bankresponsecode'=>$tableau[18],
-'complementarycode'=>$tableau[19],
-'complementaryinfo'=>$tableau[20],
-'returncontext'=>$tableau[21],
-'caddie'=>$tableau[22],
-'receiptcomplement'=>$tableau[23],
-'merchantlanguage'=>$tableau[24],
-'language'=>$tableau[25],
-'customerid'=>$tableau[26],
-'orderid'=>$tableau[27],
-'customeremail'=>$tableau[28],
-'customeripaddress'=>$tableau[29],
-'captureday'=>$tableau[30],
-'capturemode'=>$tableau[31],
-'data'=>$tableau[32],
-); 
-	//Add to Sales in google doc using Zend : (require a plugin Zend)
-	$service=Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
-	$client=Zend_Gdata_ClientLogin::getHttpClient($options['googleemail'],$options['googlepassword'], $service);
-	// On va chercher le numéro de la feuille :
-	$query_worksheet = new Zend_Gdata_Spreadsheets_DocumentQuery(); // todo pour pas de client ici ?
-	$query_worksheet->setSpreadsheetKey($options['spreadsheetKey']);
-	$spreadsheetService = new Zend_Gdata_Spreadsheets($client);
-	$feed = $spreadsheetService->getWorksheetFeed($query_worksheet);
-	foreach($feed->entries as $entry){
-		$worksheetId_PremiereFeuille=basename($entry->id);
-		break; // on arrete la boucle, donc on écrit dans la première feuille !!
-	}
-	$spreadsheetService = new Zend_Gdata_Spreadsheets($client);
-	// Insert row in google spreadsheet :
-	$insertedListEntry = $spreadsheetService->insertRow($response,$options['spreadsheetKey'],$worksheetId_PremiereFeuille);	
-
-	}// Fin du test Zend
-	} // Fin du debug
 	
 } // Fin de la fonction des réglages
 
 // Sanitize and validate input. Accepts an array, return a sanitized array.
 function wpcb_validate_options($input) {
-	foreach ($input as $key=>$value){$input[$key]=wp_filter_nohtml_kses($input[$key]);}
+	$exclude_from_filter_nohtml_kses=array('textarea_cheque','textarea_virement');
+	foreach ($input as $key=>$value){
+		if (!in_array($key,$exclude_from_filter_nohtml_kses)){
+			$input[$key]=wp_filter_nohtml_kses($input[$key]);
+		}
+	}
 	return $input;
 }
 
@@ -464,6 +565,27 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 		}
 		// End of atos
 	}
+	elseif ($_GET['action']=='paypal'){
+	$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1") ;
+		if ($options['sandbox']){
+			$message='<form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">';
+		}
+		else{
+			$message='<form action="https://www.paypal.com/cgi-bin/webscr" method="post">';
+		}
+		$message.='<input type="hidden" name="cmd" value="_xclick">';
+		$message.='<input type="hidden" name="business" value="'.$options['business'].'">';
+		$message.='<input type="hidden" name="lc" value="FR">';
+		$message.='<input type="hidden" name="item_name" value="Commande #'.$purchase_log->id.'">';
+		$message.='<input type="hidden" name="item_number" value="'.$sessionid.'">';
+		$amount=number_format($purchase_log->totalprice,2);
+		$message.='<input type="hidden" name="amount" value="'.$amount.'">';
+		$message.='<input type="hidden" name="no_note" value="1">';
+		$message.='<input type="hidden" name="return" value="'.$options['return'].'">';
+		$message.='<input type="hidden" name="cancel_return" value="'.$options['cancel_return'].'">';
+		$message.='<input type="hidden" name="notify_url" value="'.$options['notify_url'].'">';
+		$message.='<input type="hidden" name="no_shipping" value="1"><input type="hidden" name="currency_code" value="EUR"><input type="hidden" name="button_subtype" value="services"><input type="hidden" name="no_note" value="0"><input type="hidden" name="bn" value="PP-BuyNowBF:btn_paynowCC_LG.gif:NonHostedGuest"><input type="image" src="https://www.paypalobjects.com/fr_FR/FR/i/btn/btn_paynowCC_LG.gif" border="0" name="submit" alt="PayPal - la solution de paiement en ligne la plus simple et la plus sécurisée !"><img alt="" border="0" src="https://www.paypalobjects.com/fr_XC/i/scr/pixel.gif" width="1" height="1"></form>';
+	}
 	elseif ($_GET['action']=='normal_return'){
 		// Pas utilisé pour l'instant
 		$wpsc_cart->empty_cart();
@@ -471,6 +593,11 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 	elseif ($_GET['action']=='cancel_return'){
 		// Pas utilisé pour l'instant
 		$wpsc_cart->empty_cart();
+	}
+	if ($_GET['action']=='sandbox'){
+	
+	
+	
 	}
 	else{
 		//Appel direct à cette page

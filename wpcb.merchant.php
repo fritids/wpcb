@@ -47,4 +47,6 @@ function form_wpcb() {
 	$output='<a href="'.site_url().'/wp-admin/options-general.php?page=wpcb/wpcb.php">Cliquez ici pour les réglages</a>';
 	return $output;
 }
+
+
 ?>
