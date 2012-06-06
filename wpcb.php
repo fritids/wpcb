@@ -3,22 +3,18 @@
 Plugin Name:WP e-Commerce Atos SIPS
 Plugin URI: http://wpcb.fr
 Description: Credit Card Payement Gateway for ATOS SIPS (Mercanet,...) (WP e-Commerce is required)
-Version: 1.1.8.1
+Version: 1.1.9
 Author: 6WWW
 Author URI: http://6www.net
 */
-
-if (!defined('__WPRoot__')){define('__WPRoot__',dirname(dirname(dirname(dirname(__FILE__)))));}
-if (!defined('__ServerRoot__')){define('__ServerRoot__',dirname(dirname(dirname(dirname(dirname(__FILE__))))));}
-if (!defined('__WPUrl__')){define('__WPUrl__',site_url());}
 
 
 // Actions lors de la desactivation du plugin :
 register_deactivation_hook( __FILE__, 'wpcb_deactivate' );
 function wpcb_deactivate(){
 	// On deactivate, remove files :
-	unlink(__WPRoot__.'/automatic_response.php');
-	unlink(__WPRoot__.'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php');
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php');
 }
 
 // Actions lors de la mise en jour du plugin :
@@ -61,30 +57,30 @@ function wpcb_update(){
 register_uninstall_hook(__FILE__, 'wpcb_delete_plugin_options');
 function wpcb_delete_plugin_options() {
 	delete_option('wpcb_options');
-	unlink(__WPRoot__.'/automatic_response.php');
-	unlink(__WPRoot__.'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php');
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php');
 }
 
 register_activation_hook(__FILE__, 'wpcb_activate');
 function wpcb_activate() {
 	$options = get_option('wpcb_options');
 	$sourceFile = dirname(__FILE__). '/automatic_response.php';
-	$destinationFile = __WPRoot__.'/automatic_response.php';			
+	$destinationFile = dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php';			
 	copy($sourceFile, $destinationFile);
 	$sourceFile = dirname(__FILE__). '/wpcb.merchant.php';
-	$destinationFile = __WPRoot__.'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
+	$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
 	copy($sourceFile, $destinationFile);
     if(!is_array($options)) {
 		delete_option('wpcb_options'); // so we don't have to reset all the 'off' checkboxes too! (don't think this is needed but leave for now)
-		$options = array("merchant_id" => "082584341411111","pathfile" => __ServerRoot__."cgi-bin/demo/pathfile",
-					"path_bin_request" => __ServerRoot__."cgi-bin/demo/request",
-					"path_bin_response" => __ServerRoot__."cgi-bin/demo/response" ,
+		$options = array("merchant_id" => "082584341411111","pathfile" => dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile",
+					"path_bin_request" => dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request",
+					"path_bin_response" => dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/response" ,
 					"merchant_country" => "fr","currency_code" => "978",
-					"normal_return_url" => __WPUrl__,"cancel_return_url" => __WPUrl__,
+					"normal_return_url" => site_url(),"cancel_return_url" => site_url(),
 					"language" => "fr","payment_means" => "CB,2,VISA,2,MASTERCARD,2",
 					"header_flag" => "no","logfile" => "/homez.136/littlebii/cgi-bin/demo/log.txt",
 					"advert" => "advert.jpg","logo_id" => "logo_id.jpg","logo_id2" => "logo_id2.jpg",
-					"wpec_gateway_image" => __WPUrl__."/wp-content/plugins/wpcb/logo/LogoMercanetBnpParibas.gif",
+					"wpec_gateway_image" => site_url()."/wp-content/plugins/wpcb/logo/LogoMercanetBnpParibas.gif",
 					"wpec_display_name" => "Cartes bancaires (Visa, Master Card,...)",
 					"test"=>"0","demo"=>"0","version"=>$plugin_data['Version'],
 					"emailapiKey"=>"salut@yop.com","apiKey"=>"***",
@@ -115,7 +111,7 @@ function wpcb_render_form() {
 		<ol>
 		<?php
 		$sourceFile=dirname(__FILE__).'/automatic_response.php';
-		$destinationFile = __WPRoot__.'/automatic_response.php';			
+		$destinationFile = dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php';			
 		if (
 		(!file_exists($destinationFile)) || 
 		( (isset($_GET['action'])) && ($_GET['action']=='copyautomaticresponse')) 
@@ -123,14 +119,14 @@ function wpcb_render_form() {
 				copy($sourceFile, $destinationFile);
 		}
 		if(file_exists(!$destinationFile)){
-			$nonce_url=wp_nonce_url(__WPUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse');
+			$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse'));
 			echo '<li><span style="color:red;">Copier le fichier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
 		} 
 		else {
 			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
 		}
 		$sourceFile = dirname(__FILE__).'/wpcb.merchant.php';
-		$destinationFile = __WPRoot__.'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
+		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
 		if (
 		(!file_exists($destinationFile)) ||
 		((isset($_GET['action'])) && ($_GET['action']=='copywpcbmerchant'))
@@ -138,7 +134,7 @@ function wpcb_render_form() {
 			copy($sourceFile, $destinationFile);
 		}
 		if(!file_exists($destinationFile)) {
-			$nonce_url=wp_nonce_url(__WPUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant');
+			$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant'));
 			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
 		} 
 		else {
@@ -230,12 +226,16 @@ function wpcb_render_form() {
 				<td><input type="text" size="3" name="wpcb_options[currency_code]" value="<?php echo $options['currency_code']; ?>" /></td>
 				</tr>
 				<tr>
-				<th scope="row">normal_return_url (là où les gens sont redirigés lorsqu'ils cliquent sur retour à la boutique)</th>
+				<th scope="row">normal_return_url (là où les gens sont redirigés lorsqu'ils cliquent sur retour à la boutique. Dev : sessionid est ajouté en GET)</th>
 				<td><input type="text" size="57" name="wpcb_options[normal_return_url]" value="<?php echo $options['normal_return_url']; ?>" /></td>
 				</tr>
 				<tr>
-				<th scope="row">cancel_return_url (là ou les gens sont redirigés s'ils annulent leur paiement)</th>
+				<th scope="row">cancel_return_url (là ou les gens sont redirigés s'ils annulent leur paiement Dev : sessionid est ajouté en GET)</th>
 				<td><input type="text" size="57" name="wpcb_options[cancel_return_url]" value="<?php echo $options['cancel_return_url']; ?>" /></td>
+				</tr>
+				<tr>
+				<th scope="row">automatic_response_url (Mettre à jour puis vérifier ensuite que le lien renvoi une page blanche <a href="<?php echo $options['automatic_response_url']?>" target="_blank">en cliquant ici)</a></th>
+				<td><input type="text" size="57" name="wpcb_options[automatic_response_url]" value="<?php echo $options['automatic_response_url']; ?>" /></td>
 				</tr>
 				<tr>
 				<th scope="row">language (fr pour français)</th>
@@ -313,13 +313,15 @@ function wpcb_render_form() {
 		echo '<p>Infos Développeur:</p>';
 		echo '<ul>';
 		echo '<li><p>Plugin version : '.$options['version'].'</li>';
-		echo '<li><p>Racine wordpress : '.__WPRoot__.'</p></li>';
-		echo '<li>Racine site : '.__ServerRoot__.'</li>';
+		echo '<li><p>Dossier Plugin : '.dirname(__FILE__).'</p></li>';
+		echo '<li><p>Racine wordpress : '.dirname(dirname(dirname(dirname(__FILE__)))).'</p></li>';
 		echo '<li>Automatic Response : <a href="'.site_url('automatic_response.php').'" target="_blank">'.site_url('automatic_response.php').'</a></li>';
-		$nonce_url=wp_nonce_url(__WPUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse');
-		echo '<li>Developpeur : Copier le fichier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
-		$nonce_url=wp_nonce_url(__WPUrl__.'/wp-admin/options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant');
-		echo '<li>Developpeur : Copier le fichier '.dirname(__FILE__).'/wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copyautomaticresponse'));
+		$destinationFile = dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php';
+		echo '<li>Developpeur : Copier automatic_response.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		$nonce_url=wp_nonce_url(admin_url( 'options-general.php?page=wpcb/wpcb.php&action=copywpcbmerchant'));
+		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
+		echo '<li>Developpeur : Copier wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 		?>
 			<li><a href="http://www.seoh.fr" target="_blank">Référencer votre site e-commerce avec l'agence SEOh</a></li>
 			<li><a href="http://profiles.wordpress.org/6www">Les autres plugins de 6WWW</a></li>
@@ -413,10 +415,10 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 	if (!$purch_log_email){$purch_log_email=get_bloginfo('admin_email');}
 	if ($_GET['action']=='CB'){
 		// cf. Dictionnaire des Données Atos :
-		if ($options['demo']){
+		if ((array_key_exists('demo', $options)) && ($options['demo'])){
 			$merchant_id="082584341411111";
-			$pathfile=__ServerRoot__."/cgi-bin/demo/pathfile";
-			$path_bin_request =__ServerRoot__."/cgi-bin/demo/request";
+			$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
+			$path_bin_request =dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request";
 		}
 		else{
 			$merchant_id=$options['merchant_id'];	
@@ -426,13 +428,14 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 		$parm="merchant_id=". $merchant_id;
 		$parm="$parm merchant_country=".$options['merchant_country'];
 		$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1") ;
-		$amount=number_format($purchase_log->totalprice,2)*100;
-		$parm="$parm amount=".str_pad($amount,3,"0",STR_PAD_LEFT);
+		$amount= ($purchase_log->totalprice)*100;
+		$amount=str_pad($amount,3,"0",STR_PAD_LEFT);
+		$parm="$parm amount=".$amount;
 		$parm="$parm currency_code=".$options['currency_code'];
 		$parm="$parm pathfile=". $pathfile;
-		$parm="$parm normal_return_url=".$options['normal_return_url'];
-		$parm="$parm cancel_return_url=".$options['cancel_return_url'];
-		$parm="$parm automatic_response_url=".site_url('automatic_response.php');
+		$parm="$parm normal_return_url=".$options['normal_return_url']."?sessionid=".$sessionid;
+		$parm="$parm cancel_return_url=".$options['cancel_return_url']."?sessionid=".$sessionid;
+		$parm="$parm automatic_response_url=".$options['automatic_response_url'];
 		$parm="$parm language=".$options['language'];
 		$parm="$parm payment_means=".$options['payment_means'];
 		$parm="$parm header_flag=".$options['header_flag'];
