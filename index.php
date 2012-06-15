@@ -3,8 +3,8 @@
 /*
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
-Description: Credit Card Payement Gateway for ATOS SIPS (Mercanet,...) (WP e-Commerce is required)
-Version: 2.0
+Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
+Version: 2.1
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -17,7 +17,6 @@ $merchantfiles=array('atos','cheque','virement','simplepaypal','systempaycyberpl
 	foreach ($merchantfiles as $merchantfile){
 		unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
 	}
-unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-shipping/livraison.php');
 }
 
 // Actions lors de la mise en jour du plugin :
@@ -76,7 +75,6 @@ function wpcb_activate() {
 	foreach ($merchantfiles as $merchantfile){
 		copy(dirname(__FILE__).'/'.$merchantfile.'.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
 	}
-	copy(dirname(__FILE__).'/livraison.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-shipping/livraison.php');
 }
 
 function wpcb_plugin_menu() {add_plugins_page('WPCB','WPCB','administrator','wpcb','wpcb_display');}
@@ -95,33 +93,33 @@ function wpcb_display() {
             $active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'general';
         ?>
   
-        <h2 class="nav-tab-wrapper">  
-            <a href="?page=wpcb&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">Options générales</a>  
-            <a href="?page=wpcb&tab=atos" class="nav-tab <?php echo $active_tab == 'atos' ? 'nav-tab-active' : ''; ?>">Atos</a>
-            <a href="?page=wpcb&tab=cheque" class="nav-tab <?php echo $active_tab == 'cheque' ? 'nav-tab-active' : ''; ?>">Chèque</a>
-            <a href="?page=wpcb&tab=virement" class="nav-tab <?php echo $active_tab == 'virement' ? 'nav-tab-active' : ''; ?>">Virement</a>
-            <a href="?page=wpcb&tab=paypal" class="nav-tab <?php echo $active_tab == 'paypal' ? 'nav-tab-active' : ''; ?>">Paypal</a>
-			<a href="?page=wpcb&tab=systempaycyberplus" class="nav-tab <?php echo $active_tab == 'systempaycyberplus' ? 'nav-tab-active' : ''; ?>">Systempay Cyberplus</a>
-			<a href="?page=wpcb&tab=livraison" class="nav-tab <?php echo $active_tab == 'livraison' ? 'nav-tab-active' : ''; ?>">Livraison</a>
-			<a href="?page=wpcb&tab=mailchimp" class="nav-tab <?php echo $active_tab == 'mailchimp' ? 'nav-tab-active' : ''; ?>">Mailchimp</a>
-            <a href="?page=wpcb&tab=dev" class="nav-tab <?php echo $active_tab == 'dev' ? 'nav-tab-active' : ''; ?>">Dev</a>
+        <h2 class="nav-tab-wrapper">
+            <a style="font-size:11px;" href="?page=wpcb&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">Options générales</a>  
+            <a style="font-size:11px;" href="?page=wpcb&tab=atos" class="nav-tab <?php echo $active_tab == 'atos' ? 'nav-tab-active' : ''; ?>">Atos</a>
+            <a style="font-size:11px;" href="?page=wpcb&tab=cheque" class="nav-tab <?php echo $active_tab == 'cheque' ? 'nav-tab-active' : ''; ?>">Chèque</a>
+            <a style="font-size:11px;" href="?page=wpcb&tab=virement" class="nav-tab <?php echo $active_tab == 'virement' ? 'nav-tab-active' : ''; ?>">Virement</a>
+            <a style="font-size:11px;" href="?page=wpcb&tab=paypal" class="nav-tab <?php echo $active_tab == 'paypal' ? 'nav-tab-active' : ''; ?>">Paypal</a>
+			<a style="font-size:11px;" href="?page=wpcb&tab=systempaycyberplus" class="nav-tab <?php echo $active_tab == 'systempaycyberplus' ? 'nav-tab-active' : ''; ?>">Systempay Cyberplus</a>
+			<a style="font-size:11px;" href="?page=wpcb&tab=livraison" class="nav-tab <?php echo $active_tab == 'livraison' ? 'nav-tab-active' : ''; ?>">Livraison</a>
+			<a style="font-size:11px;" href="?page=wpcb&tab=mailchimp" class="nav-tab <?php echo $active_tab == 'mailchimp' ? 'nav-tab-active' : ''; ?>">Mailchimp</a>
+            <a style="font-size:11px;" href="?page=wpcb&tab=dev" class="nav-tab <?php echo $active_tab == 'dev' ? 'nav-tab-active' : ''; ?>">Dev</a>
         </h2>  
   
 
         <!-- Create the form that will be used to render our options -->  
         <form method="post" action="options.php"> 
         <?php
-    if( $active_tab == 'general' ) {settings_fields( 'wpcb_general' );do_settings_sections( 'wpcb_general' );}
-	elseif( $active_tab == 'atos' ) {settings_fields( 'wpcb_atos' );do_settings_sections( 'wpcb_atos' );}
-	elseif( $active_tab == 'cheque' ) {settings_fields( 'wpcb_cheque' );do_settings_sections( 'wpcb_cheque' );}
-    elseif( $active_tab == 'virement' ) {settings_fields( 'wpcb_virement' );do_settings_sections( 'wpcb_virement' );}
-    elseif( $active_tab == 'paypal' ) {settings_fields( 'wpcb_paypal' );do_settings_sections( 'wpcb_paypal' );}
-	elseif( $active_tab == 'systempaycyberplus'){settings_fields( 'wpcb_systempaycyberplus');do_settings_sections('wpcb_systempaycyberplus');}
-	elseif( $active_tab == 'livraison' ) {settings_fields( 'wpcb_livraison' );do_settings_sections( 'wpcb_livraison');}
-	elseif( $active_tab == 'mailchimp' ) {settings_fields( 'wpcb_mailchimp' );do_settings_sections( 'wpcb_mailchimp');}
-    elseif( $active_tab == 'dev' ) {settings_fields( 'wpcb_dev' ); do_settings_sections( 'wpcb_dev');}
-	submit_button();
- ?>  
+	    if( $active_tab == 'general' ) {settings_fields( 'wpcb_general' );do_settings_sections( 'wpcb_general' );}
+	    elseif( $active_tab == 'atos' ) {settings_fields( 'wpcb_atos' );do_settings_sections( 'wpcb_atos' );}
+		elseif( $active_tab == 'cheque' ) {settings_fields( 'wpcb_cheque' );do_settings_sections( 'wpcb_cheque' );}
+	    elseif( $active_tab == 'virement' ) {settings_fields( 'wpcb_virement' );do_settings_sections( 'wpcb_virement' );}
+	    elseif( $active_tab == 'paypal' ) {settings_fields( 'wpcb_paypal' );do_settings_sections( 'wpcb_paypal' );}
+		elseif( $active_tab == 'systempaycyberplus'){settings_fields( 'wpcb_systempaycyberplus');do_settings_sections('wpcb_systempaycyberplus');}
+		elseif( $active_tab == 'livraison' ) {settings_fields( 'wpcb_livraison' );do_settings_sections( 'wpcb_livraison' );}
+		elseif( $active_tab == 'mailchimp' ) {settings_fields( 'wpcb_mailchimp' );do_settings_sections( 'wpcb_mailchimp' );}
+	    elseif( $active_tab == 'dev' ) {settings_fields( 'wpcb_dev' ); do_settings_sections( 'wpcb_dev' );}
+	    submit_button();
+	    ?>
 	</form>  
     </div><!-- /.wrap -->  
 <?php  
@@ -154,7 +152,7 @@ function wpcb_general_callback() {
 		$installed=false;
 		if (!file_exists(dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php')){
 			if(!copy(dirname(__FILE__).'/'.$merchantfile.'.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php')){
-				$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=copyfiles'));
+				$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=copymerchants'));
 				echo '<li><span style="color:red;">'.$merchantfile.'.merchant.php n\'est pas installé. <a href="'.$nonce_url.'">Installer</a></span></li>';
 			}
 			else {
@@ -568,33 +566,119 @@ function wpcb_wpec_gateway_image_systempaycyberplus_callback(){
         echo '<input type="text" size="75" id="wpec_gateway_image_systempaycyberplus" name="wpcb_systempaycyberplus[wpec_gateway_image_systempaycyberplus]" value="' . $val . '" />';
 }
 
-
 /** 
-* LIVRAISON options
+* Livraison options
 */  
 function wpcb_intialize_livraison_options() {  
     if(false == get_option( 'wpcb_livraison' )){add_option( 'wpcb_livraison' );}
-	add_settings_section('livraison_settings_section','Options de livraison','wpcb_livraison_callback','wpcb_livraison');
+	add_settings_section('livraison_settings_section','livraison Options','wpcb_livraison_callback','wpcb_livraison');
 	// Add the fields :
-	add_settings_field('lettremaxdisplayname','Nom pour Lettre MAX','wpcb_lettremaxdisplayname_callback','wpcb_livraison','livraison_settings_section');
-	//add_settings_field('certificat','Certificat','wpcb_certificat_callback','wpcb_livraison','livraison_settings_section');
-	//add_settings_field('wpec_gateway_image_paypal','Image sur la page de choix du paiement','wpcb_wpec_gateway_image_livraison_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('ENLEVEMENT','Proposer l\'enlèvement sur place','wpcb_ENLEVEMENT_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('ENLEVEMENT_name','Affichage pour Enlèvement (adresse par exemple)','wpcb_ENLEVEMENT_name_callback','wpcb_livraison','livraison_settings_section');
+		add_settings_field('COLIS','Proposer la poste colis','wpcb_COLIS_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('COLIS_name','Affichage pour Colis','wpcb_COLIS_name_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('CHRONOPOST','Proposer la poste chronopost','wpcb_CHRONOPOST_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('CHRONOPOST_name','Affichage Chronopost','wpcb_CHRONOPOST_name_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('ENVELOPPEDOCUMENT','Proposer la poste Enveloppe Document','wpcb_ENVELOPPEDOCUMENT_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('ENVELOPPEDOCUMENT_name','Affichage enveloppe document France','wpcb_ENVELOPPEDOCUMENT_name_callback','wpcb_livraison','livraison_settings_section');
+		add_settings_field('ENVELOPPEDOCUMENTUE','Proposer la poste Enveloppe Document Union Européenne','wpcb_ENVELOPPEDOCUMENTUE_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('ENVELOPPEDOCUMENTUE_name','Affichage enveloppe document Union Européenne','wpcb_ENVELOPPEDOCUMENTUE_name_callback','wpcb_livraison','livraison_settings_section');
+		add_settings_field('ENVELOPPEDOCUMENTOMRDM','Proposer la poste Enveloppe Document Outre-Mer Reste du Monde','wpcb_ENVELOPPEDOCUMENTOMRDM_callback','wpcb_livraison','livraison_settings_section');
+		add_settings_field('ENVELOPPEDOCUMENTOMRDM_name','Affichage enveloppe document Outre-Mer & Reste du Monde','wpcb_ENVELOPPEDOCUMENTOMRDM_name_callback','wpcb_livraison','livraison_settings_section');
+
 	// Register the fields :
 	register_setting('wpcb_livraison','wpcb_livraison',''); //sanitize
 }
 add_action( 'admin_init', 'wpcb_intialize_livraison_options' );  
+include('livraison.php');
 function wpcb_livraison_callback() {  
-    echo '<p>Réglage des options de livraison</p>';  
+    echo '<p>Réglage des options pour la livraison</p>';  
+    // API
+		$post_data['apiKey']=$wpcb_general['apiKey'];
+		$post_data['emailapiKey']=$wpcb_general['emailapiKey'];
+		$response=wp_remote_post('http://wpcb.fr/api/wpcb/valid.php',array('body' =>$post_data));
+		$valid=unserialize($response['body']);
+		if ($valid[0]){
+			echo '<p><span style="color:green">Votre clé API est valide -> OK!</span></p>';
+		}
+		else {
+			echo '<p><span style="color:red">Optionel : Vous pouvez débloquer les options de livraison et calcul de frais de port en achetant une clé API</a>.</span> C\'est pas cher et ça m\'aide à améliorer mes plugins.</p>';
+		}
+		// END OF API
+		echo '<p>Si les tarifs (donnés à titre indicatif) ont changé, merci de me le notifier à thomas@6www.net. </p>';
 }
-
-function wpcb_lettremaxdisplayname_callback(){  
+function wpcb_ENLEVEMENT_callback($args){  
     $options = get_option( 'wpcb_livraison');  
-    $defaultval = 'Lettre Max (2 jours)'; 
-    if(isset($options['lettremaxdisplayname'])){$val = $options['lettremaxdisplayname'];}else{$val=$defaultval;}
-        echo '<input type="text"  size="75" id="lettremaxdisplayname" name="wpcb_livraison[lettremaxdisplayname]" value="' . $val . '" placeholder="'.$defaultval.'"/>';  
+	$html = '<input type="checkbox" id="ENLEVEMENT" name="wpcb_livraison[ENLEVEMENT]" value="1" ' . checked(1, $options['ENLEVEMENT'], false) . '/>';  
+    $html .= '<label for="ENLEVEMENT"> '  . $args[0] . '</label>';   
+    echo $html;
 }
-
-
+function wpcb_ENLEVEMENT_name_callback(){  
+    $options = get_option( 'wpcb_livraison');  
+    $defaultval = 'Enlèvement sur place à Lyon Centre'; 
+    if(isset($options['ENLEVEMENT_name'])){$val = $options['ENLEVEMENT_name'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="ENLEVEMENT_name" name="wpcb_livraison[ENLEVEMENT_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
+}
+function wpcb_COLIS_callback($args){  
+    $options = get_option( 'wpcb_livraison');  
+	$html = '<input type="checkbox" id="COLIS" name="wpcb_livraison[COLIS]" value="1" ' . checked(1, $options['COLIS'], false) . '/>';  
+    $html .= '<label for="COLIS"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_COLIS_name_callback(){  
+    $options = get_option( 'wpcb_livraison');  
+    $defaultval = 'Colieco'; 
+    if(isset($options['COLIS_name'])){$val = $options['COLIS_name'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="COLIS_name" name="wpcb_livraison[COLIS_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
+}
+function wpcb_CHRONOPOST_callback($args){  
+    $options = get_option( 'wpcb_livraison');  
+	$html = '<input type="checkbox" id="CHRONOPOST" name="wpcb_livraison[CHRONOPOST]" value="1" ' . checked(1, $options['CHRONOPOST'], false) . '/>';  
+    $html .= '<label for="CHRONOPOST"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_CHRONOPOST_name_callback(){  
+    $options = get_option( 'wpcb_livraison');  
+    $defaultval = 'Chronopost'; 
+    if(isset($options['CHRONOPOST_name'])){$val = $options['CHRONOPOST_name'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="CHRONOPOST_name" name="wpcb_livraison[CHRONOPOST_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
+}
+function wpcb_ENVELOPPEDOCUMENT_callback($args){  
+    $options = get_option( 'wpcb_livraison');  
+	$html = '<input type="checkbox" id="ENVELOPPEDOCUMENT" name="wpcb_livraison[ENVELOPPEDOCUMENT]" value="1" ' . checked(1, $options['ENVELOPPEDOCUMENT'], false) . '/>';  
+    $html .= '<label for="ENVELOPPEDOCUMENT"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_ENVELOPPEDOCUMENT_name_callback(){  
+    $options = get_option( 'wpcb_livraison');  
+    $defaultval = 'Enveloppe Document France'; 
+    if(isset($options['ENVELOPPEDOCUMENT_name'])){$val = $options['ENVELOPPEDOCUMENT_name'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="ENVELOPPEDOCUMENT_name" name="wpcb_livraison[ENVELOPPEDOCUMENT_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
+}
+function wpcb_ENVELOPPEDOCUMENTUE_callback($args){  
+    $options = get_option( 'wpcb_livraison');  
+	$html = '<input type="checkbox" id="ENVELOPPEDOCUMENTUE" name="wpcb_livraison[ENVELOPPEDOCUMENTUE]" value="1" ' . checked(1, $options['ENVELOPPEDOCUMENTUE'], false) . '/>';  
+    $html .= '<label for="ENVELOPPEDOCUMENTUE"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_ENVELOPPEDOCUMENTUE_name_callback(){  
+    $options = get_option( 'wpcb_livraison');  
+    $defaultval = 'Enveloppe Document Union Européenne'; 
+    if(isset($options['ENVELOPPEDOCUMENTUE_name'])){$val = $options['ENVELOPPEDOCUMENTUE_name'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="ENVELOPPEDOCUMENTUE_name" name="wpcb_livraison[ENVELOPPEDOCUMENTUE_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
+}
+function wpcb_ENVELOPPEDOCUMENTOMRDM_callback($args){  
+    $options = get_option( 'wpcb_livraison');  
+	$html = '<input type="checkbox" id="ENVELOPPEDOCUMENTOMRDM" name="wpcb_livraison[ENVELOPPEDOCUMENTOMRDM]" value="1" ' . checked(1, $options['ENVELOPPEDOCUMENTOMRDM'], false) . '/>';  
+    $html .= '<label for="ENVELOPPEDOCUMENTOMRDM"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_ENVELOPPEDOCUMENTOMRDM_name_callback(){  
+    $options = get_option( 'wpcb_livraison');  
+    $defaultval = 'Enveloppe Document Outre-Mer & Reste du monde'; 
+    if(isset($options['ENVELOPPEDOCUMENTOMRDM_name'])){$val = $options['ENVELOPPEDOCUMENTOMRDM_name'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="ENVELOPPEDOCUMENTOMRDM_name" name="wpcb_livraison[ENVELOPPEDOCUMENTOMRDM_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
+}
 
 /** 
 * Developper options
@@ -623,15 +707,14 @@ function wpcb_dev_callback() {
 		echo '<li><p>Plugin version : '.$wpcb_dev['version'].'</li>';
 		echo '<li><p>Dossier Plugin : '.dirname(__FILE__).'</p></li>';
 		echo '<li><p>Racine wordpress : '.dirname(dirname(dirname(dirname(__FILE__)))).'</p></li>';
-		if	((isset($_GET['action'])) && ($_GET['action']=='copyfiles')){
+		if	((isset($_GET['action'])) && ($_GET['action']=='copymerchants')){
 		$merchantfiles=array('atos','cheque','virement','simplepaypal','systempaycyberplus');
 		foreach ($merchantfiles as $merchantfile){
 			copy(dirname(__FILE__).'/'.$merchantfile.'.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
 		}
-		copy(dirname(__FILE__).'/livraison.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-shipping/livraison.php');
 		}
-		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=copyfiles'));
-		echo '<li>Copier les fichiers <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=copymerchants'));
+		echo '<li>Copier les fichiers merchants <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=sandbox'));
 		echo '<li>Tester votre fichier ipn atos <a href="'.$nonce_url.'">en cliquant ici</a> (Cela va mettre Ã  jour log.txt et google drive)</li>';
 		echo '<li>'.$wpcb_atos['automatic_response_url'].'</li>';
