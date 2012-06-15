@@ -1,16 +1,16 @@
 <?php
-$options = get_option('simplepaypal_options');
+$wpcb_paypal_options = get_option ( 'wpcb_paypal_options' );
 $nzshpcrt_gateways[$num] = array(
 'name' => 'Paypal (WPCB)',
 'api_version' => 2.0,
 'class_name' => 'wpsc_merchant_simplepaypal',
 'has_recurring_billing' => true,
-'display_name' => $options['wpec_display_name'],
+'display_name' => 'Paypal ',
 'wp_admin_cannot_cancel' => false,
 'requirements' => array(),'form' => 'form_simplepaypal',
 'internalname' => 'simplepaypal',
 'submit_function' => 'submit_simplepaypal',
-'image' => $options['wpec_gateway_image_paypal']
+'image' => $wpcb_paypal_options['wpec_gateway_image_paypal']
 );
 
 class wpsc_merchant_simplepaypal extends wpsc_merchant {
@@ -26,7 +26,7 @@ class wpsc_merchant_simplepaypal extends wpsc_merchant {
 } //end of class
 
 function form_simplepaypal() {
-	$output='<a href="'.site_url().'/wp-admin/options-general.php?page=wpcb/wpcb.php">Cliquez ici pour les réglages</a>';
+	$output='<a href="plugins.php?page=wpcb_plugin_options&tab=paypal_options">Cliquez ici pour les autres réglages</a>';
 	return $output;
 }
 
