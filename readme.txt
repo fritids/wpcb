@@ -1,8 +1,11 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 2.0
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 2.1
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
-== Description ==Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.Fonctionne pour de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
-* et de nombreuses autres banques basée sur la technologie ATOS SIPS
+Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
+== Description ==Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
+Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
+Fonctionne pour de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
+* et de nombreuses autres banques basée sur la technologie ATOS SIPS ou SYSTEMPAY CYBERPLUS
 
 = Attention =
 Version Beta !
@@ -10,12 +13,14 @@ La dernière version stable : http://downloads.wordpress.org/plugin/wpcb.1.1.9.z
 
 = Pour les détenteurs d'une clé API =
 * Support pour la mise en place du plugin par email.
+* Calcul des frais de port !
 * Ajout dans google drive de toutes vos ventes !
 * Ajout de tous vos acheteurs dans votre outil de mailling MailChimp
 = A venir pour les détenteurs d'une clé API =
 * Sauter l'étape de clic sur l'icone des cartes ou du bouton paypal (comme woocommerce)
 == Installation ==1. Envoyer `wpcb` vers le dossier `/wp-content/plugins/`2. Activer le plugin dans le menu 'Extensions' de Wordpress3. Placer `[wpcb]` sur une (et une seule!) page
 4. Régler les paramètres suivant les indications
+5. Rendez-vous sur http://wpcb.fr/api-key pour débloquer les options pro
 
 == Frequently Asked Questions ==
 
@@ -96,7 +101,12 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 4. Réglages Paypal
 5. Réglages Systempay Cyberplus (Banque Populaire)
 6. Réglages Mailchimp
-7. Placer le shortcode wpcb sur une page / Options de paiement== Changelog ==
+7. Placer le shortcode wpcb sur une page / Options de paiement8. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
+== Changelog ==
+
+= 2.1 =
+* Pour les détenteurs de l'API : Ajout du module de calcul de frais de port. Mon autre plugin : http://wordpress.org/extend/plugins/wp-e-commerce-livraison-france/ va être remplacé par celui çi.
+
 = 2 =* Version beta !!!* Ajout d'une fonction sandbox pour tester vos paiement et le bon fonctionnement de votre fichier automatique response* Ajout du mode de paiement par chèque !* Ajout du mode de paiement par virement bancaire !
 * Changement d'interface de réglage
 * Ajout de Cyberplus Systempay= 1.1.9 =* Ajout de la session id en get dans les normal et cancel return* Ajout de automatic_response_url comme choix libre par le commercant dans le cas ou son site bloque certains dossier (deplacement manuel dans ce cas)* Correction d'une erreur avec l'affichage des milliers et decimaux dans le calcul des prix (>1000€!)* Correction mineures à droite à gauche pour plus de simplicité...= 1.1.8.1 =* Bug si Zend non installé, corrigé
