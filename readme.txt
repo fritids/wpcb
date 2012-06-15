@@ -1,13 +1,12 @@
-=== WP e-Commerce Atos SIPS ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 1.1.9
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 2.0
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
-== Description ==Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.Fonctionne pour de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
+== Description ==Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.Fonctionne pour de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
 * et de nombreuses autres banques basée sur la technologie ATOS SIPS
 
 = Attention =
 Version Beta !
 La dernière version stable : http://downloads.wordpress.org/plugin/wpcb.1.1.9.zip
-
 
 = Pour les détenteurs d'une clé API =
 * Support pour la mise en place du plugin par email.
@@ -98,7 +97,7 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 5. Réglages Systempay Cyberplus (Banque Populaire)
 6. Réglages Mailchimp
 7. Placer le shortcode wpcb sur une page / Options de paiement== Changelog ==
-= 2 =* Ajout d'une fonction sandbox pour tester vos paiement et le bon fonctionnement de votre fichier automatique response* Ajout du mode de paiement par chèque !* Ajout du mode de paiement par virement bancaire !
+= 2 =* Version beta !!!* Ajout d'une fonction sandbox pour tester vos paiement et le bon fonctionnement de votre fichier automatique response* Ajout du mode de paiement par chèque !* Ajout du mode de paiement par virement bancaire !
 * Changement d'interface de réglage
 * Ajout de Cyberplus Systempay= 1.1.9 =* Ajout de la session id en get dans les normal et cancel return* Ajout de automatic_response_url comme choix libre par le commercant dans le cas ou son site bloque certains dossier (deplacement manuel dans ce cas)* Correction d'une erreur avec l'affichage des milliers et decimaux dans le calcul des prix (>1000€!)* Correction mineures à droite à gauche pour plus de simplicité...= 1.1.8.1 =* Bug si Zend non installé, corrigé
 = 1.1.8 =

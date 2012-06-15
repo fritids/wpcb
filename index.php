@@ -1,25 +1,22 @@
 <?php
 
 /*
-Plugin Name:WP e-Commerce Atos SIPS
+Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Credit Card Payement Gateway for ATOS SIPS (Mercanet,...) (WP e-Commerce is required)
-Version: 1.1.9
+Version: 2.0
 Author: 6WWW
 Author URI: http://6www.net
 */
 
-wp_deregister_script('admin-bar');
-wp_deregister_style('admin-bar');
-remove_action('wp_footer','wp_admin_bar_render',1000);
+
 
 register_deactivation_hook( __FILE__, 'wpcb_deactivate' );
 function wpcb_deactivate(){
-	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/atos.merchant.php');
-	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/cheque.merchant.php');
-	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/virement.merchant.php');
-	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/simplepaypal.merchant.php');
-	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/systempaycyberplus.merchant.php');
+$merchantfiles=array('atos','cheque','virement','simplepaypal','systempaycyberplus');
+	foreach ($merchantfiles as $merchantfile){
+		unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
+	}
 }
 
 // Actions lors de la mise en jour du plugin :
@@ -148,98 +145,24 @@ function wpcb_general_callback() {
     echo '<ol>';
     $merchantfiles=array('atos','cheque','virement','simplepaypal','systempaycyberplus');
 	foreach ($merchantfiles as $merchantfile){
+		$installed=false;
 		if (!file_exists(dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php')){
-			copy(dirname(__FILE__).'/'.$merchantfile.'.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
-			
-			
-			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
-			
+			if(!copy(dirname(__FILE__).'/'.$merchantfile.'.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php')){
+				$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=copymerchants'));
+				echo '<li><span style="color:red;">'.$merchantfile.'.merchant.php n\'est pas installé. <a href="'.$nonce_url.'">Installer</a></span></li>';
+			}
+			else {
+				$installed=true;
+			}
 		}
+		else{
+			$installed=true;
+		}
+		if ($installed) {
+				echo '<li><span style="color:green">Le fichier '.$merchantfile.'.merchant.php est bien au bon endroit -> OK!</span></li>';
+			}
 	}
 	
-		$sourceFile = dirname(__FILE__).'/atos.merchant.php';
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/atos.merchant.php';
-		if (
-		(!file_exists($destinationFile)) ||
-		((isset($_GET['action'])) && ($_GET['action']=='copyatosmerchant'))
-		){
-			copy($sourceFile, $destinationFile);
-		}
-		if(!file_exists($destinationFile)) {
-			$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=general_options&action=copyatosmerchant'));
-			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/atos.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
-		} 
-		else {
-			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
-		}
-		// Copy chèques :
-		$sourceFile = dirname(__FILE__).'/cheque.merchant.php';
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/cheque.merchant.php';
-		if (
-		(!file_exists($destinationFile)) ||
-		((isset($_GET['action'])) && ($_GET['action']=='copychequemerchant'))
-		){
-			copy($sourceFile, $destinationFile);
-		}
-		if(!file_exists($destinationFile)) {
-			$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=general_options&action=copychequemerchant'));
-			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/cheque.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
-		} 
-		else {
-			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
-		}
-		// Fin copy chèque
-		// Copy Virement :
-		$sourceFile = dirname(__FILE__).'/virement.merchant.php';
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/virement.merchant.php';
-		if (
-		(!file_exists($destinationFile)) ||
-		((isset($_GET['action'])) && ($_GET['action']=='copyvirementmerchant'))
-		){
-			copy($sourceFile, $destinationFile);
-		}
-		if(!file_exists($destinationFile)) {
-			$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=general_options&action=copyvirementmerchant'));
-			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/virement.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
-		} 
-		else {
-			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
-		}
-		// Fin copy Virement
-		// Copy Paypal :
-		$sourceFile = dirname(__FILE__).'/simplepaypal.merchant.php';
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/simplepaypal.merchant.php';
-		if (
-		(!file_exists($destinationFile)) ||
-		((isset($_GET['action'])) && ($_GET['action']=='copysimplepaypalmerchant'))
-		){
-			copy($sourceFile, $destinationFile);
-		}
-		if(!file_exists($destinationFile)) {
-			$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=general_options&action=copysimplepaypalmerchant'));
-			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/simplepaypal.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
-		} 
-		else {
-			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
-		}
-		// Fin copy Paypal
-		// Copy systempaycyberplus :
-		$sourceFile = dirname(__FILE__).'/systempaycyberplus.merchant.php';
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/systempaycyberplus.merchant.php';
-		if (
-		(!file_exists($destinationFile)) ||
-		((isset($_GET['action'])) && ($_GET['action']=='copysystempaycyberplusmerchant'))
-		){
-			copy($sourceFile, $destinationFile);
-		}
-		if(!file_exists($destinationFile)) {
-			$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=general_options&action=copysystempaycyberplusmerchant'));
-			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/systempaycyberplus.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
-		} 
-		else {
-			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
-		}
-		// Fin copy Paypal
 		$wpcb_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[wpcb]%' AND `post_status`='publish'");
 		if ($wpcb_checkout_page!=NULL){
 			echo '<li><span style="color:green">Le shortcode [wpcb] est sur la page : <a href="'.site_url('?page_id='.$wpcb_checkout_page->ID).'">'.$wpcb_checkout_page->ID.'</a> -> OK!</span></li>';
@@ -299,6 +222,8 @@ function wpcb_general_callback() {
 		
 		echo "<li>Remplissez les autres onglets d'options.</li>";
 		echo "</ol>";
+		echo '<p>La clé API vous donne accès à de nombreuses fonctionnalitées supplémentaires listée <a target="_blank" href="http://wordpress.org/extend/plugins/wpcb/">ici</a></p>';
+		echo '<p>Ca ne coute que 5€ HT et m\'aide à maintenir mes plugins à jour.</p><p>Vous pouvez la commander <a target="_blank" href="http://wpcb.fr/api-key/">ici</a></p>';
 } // end wpcb_general_callback  
   
 /* ------------------------------------------------------------------------ * 
@@ -372,7 +297,8 @@ add_action( 'admin_init', 'wpcb_intialize_atos_options' );
 
 
 function wpcb_atos_callback() {  
-    echo '<p>Réglage des options Carte bancaire Atos</p>';  
+    echo '<p>Réglage des options Carte bancaire Atos</p>';
+	echo '<p>En rouge les chemins à verifier</p>';
 } // end wpcb_general_callback  
 
 function wpcb_merchant_id_callback() {  
@@ -385,19 +311,23 @@ function wpcb_pathfile_callback() {
     $options = get_option( 'wpcb_atos');  
     $val = dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile"; 
     if(isset($options['pathfile'])){$val = $options['pathfile'];}
-    echo '<input type="text"  size="75"id="pathfile" name="wpcb_atos[pathfile]" value="' . $val . '" />';  
+	if (!file_exists($val)){$style='style="color:#FF0000;"';}
+    echo '<input type="text" '.$style.' size="75"id="pathfile" name="wpcb_atos[pathfile]" value="' . $val . '" />';  
 }
 function wpcb_path_bin_request_callback() {  
     $options = get_option( 'wpcb_atos');  
     $val = dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request"; 
     if(isset($options['path_bin_request'])){$val = $options['path_bin_request'];}
-    echo '<input type="text"  size="75"id="path_bin_request" name="wpcb_atos[path_bin_request]" value="' . $val . '" />';  
+	if (!file_exists($val)){$style='style="color:#FF0000;"';}
+    echo '<input type="text" '.$style.' size="75" id="path_bin_request" name="wpcb_atos[path_bin_request]" value="' . $val . '" />';
+	
 }
 function wpcb_path_bin_response_callback() {  
     $options = get_option( 'wpcb_atos');  
     $val = dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/response"; 
     if(isset($options['path_bin_response'])){$val = $options['path_bin_response'];}
-    echo '<input type="text"  size="75"id="path_bin_response" name="wpcb_atos[path_bin_response]" value="' . $val . '" />';  
+	if (!file_exists($val)){$style='style="color:#FF0000;"';}
+    echo '<input type="text" '.$style.' size="75"id="path_bin_response" name="wpcb_atos[path_bin_response]" value="' . $val . '" />';  
 }
 function wpcb_merchant_country_callback() {  
     $options = get_option( 'wpcb_atos');  
@@ -425,9 +355,9 @@ function wpcb_cancel_return_url_callback() {
 }
 function wpcb_automatic_response_url_callback() {  
     $options = get_option( 'wpcb_atos');  
-    $val = site_url()."?ipn=atos"; 
-    if(isset($options['automatic_response_url'])){$val = $options['automatic_response_url'];}
-    echo '<input type="text"  size="75"id="automatic_response_url" name="wpcb_atos[automatic_response_url]" value="' . $val . '" />';  
+    $defaultval = site_url()."?ipn=atos"; 
+    if (isset($options['automatic_response_url'])){$val=$options['automatic_response_url'];}else{$val=$defaultval;}
+    echo '<input type="text"  size="75" id="automatic_response_url" name="wpcb_atos[automatic_response_url]" value="' . $val . '" placeholder="'.$defaultval.'"/>';  
 }
 function wpcb_language_callback() {  
     $options = get_option( 'wpcb_atos');  
@@ -475,15 +405,16 @@ function wpcb_wpec_atos_gateway_image_callback() {
     $options = get_option( 'wpcb_atos');  
     $val = plugins_url('logo/LogoMercanetBnpParibas.gif',__FILE__); 
     if(isset($options['wpec_atos_gateway_image'])){$val = $options['wpec_atos_gateway_image'];}
+	echo '<img src="'.$val.'" width="75"/>';
     echo '<input type="text"  size="75"id="wpec_atos_gateway_image" name="wpcb_atos[wpec_atos_gateway_image]" value="' . $val . '" />';  
 }
-function wpcb_logfile_callback() {  
+function wpcb_logfile_callback(){  
     $options = get_option( 'wpcb_atos');  
-    $val = dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request"; 
+    $val = dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/logfile.txt"; 
     if(isset($options['logfile'])){$val = $options['logfile'];}
-    echo '<input type="text"  size="75"id="logfile" name="wpcb_atos[logfile]" value="' . $val . '" />';  
+	if (!file_exists($val)){$style='style="color:#FF0000;"';}
+    echo '<input type="text" '.$style.' size="75"id="logfile" name="wpcb_atos[logfile]" value="' . $val . '" />';  
 }
-
 
 /** 
 * Cheque options
@@ -494,8 +425,7 @@ function wpcb_intialize_cheque_options() {
 	add_settings_field('displaycheque','Afficher à l\'acheteur','wpcb_displaycheque_callback','wpcb_cheque','cheque_settings_section');
 	register_setting('wpcb_cheque','wpcb_cheque','');
 }
-add_action( 'admin_init', 'wpcb_intialize_cheque_options' );  
-
+add_action('admin_init', 'wpcb_intialize_cheque_options');  
 
 
 function wpcb_cheque_callback() {  
@@ -519,8 +449,6 @@ function wpcb_intialize_virement_options() {
 	register_setting('wpcb_virement','wpcb_virement','');
 } 
 add_action( 'admin_init', 'wpcb_intialize_virement_options' );  
-
-
 
 function wpcb_virement_callback() {  
     echo '<p>Réglage des options pour le paiement par virement bancaire</p>';  
@@ -576,14 +504,15 @@ function wpcb_wpec_gateway_image_paypal_callback(){
     $options = get_option( 'wpcb_paypal');  
     $val = plugins_url('logo/paypal.jpg' , __FILE__); 
     if(isset($options['wpec_gateway_image_paypal'])){$val = $options['wpec_gateway_image_paypal'];}
-        echo '<input type="text" size="75" id="wpec_gateway_image_paypal" name="wpcb_paypal[wpec_gateway_image_paypal]" value="' . $val . '" />';
+	echo '<img src="'.$val.'" widht="75"/>';
+	echo '<input type="text" size="75" id="wpec_gateway_image_paypal" name="wpcb_paypal[wpec_gateway_image_paypal]" value="' . $val . '" />';
 }
 
 function wpcb_notify_url_callback(){  
     $options = get_option( 'wpcb_paypal');  
-    $val =site_url().'?ipn=paypal'; 
-    if(isset($options['notify_url'])){$val = $options['notify_url'];}
-        echo '<input type="text"  size="75"id="notify_url" name="wpcb_paypal[notify_url]" value="' . $val . '" />';
+    $defaultval =site_url().'?ipn=paypal';
+    if(isset($options['notify_url'])){$val = $options['notify_url'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="notify_url" name="wpcb_paypal[notify_url]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
 }
 
 function wpcb_sandbox_paypal_callback($args){  
@@ -632,9 +561,6 @@ function wpcb_wpec_gateway_image_systempaycyberplus_callback(){
         echo '<img src="'.$val.'">';
         echo '<input type="text" size="75" id="wpec_gateway_image_systempaycyberplus" name="wpcb_systempaycyberplus[wpec_gateway_image_systempaycyberplus]" value="' . $val . '" />';
 }
-
-
-
 
 
 /** 
@@ -909,10 +835,6 @@ function wpcb_apikey_mailchimp_callback(){
     if(isset($options['apikey'])){$val = $options['apikey'];}
         echo '<input type="text"  size="75"id="apikey" name="wpcb_mailchimp[apikey]" value="' . $val . '" />';
 }
-
-
-
-
 
 
 add_action('wpsc_submit_checkout','add_to_mailchimp');
