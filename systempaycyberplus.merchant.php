@@ -1,7 +1,7 @@
 <?php
 $wpcb_systempaycyberplus_options = get_option ( 'wpcb_systempaycyberplus_options' );
 $nzshpcrt_gateways[$num] = array(
-'name' => 'Systempay Cyberplus',
+'name' => 'CB Systempay Cyberplus (WPCB)',
 'api_version' => 2.0,
 'class_name' => 'wpsc_merchant_systempaycyberplus',
 'has_recurring_billing' => true,
