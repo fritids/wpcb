@@ -1,10 +1,10 @@
 <?php
 // Cheques (forcement deux fichiers...)
 $nzshpcrt_gateways[$num] = array(
-	'name' => 'Cheque',
+	'name' => 'Cheque (WPCB)',
 	'api_version' => 2.0,
 	'has_recurring_billing' => true,
-	'display_name' => 'Paiement par Chèque',	
+	'display_name' => 'Paiement par ChÃ¨que',	
 	'wp_admin_cannot_cancel' => false,
 	'requirements' => array(),
 	'submit_function' => 'submit_cheque',
@@ -37,8 +37,8 @@ add_filter("wpsc_transaction_result_message_html", "cheque_custom_message");
 add_filter("wpsc_transaction_result_message", "cheque_custom_message");
 
 function form_cheque() {
-	// Les réglages se font ailleurs car les réglages de wpec sont trop pourris...
-	$output='<a href="'.admin_url().'/options-general.php?page=wpcb/wpcb.php">Cliquez ici pour les réglages</a>';
+	// Les rÃ©glages se font ailleurs car les rÃ©glages de wpec sont trop pourris...
+	$output='<a href="'.admin_url().'/options-general.php?page=wpcb/wpcb.php">Cliquez ici pour les rÃ©glages</a>';
 	return $output;
 }
 function submit_cheque(){return true;}

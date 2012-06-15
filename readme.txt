@@ -1,11 +1,19 @@
-=== WP e-Commerce Atos SIPS ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWWRequires at least: 2.7Tested up to: 3.3Stable tag: 1.1.9
+=== WP e-Commerce Atos SIPS ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 1.1.9
 
-Paiement par cartes bancaires (majoritée des banques françaises) pour le plugin WP e-Commerce.== Description ==Paiement par cartes bancaires Atos SIPS (majoritée des banques françaises) pour le plugin WP e-Commerce.Fonctionne pour de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
+Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
+== Description ==Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.Fonctionne pour de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
 * et de nombreuses autres banques basée sur la technologie ATOS SIPS
 
-= A venir pour les détenteurs d'une clé API =
+= Attention =
+Version Beta !
+La dernière version stable : http://downloads.wordpress.org/plugin/wpcb.1.1.9.zip
+
+
+= Pour les détenteurs d'une clé API =
+* Support pour la mise en place du plugin par email.
 * Ajout dans google drive de toutes vos ventes !
 * Ajout de tous vos acheteurs dans votre outil de mailling MailChimp
+= A venir pour les détenteurs d'une clé API =
 * Sauter l'étape de clic sur l'icone des cartes ou du bouton paypal (comme woocommerce)
 == Installation ==1. Envoyer `wpcb` vers le dossier `/wp-content/plugins/`2. Activer le plugin dans le menu 'Extensions' de Wordpress3. Placer `[wpcb]` sur une (et une seule!) page
 4. Régler les paramètres suivant les indications
@@ -85,8 +93,11 @@ Numéro de commande : %purchase_id%
 Les prix sont TTC.
 Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Email, Coordonnées postales, etc.'
 = Ou placer le fichier automatic_response.php ? =Ce fichier est automatiquement copié à la racine de votre blog wordpress c'est à dire à coté du fichier wp-config.phpSi cela n'est pas fait, faite le manuellement.= Comment configurer google drive pour recevoir les ventes ? =Télécharger le fichier <a href="https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc">https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc</a>Envoyer ce fichier dans votre google drive et noter votre nouvelle cle de fichier (dans mon fichier, à titre d'exemple, la clé est : 0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc cela se lit dans l'url)Ne changer pas les entetes et attention à ce que ce soit la feuille numéro 1 du classeur !!
-= Autre question ? =Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.== Screenshots ==1. Réglages du module2. Choix de la méthode de paiement3. Les cartes bancaires qui redirigent vers l'espace sécurisé Atos SIPS
-4. Réglages Systempay Cyberplus== Changelog ==
+= Autre question ? =Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.== Screenshots ==1. Réglages du module2. Réglages ATOS3. Réglages Chèque ou Virement
+4. Réglages Paypal
+5. Réglages Systempay Cyberplus (Banque Populaire)
+6. Réglages Mailchimp
+7. Placer le shortcode wpcb sur une page / Options de paiement== Changelog ==
 = 2 =* Ajout d'une fonction sandbox pour tester vos paiement et le bon fonctionnement de votre fichier automatique response* Ajout du mode de paiement par chèque !* Ajout du mode de paiement par virement bancaire !
 * Changement d'interface de réglage
 * Ajout de Cyberplus Systempay= 1.1.9 =* Ajout de la session id en get dans les normal et cancel return* Ajout de automatic_response_url comme choix libre par le commercant dans le cas ou son site bloque certains dossier (deplacement manuel dans ce cas)* Correction d'une erreur avec l'affichage des milliers et decimaux dans le calcul des prix (>1000€!)* Correction mineures à droite à gauche pour plus de simplicité...= 1.1.8.1 =* Bug si Zend non installé, corrigé

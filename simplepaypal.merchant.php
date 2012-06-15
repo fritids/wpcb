@@ -1,7 +1,7 @@
 <?php
 $options = get_option('simplepaypal_options');
 $nzshpcrt_gateways[$num] = array(
-'name' => 'Paypal Simple',
+'name' => 'Paypal (WPCB)',
 'api_version' => 2.0,
 'class_name' => 'wpsc_merchant_simplepaypal',
 'has_recurring_billing' => true,

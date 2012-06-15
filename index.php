@@ -15,10 +15,11 @@ remove_action('wp_footer','wp_admin_bar_render',1000);
 
 register_deactivation_hook( __FILE__, 'wpcb_deactivate' );
 function wpcb_deactivate(){
-	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/wpcb.merchant.php');
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/atos.merchant.php');
 	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/cheque.merchant.php');
 	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/virement.merchant.php');
 	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/simplepaypal.merchant.php');
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/systempaycyberplus.merchant.php');
 }
 
 // Actions lors de la mise en jour du plugin :
@@ -37,7 +38,7 @@ function wpcb_update(){
 	// Check if it is a plugin update :
 	 $wpcb_dev = get_option ( 'wpcb_dev' );
 	if (version_compare($wpcb_dev['version'],$plugin_data['Version'],"<")){
-		wpcb_activate(); // So that the 2 files wpcb.merchant.php  are copied again
+		wpcb_activate(); // So that the 2 files atos.merchant.php  are copied again
 	}
 		 // if the ZF plugin is successfully loaded this constant is set to true
   if (defined('WP_ZEND_FRAMEWORK') && constant('WP_ZEND_FRAMEWORK')) {
@@ -72,11 +73,10 @@ function wpcb_delete_plugin_options() {
 
 register_activation_hook(__FILE__, 'wpcb_activate');
 function wpcb_activate() {
-	copy(dirname(__FILE__). '/wpcb.merchant.php', dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/wpcb.merchant.php');
-	copy(dirname(__FILE__). '/cheque.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/cheque.merchant.php');
-	copy(dirname(__FILE__). '/virement.merchant.php', dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/virement.merchant.php');
-	copy(dirname(__FILE__). '/simplepaypal.merchant.php', dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/simplepaypal.merchant.php');
-	copy(dirname(__FILE__). '/systempaycyberplus.merchant.php', dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/systempaycyberplus.merchant.php');
+	$merchantfiles=array('atos','cheque','virement','simplepaypal','systempaycyberplus');
+	foreach ($merchantfiles as $merchantfile){
+		copy(dirname(__FILE__).'/'.$merchantfile.'.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
+	}
 }
 
 function wpcb_plugin_menu() {add_plugins_page('WPCB','WPCB','administrator','wpcb','wpcb_display');}
@@ -100,7 +100,7 @@ function wpcb_display() {
             <a href="?page=wpcb&tab=atos" class="nav-tab <?php echo $active_tab == 'atos' ? 'nav-tab-active' : ''; ?>">Atos</a>
             <a href="?page=wpcb&tab=cheque" class="nav-tab <?php echo $active_tab == 'cheque' ? 'nav-tab-active' : ''; ?>">Chèque</a>
             <a href="?page=wpcb&tab=virement" class="nav-tab <?php echo $active_tab == 'virement' ? 'nav-tab-active' : ''; ?>">Virement</a>
-            <a href="?page=wpcb&tab=paypal" class="nav-tab <?php echo $active_tab == 'paypal_options' ? 'nav-tab-active' : ''; ?>">Paypal</a>
+            <a href="?page=wpcb&tab=paypal" class="nav-tab <?php echo $active_tab == 'paypal' ? 'nav-tab-active' : ''; ?>">Paypal</a>
 			<a href="?page=wpcb&tab=systempaycyberplus" class="nav-tab <?php echo $active_tab == 'systempaycyberplus' ? 'nav-tab-active' : ''; ?>">Systempay Cyberplus</a>
 			<a href="?page=wpcb&tab=mailchimp" class="nav-tab <?php echo $active_tab == 'mailchimp' ? 'nav-tab-active' : ''; ?>">Mailchimp</a>
             <a href="?page=wpcb&tab=dev" class="nav-tab <?php echo $active_tab == 'dev' ? 'nav-tab-active' : ''; ?>">Dev</a>
@@ -146,17 +146,17 @@ function wpcb_general_callback() {
     $wpcb_atos = get_option ( 'wpcb_atos' );
         
     echo '<ol>';
-		$sourceFile = dirname(__FILE__).'/wpcb.merchant.php';
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
+		$sourceFile = dirname(__FILE__).'/atos.merchant.php';
+		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/atos.merchant.php';
 		if (
 		(!file_exists($destinationFile)) ||
-		((isset($_GET['action'])) && ($_GET['action']=='copywpcbmerchant'))
+		((isset($_GET['action'])) && ($_GET['action']=='copyatosmerchant'))
 		){
 			copy($sourceFile, $destinationFile);
 		}
 		if(!file_exists($destinationFile)) {
-			$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=general_options&action=copywpcbmerchant'));
-			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
+			$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=general_options&action=copyatosmerchant'));
+			echo '<li><span style="color:red;">Copier le fichier '.dirname(__FILE__).'/atos.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></span></li>';
 		} 
 		else {
 			echo '<li><span style="color:green">Le fichier '.$destinationFile.' est bien au bon endroit -> OK!</span></li>';
@@ -474,10 +474,6 @@ function wpcb_logfile_callback() {
 }
 
 
-
-
-
-
 /** 
 * Cheque options
 */  
@@ -657,30 +653,15 @@ function wpcb_dev_callback() {
 		echo '<li><p>Plugin version : '.$wpcb_dev['version'].'</li>';
 		echo '<li><p>Dossier Plugin : '.dirname(__FILE__).'</p></li>';
 		echo '<li><p>Racine wordpress : '.dirname(dirname(dirname(dirname(__FILE__)))).'</p></li>';
-		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev_options&action=copywpcbmerchant'));
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/wpcb.merchant.php';
-		echo '<li>Copier wpcb.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
-		// ChÃ¨que :
-		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev_options&action=copychequemerchant'));
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/cheque.merchant.php';
-		echo '<li>Copier cheque.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
-		// End of ChÃ¨ques
-		// Virement :
-		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev_options&action=copyvirementmerchant'));
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/virement.merchant.php';
-		echo '<li>Copier virement.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
-		// End of Virement
-		// Paypal :
-		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev_options&action=copysimplepaypalmerchant'));
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/simplepaypal.merchant.php';
-		echo '<li>Copier simplepaypal.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
-		// End of Paypal
-		// systempaycyberplus :
-		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev_options&action=copysystempaycyberplusmerchant'));
-		$destinationFile = dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/systempaycyberplus.merchant.php';
-		echo '<li>Copier systempaycyberplus.merchant.php vers '.$destinationFile.' <a href="'.$nonce_url.'">en cliquant ici</a></li>';
-		// End of systempaycyberplus
-		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev_options&action=sandbox'));
+		if	((isset($_GET['action'])) && ($_GET['action']=='copymerchants')){
+		$merchantfiles=array('atos','cheque','virement','simplepaypal','systempaycyberplus');
+		foreach ($merchantfiles as $merchantfile){
+			copy(dirname(__FILE__).'/'.$merchantfile.'.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
+		}
+		}
+		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=copymerchants'));
+		echo '<li>Copier les fichiers merchants <a href="'.$nonce_url.'">en cliquant ici</a></li>';
+		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=sandbox'));
 		echo '<li>Tester votre fichier ipn atos <a href="'.$nonce_url.'">en cliquant ici</a> (Cela va mettre Ã  jour log.txt et google drive)</li>';
 		echo '<li>'.$wpcb_atos['automatic_response_url'].'</li>';
 		if ((isset($_GET['action'])) && ($_GET['action']=='sandbox')){
