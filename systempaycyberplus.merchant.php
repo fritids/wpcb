@@ -24,7 +24,7 @@ class wpsc_merchant_systempaycyberplus extends wpsc_merchant {
 } //end of class
 
 function form_systempaycyberplus() {
-	$output='<a href="plugins.php?page=wpcb_plugin_options&tab=systempaycyberplus_options">Cliquez ici pour les autres réglages</a>';
+	$output='<a href="'.admin_url( 'plugins.php?page=wpcb&tab=systempaycyberplus').'">Cliquez ici pour les réglages</a>';
 	return $output;
 }
 
