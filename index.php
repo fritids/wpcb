@@ -51,6 +51,11 @@ function wpcb_update(){
   }
   // nothing found, you may advice the user to install the ZF plugin
   define('WP_ZEND_FRAMEWORK', false);
+  
+  
+
+  
+  
 }
 
 // Lors de la desinstallation : 
@@ -147,6 +152,14 @@ function wpcb_general_callback() {
     $wpcb_atos = get_option ( 'wpcb_atos' );
         
     echo '<ol>';
+    // Check if wp-e-commerce is installed :
+    if (is_plugin_active('wp-e-commerce/wp-shopping-cart.php')) {
+    //plugin is activated
+    	echo '<li><span style="color:green">WP e-Commerce est installé -> OK!</span></li>';
+	}
+	else{
+		    	echo '<li><span style="color:green">WP e-Commerce n\'est pas installé !</span></li>';		
+	}
     $merchantfiles=array('atos','cheque','virement','simplepaypal','systempaycyberplus');
 	foreach ($merchantfiles as $merchantfile){
 		$installed=false;
@@ -165,7 +178,7 @@ function wpcb_general_callback() {
 		if ($installed) {
 				echo '<li><span style="color:green">Le fichier '.$merchantfile.'.merchant.php est bien au bon endroit -> OK!</span></li>';
 			}
-	}
+		}
 	
 		$wpcb_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[wpcb]%' AND `post_status`='publish'");
 		if ($wpcb_checkout_page!=NULL){
@@ -819,6 +832,9 @@ function wpcb_dev_callback() {
 			$response=wp_remote_post($wpcb_atos['automatic_response_url'],array('body' =>$post_data));
 			//print_r($response);
 		}
+		echo '</ul>';
+		echo '<p> Changelog Version trunk :</p>';
+		my_update_notice();
 }
 
 function wpcb_version_callback(){  
@@ -1399,5 +1415,81 @@ else{
 } // fin du ipn=paypal
 
 }// fin de la function check ipn
+
+
+
+
+add_action( 'wp_dashboard_setup', 'wpcb_dashboard_widget_setup' );
+
+function wpcb_dashboard_widget_setup() {
+  wp_add_dashboard_widget( 'wpcb_dashboard_news', __( 'WPCB News' , 'wpsc' ), 'wpcb_dashboard_news' );
+// Sort the Dashboard widgets so ours it at the top
+		global $wp_meta_boxes;
+		$normal_dashboard = $wp_meta_boxes['dashboard']['normal']['core'];
+		// Backup and delete our new dashbaord widget from the end of the array
+		$wpcb_widget_backup = array( 'wpcb_dashboard_news' => $normal_dashboard['wpcb_dashboard_news'] );
+		unset( $normal_dashboard['wpcb_dashboard_news'] );
+		// Merge the two arrays together so our widget is at the beginnin
+		$sorted_dashboard = array_merge( $wpcb_widget_backup, $normal_dashboard );
+		// Save the sorted array back into the original metaboxes
+		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
+}
+
+
+ 
+function pull_tag_trunk( $plugin_uri, $tag = 'Stable tag' ) {
+    $trunk_readme = file( 'http://plugins.svn.wordpress.org/' . $plugin_uri . '/trunk/readme.txt' );
+    foreach( $trunk_readme as $i => $line ) 
+    if( substr_count( $line, $tag . ': ' ) > 0 ) return trim( substr( $line, strpos( $line, $tag . ': ' ) + strlen( $tag ) + 2 ) );
+    return NULL;
+}
+ 
+function pull_tag_stable( $readme_array, $tag ) {
+    foreach( $readme_array as $i => $line ) 
+    if( substr_count( $line, $tag . ': ' ) > 0 ) return trim( substr( $line, strpos( $line, $tag . ': ' ) + strlen( $tag ) + 2 ) );
+    return NULL;
+}
+
+function my_update_notice() {
+	$plugin_uri='wpcb';
+	$latest_version = pull_tag_trunk( $plugin_uri );
+	$stable_readme = file( 'http://plugins.svn.wordpress.org/' . $plugin_uri . '/tags/' . $latest_version . '/readme.txt' );
+	$stable_version = pull_tag_stable( $stable_readme, 'Stable tag' );
+	
+	$data = file_get_contents('http://plugins.svn.wordpress.org/wpcb/tags/'.$stable_version.'/readme.txt');
+       if ($data) {
+              $matches = null;
+              if (preg_match('~==\s*Changelog\s*==\s*=\s*[0-9.]+\s*=(.*)(=\s*[0-9.]+\s*=|$)~Uis', $data, $matches)) {
+                     $changelog = (array) preg_split('~[\r\n]+~', trim($matches[1]));
+                     echo '<div style="color: #f00;">Penser à sauvegarder vos paramètres avant tout. Nouveautés:</div><div style="font-weight: normal;">';
+                     $ul = false;
+                     foreach ($changelog as $index => $line) {
+                            if (preg_match('~^\s*\*\s*~', $line)) {
+                                   if (!$ul) {
+                                          echo '<ul style="list-style: disc; margin-left: 20px;">';
+                                          $ul = true;
+                                   }
+                                   $line = preg_replace('~^\s*\*\s*~', '', htmlspecialchars($line));
+                                   echo '<li style="width: 50%; margin: 0; float: left; ' . ($index % 2 == 0 ? 'clear: left;' : '') . '">' . $line . '</li>';
+                            } else {
+                                   if ($ul) {
+                                         echo '</ul><div style="clear: left;"></div>';
+                                          $ul = false;
+                                   }
+                                   echo '<p style="margin: 5px 0;">' . htmlspecialchars($line) . '</p>';
+                            }
+                     }
+                     if ($ul) {
+                            echo '</ul><div style="clear: left;"></div>';
+                     }
+                     echo '</div>';
+              }
+       }
+}
+if ( is_admin() )
+	add_action( 'in_plugin_update_message-' . plugin_basename(__FILE__), 'my_update_notice' );
+
+
+
 
 ?>
