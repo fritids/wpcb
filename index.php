@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.2
+Version: 2.3
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -590,6 +590,10 @@ function wpcb_intialize_livraison_options() {
 	add_settings_field('ENLEVEMENT_name','Affichage pour Enlèvement (adresse par exemple)','wpcb_ENLEVEMENT_name_callback','wpcb_livraison','livraison_settings_section');
 		add_settings_field('COLIS','Proposer la poste colis','wpcb_COLIS_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('COLIS_name','Affichage pour Colis','wpcb_COLIS_name_callback','wpcb_livraison','livraison_settings_section');
+		add_settings_field('LETTREPRIORITAIRE','Proposer lettre Prioritaire','wpcb_LETTREPRIORITAIRE_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('LETTREPRIORITAIRE_name','Affichage pour Lettre Prioritaire','wpcb_LETTREPRIORITAIRE_name_callback','wpcb_livraison','livraison_settings_section');
+			add_settings_field('LETTREVERTE','Proposer lettre Verte','wpcb_LETTREVERTE_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('LETTREVERTE_name','Affichage pour Lettre Verte','wpcb_LETTREVERTE_name_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('CHRONOPOST','Proposer la poste chronopost','wpcb_CHRONOPOST_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('CHRONOPOST_name','Affichage Chronopost','wpcb_CHRONOPOST_name_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('ENVELOPPEDOCUMENT','Proposer la poste Enveloppe Document','wpcb_ENVELOPPEDOCUMENT_callback','wpcb_livraison','livraison_settings_section');
@@ -666,6 +670,33 @@ function wpcb_COLIS_name_callback(){
     if(isset($options['COLIS_name'])){$val = $options['COLIS_name'];}else{$val=$defaultval;}
         echo '<input type="text"  size="75"id="COLIS_name" name="wpcb_livraison[COLIS_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
 }
+function wpcb_LETTREPRIORITAIRE_callback($args){  
+    $options = get_option( 'wpcb_livraison');  
+	$html = '<input type="checkbox" id="LETTREPRIORITAIRE" name="wpcb_livraison[LETTREPRIORITAIRE]" value="1" ' . checked(1, $options['LETTREPRIORITAIRE'], false) . '/>';  
+    $html .= '<label for="LETTREPRIORITAIRE"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_LETTREPRIORITAIRE_name_callback(){  
+    $options = get_option( 'wpcb_livraison');  
+    $defaultval = 'Lettre Prioritaire'; 
+    if(isset($options['LETTREPRIORITAIRE_name'])){$val = $options['LETTREPRIORITAIRE_name'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="LETTREPRIORITAIRE_name" name="wpcb_livraison[LETTREPRIORITAIRE_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
+}
+function wpcb_LETTREVERTE_callback($args){  
+    $options = get_option( 'wpcb_livraison');  
+	$html = '<input type="checkbox" id="LETTREVERTE" name="wpcb_livraison[LETTREVERTE]" value="1" ' . checked(1, $options['LETTREVERTE'], false) . '/>';  
+    $html .= '<label for="LETTREVERTE"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_LETTREVERTE_name_callback(){  
+    $options = get_option( 'wpcb_livraison');  
+    $defaultval = 'Lettre  Verte'; 
+    if(isset($options['LETTREVERTE_name'])){$val = $options['LETTREVERTE_name'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="LETTREVERTE_name" name="wpcb_livraison[LETTREVERTE_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
+}
+
+
+
 function wpcb_CHRONOPOST_callback($args){  
     $options = get_option( 'wpcb_livraison');  
 	$html = '<input type="checkbox" id="CHRONOPOST" name="wpcb_livraison[CHRONOPOST]" value="1" ' . checked(1, $options['CHRONOPOST'], false) . '/>';  
@@ -1435,28 +1466,15 @@ function wpcb_dashboard_widget_setup() {
 		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
 }
 
-
- 
-function pull_tag_trunk( $plugin_uri, $tag = 'Stable tag' ) {
-    $trunk_readme = file( 'http://plugins.svn.wordpress.org/' . $plugin_uri . '/trunk/readme.txt' );
-    foreach( $trunk_readme as $i => $line ) 
-    if( substr_count( $line, $tag . ': ' ) > 0 ) return trim( substr( $line, strpos( $line, $tag . ': ' ) + strlen( $tag ) + 2 ) );
-    return NULL;
-}
- 
-function pull_tag_stable( $readme_array, $tag ) {
-    foreach( $readme_array as $i => $line ) 
-    if( substr_count( $line, $tag . ': ' ) > 0 ) return trim( substr( $line, strpos( $line, $tag . ': ' ) + strlen( $tag ) + 2 ) );
-    return NULL;
+function wpcb_dashboard_news() {
+	$rss = fetch_feed( 'http://wpcb.fr/blog/' );
+	$args = array( 'show_author' => 1, 'show_date' => 1, 'show_summary' => 1, 'items'=>3 );
+	wp_widget_rss_output( $rss, $args );
 }
 
 function my_update_notice() {
-	$plugin_uri='wpcb';
-	$latest_version = pull_tag_trunk( $plugin_uri );
-	$stable_readme = file( 'http://plugins.svn.wordpress.org/' . $plugin_uri . '/tags/' . $latest_version . '/readme.txt' );
-	$stable_version = pull_tag_stable( $stable_readme, 'Stable tag' );
-	
-	$data = file_get_contents('http://plugins.svn.wordpress.org/wpcb/tags/'.$stable_version.'/readme.txt');
+	$plugin_data=get_plugin_data( __FILE__,false);
+	$data = file_get_contents('http://plugins.svn.wordpress.org/wpcb/trunk/readme.txt');
        if ($data) {
               $matches = null;
               if (preg_match('~==\s*Changelog\s*==\s*=\s*[0-9.]+\s*=(.*)(=\s*[0-9.]+\s*=|$)~Uis', $data, $matches)) {
