@@ -44,7 +44,7 @@ function submit_atos(){return true;}
 
 function form_atos() {
 	// Les réglages se font ailleurs car les réglages de wpec sont trop pourris...
-	$output='<a href="'.site_url().'/wp-admin/options-general.php?page=wpcb/wpcb.php">Cliquez ici pour les réglages</a>';
+	$output='<a href="'.admin_url( 'plugins.php?page=wpcb&tab=atos').'">Cliquez ici pour les réglages</a>';
 	return $output;
 }
 

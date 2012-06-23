@@ -26,7 +26,7 @@ class wpsc_merchant_simplepaypal extends wpsc_merchant {
 } //end of class
 
 function form_simplepaypal() {
-	$output='<a href="'.site_url().'/wp-admin/options-general.php?page=wpcb/wpcb.php">Cliquez ici pour les réglages</a>';
+	$output='<a href="'.admin_url( 'plugins.php?page=wpcb&tab=paypal').'">Cliquez ici pour les réglages</a>';
 	return $output;
 }
 

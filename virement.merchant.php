@@ -38,7 +38,7 @@ add_filter("wpsc_transaction_result_message", "virement_custom_message");
 
 function form_virement() {
 	// Les réglages se font ailleurs car les réglages de wpec sont trop pourris...
-	$output='<a href="'.admin_url().'/options-general.php?page=wpcb/wpcb.php">Cliquez ici pour les réglages</a>';
+	$output='<a href="'.admin_url( 'plugins.php?page=wpcb&tab=virement').'">Cliquez ici pour les réglages</a>';
 	return $output;
 }
 function submit_virement(){return true;}
