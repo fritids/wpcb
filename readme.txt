@@ -1,4 +1,4 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 2.3
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 2.3.1
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
 Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
@@ -10,7 +10,10 @@ Calcul de frais de port au départ de la France (colis, chronopost, Mondial Rela
 Système Paypal fonctionel (avec option sandbox!)
 
 Livraison :
+
 * La Poste Colis
+* Lettre Prioritaire
+* Lettre Verte
 * Enveloppe Document (France, Union Européenne, Outre-Mer & Reste du monde)
 * Chronopost
 * Mondial Relais
@@ -111,6 +114,9 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 6. Réglages Mailchimp
 7. Placer le shortcode wpcb sur une page / Options de paiement8. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
 == Changelog ==
+
+= 2.3.1 =
+* Correction d'un bug pour certains serveurs (maj non-indispensable si ça marche chez vous!)
 
 = 2.3 =
 * Nouveau mode de livraison : Lettre Prioritaire

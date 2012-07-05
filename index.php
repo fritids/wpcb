@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3
+Version: 2.3.1
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -17,6 +17,7 @@ $merchantfiles=array('atos','cheque','virement','simplepaypal','systempaycyberpl
 	foreach ($merchantfiles as $merchantfile){
 		unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/wp-content/plugins/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
 	}
+	unlink(dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
 }
 
 // Actions lors de la mise en jour du plugin :
@@ -80,6 +81,8 @@ function wpcb_activate() {
 	foreach ($merchantfiles as $merchantfile){
 		copy(dirname(__FILE__).'/'.$merchantfile.'.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
 	}
+	copy(dirname(__FILE__).'/automatic_response.php',dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
+
 }
 
 function wpcb_plugin_menu() {add_plugins_page('WPCB','WPCB','administrator','wpcb','wpcb_display');}
@@ -315,6 +318,16 @@ add_action( 'admin_init', 'wpcb_intialize_atos_options' );
 
 function wpcb_atos_callback() {  
     echo '<p>Réglage des options Carte bancaire Atos</p>';
+	if (!file_exists(dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php')) {
+		$nonce_url=admin_url( 'plugins.php?page=wpcb&tab=atos&action=copyautomaticresponse');
+		echo '<p>Installation : Copier les fichiers atos <a href="'.$nonce_url.'">en cliquant ici</a></p>';
+     }
+	else {
+				echo '<p>Verifier que en cliquant <a href="'.site_url('automatic_response.php').'">ici</a> vous avez une page blanche</p>';
+	}
+	if	((isset($_GET['action'])) && ($_GET['action']=='copyautomaticresponse')){
+		copy(dirname(__FILE__).'/automatic_response.php',dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
+	}
 	echo '<p>En rouge les chemins à verifier</p>';
 } // end wpcb_general_callback  
 
@@ -372,7 +385,7 @@ function wpcb_cancel_return_url_callback() {
 }
 function wpcb_automatic_response_url_callback() {  
     $options = get_option( 'wpcb_atos');  
-    $defaultval = site_url()."?ipn=atos"; 
+    $defaultval = site_url('/automatic_response.php'); 
     if (isset($options['automatic_response_url'])){$val=$options['automatic_response_url'];}else{$val=$defaultval;}
     echo '<input type="text"  size="75" id="automatic_response_url" name="wpcb_atos[automatic_response_url]" value="' . $val . '" placeholder="'.$defaultval.'"/>';  
 }
