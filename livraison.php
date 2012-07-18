@@ -153,6 +153,7 @@ class wpcb_livraison {
 			$services=array();
 			if ($wpcb_livraison_options['ENLEVEMENT']){$services[]='ENLEVEMENT';}
 			if ($wpcb_livraison_options['COLIS']){$services[]='COLIS';}
+			if ($wpcb_livraison_options['MINIMAX']){$services[]='MINIMAX';}
 			if ($wpcb_livraison_options['LETTREPRIORITAIRE']){$services[]='LETTREPRIORITAIRE';}
 			if ($wpcb_livraison_options['LETTREVERTE']){$services[]='LETTREVERTE';}
 			if ($wpcb_livraison_options['CHRONOPOST']){$services[]='CHRONOPOST';}

@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3.1
+Version: 2.3.2
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -601,20 +601,22 @@ function wpcb_intialize_livraison_options() {
 	// Add the fields :
 	add_settings_field('ENLEVEMENT','Proposer l\'enlèvement sur place','wpcb_ENLEVEMENT_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('ENLEVEMENT_name','Affichage pour Enlèvement (adresse par exemple)','wpcb_ENLEVEMENT_name_callback','wpcb_livraison','livraison_settings_section');
-		add_settings_field('COLIS','Proposer la poste colis','wpcb_COLIS_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('COLIS','Proposer la poste colis','wpcb_COLIS_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('COLIS_name','Affichage pour Colis','wpcb_COLIS_name_callback','wpcb_livraison','livraison_settings_section');
-		add_settings_field('LETTREPRIORITAIRE','Proposer lettre Prioritaire','wpcb_LETTREPRIORITAIRE_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('MINIMAX','Proposer la poste Mini-max','wpcb_MINIMAX_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('MINIMAX_name','Affichage pour Mini-max','wpcb_MINIMAX_name_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('LETTREPRIORITAIRE','Proposer lettre Prioritaire','wpcb_LETTREPRIORITAIRE_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('LETTREPRIORITAIRE_name','Affichage pour Lettre Prioritaire','wpcb_LETTREPRIORITAIRE_name_callback','wpcb_livraison','livraison_settings_section');
-			add_settings_field('LETTREVERTE','Proposer lettre Verte','wpcb_LETTREVERTE_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('LETTREVERTE','Proposer lettre Verte','wpcb_LETTREVERTE_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('LETTREVERTE_name','Affichage pour Lettre Verte','wpcb_LETTREVERTE_name_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('CHRONOPOST','Proposer la poste chronopost','wpcb_CHRONOPOST_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('CHRONOPOST_name','Affichage Chronopost','wpcb_CHRONOPOST_name_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('ENVELOPPEDOCUMENT','Proposer la poste Enveloppe Document','wpcb_ENVELOPPEDOCUMENT_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('ENVELOPPEDOCUMENT_name','Affichage enveloppe document France','wpcb_ENVELOPPEDOCUMENT_name_callback','wpcb_livraison','livraison_settings_section');
-		add_settings_field('ENVELOPPEDOCUMENTUE','Proposer la poste Enveloppe Document Union Européenne','wpcb_ENVELOPPEDOCUMENTUE_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('ENVELOPPEDOCUMENTUE','Proposer la poste Enveloppe Document Union Européenne','wpcb_ENVELOPPEDOCUMENTUE_callback','wpcb_livraison','livraison_settings_section');
 	add_settings_field('ENVELOPPEDOCUMENTUE_name','Affichage enveloppe document Union Européenne','wpcb_ENVELOPPEDOCUMENTUE_name_callback','wpcb_livraison','livraison_settings_section');
-		add_settings_field('ENVELOPPEDOCUMENTOMRDM','Proposer la poste Enveloppe Document Outre-Mer Reste du Monde','wpcb_ENVELOPPEDOCUMENTOMRDM_callback','wpcb_livraison','livraison_settings_section');
-		add_settings_field('ENVELOPPEDOCUMENTOMRDM_name','Affichage enveloppe document Outre-Mer & Reste du Monde','wpcb_ENVELOPPEDOCUMENTOMRDM_name_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('ENVELOPPEDOCUMENTOMRDM','Proposer la poste Enveloppe Document Outre-Mer Reste du Monde','wpcb_ENVELOPPEDOCUMENTOMRDM_callback','wpcb_livraison','livraison_settings_section');
+	add_settings_field('ENVELOPPEDOCUMENTOMRDM_name','Affichage enveloppe document Outre-Mer & Reste du Monde','wpcb_ENVELOPPEDOCUMENTOMRDM_name_callback','wpcb_livraison','livraison_settings_section');
 
 // MR : 
 		add_settings_field('mr_ComptePro','Je dispose d\'un compte pro Mondial Relay','wpcb_mr_ComptePro_callback','wpcb_livraison','livraison_settings_section');
@@ -683,6 +685,20 @@ function wpcb_COLIS_name_callback(){
     if(isset($options['COLIS_name'])){$val = $options['COLIS_name'];}else{$val=$defaultval;}
         echo '<input type="text"  size="75"id="COLIS_name" name="wpcb_livraison[COLIS_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
 }
+
+function wpcb_MINIMAX_callback($args){  
+    $options = get_option( 'wpcb_livraison');  
+	$html = '<input type="checkbox" id="MINIMAX" name="wpcb_livraison[MINIMAX]" value="1" ' . checked(1, $options['MINIMAX'], false) . '/>';  
+    $html .= '<label for="MINIMAX"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_MINIMAX_name_callback(){  
+    $options = get_option( 'wpcb_livraison');  
+    $defaultval = 'Mini-max'; 
+    if(isset($options['MINIMAX_name'])){$val = $options['MINIMAX_name'];}else{$val=$defaultval;}
+        echo '<input type="text"  size="75"id="MINIMAX_name" name="wpcb_livraison[MINIMAX_name]" value="' . $val . '" placeholder="'.$defaultval.'"/>';
+}
+
 function wpcb_LETTREPRIORITAIRE_callback($args){  
     $options = get_option( 'wpcb_livraison');  
 	$html = '<input type="checkbox" id="LETTREPRIORITAIRE" name="wpcb_livraison[LETTREPRIORITAIRE]" value="1" ' . checked(1, $options['LETTREPRIORITAIRE'], false) . '/>';  
