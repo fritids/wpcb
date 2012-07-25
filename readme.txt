@@ -1,4 +1,4 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 2.3.2
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 2.3.3
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
 Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
@@ -27,8 +27,8 @@ La dernière version stable : http://downloads.wordpress.org/plugin/wpcb.1.1.9.z
 * Calcul des frais de port !
 * Ajout dans google drive de toutes vos ventes !
 * Ajout de tous vos acheteurs dans votre outil de mailling MailChimp
-= A venir pour les détenteurs d'une clé API =
-* Sauter l'étape de clic sur l'icone des cartes ou du bouton paypal (comme woocommerce)
+= A venir pour les détenteurs d'une clé API =
+* Sauter l'étape de clic sur l'icone des cartes ou du bouton paypal (comme woocommerce)* Ajout des ventes dans trello (http://trello.com)
 == Installation ==1. Envoyer `wpcb` vers le dossier `/wp-content/plugins/`2. Activer le plugin dans le menu 'Extensions' de Wordpress3. Placer `[wpcb]` sur une (et une seule!) page
 4. Régler les paramètres suivant les indications
 5. Rendez-vous sur http://wpcb.fr/api-key pour débloquer les options pro
@@ -39,8 +39,8 @@ La dernière version stable : http://downloads.wordpress.org/plugin/wpcb.1.1.9.z
 
 Configurer correctement vos dossiers/fichiers obtenus par votre banque (dossier crypté)
 Pour les banques ATOS SIPS : 
-Dans le dossier cgi-bin (non visible depuis Internet) vous devez avoir :
-* parcom.mercanet
+Sur votre ftp, dans un dossier (non visible depuis Internet exemple unb dossier cgi-bin ou apache à coté de votre dossier www) vous devez avoir :
+* parcom.nomdelabanque 
 * parcom.005009461540411 (votre numéro de marchand à la place de celui là) (le contenu du fichier n'a pas a être modifé)
 * log.txt
 * certif.fr.005009461540411 (votre numéro de marchand à la place de celui là)
@@ -50,8 +50,7 @@ Dans le dossier cgi-bin (non visible depuis Internet) vous devez avoir :
 Note : les fichiers call_request.php, call_response.php et call_auto_response.php dans le package fourni par la banque ne sont pas necessaires car wpcb les remplace.
 
 http://6www.net/blog/wp-content/uploads/2011/05/snap13-05-2011-12.30.5308-07-2011-14.20.411.png
-
-= Pour les banques Systempay Cyberplus, comment faire ? =
+= Pour les banques Systempay Cyberplus, comment faire ? =
 Dans votre interface admin de gestion vad, régler : 
 Url serveur : http://monsite.fr/?gateway=systempaycyberplus
 
@@ -107,14 +106,14 @@ Numéro de commande : %purchase_id%
 %product_list%%total_shipping%%total_price%
 Les prix sont TTC.
 Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Email, Coordonnées postales, etc.'
-= Ou placer le fichier automatic_response.php ? =Ce fichier est automatiquement copié à la racine de votre blog wordpress c'est à dire à coté du fichier wp-config.phpSi cela n'est pas fait, faite le manuellement.= Comment configurer google drive pour recevoir les ventes ? =Télécharger le fichier <a href="https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc">https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc</a>Envoyer ce fichier dans votre google drive et noter votre nouvelle cle de fichier (dans mon fichier, à titre d'exemple, la clé est : 0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc cela se lit dans l'url)Ne changer pas les entetes et attention à ce que ce soit la feuille numéro 1 du classeur !!
-= Autre question ? =Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.== Screenshots ==1. Réglages du module2. Réglages ATOS3. Réglages Chèque ou Virement
+= Ou placer le fichier automatic_response.php ? =Ce fichier est automatiquement copié à la racine de votre blog wordpress c'est à dire à coté du fichier wp-config.phpSi cela n'est pas fait, faite le manuellement.A la désinstallation du plugin, ce fichier est supprimé.A chaque mise-à jour ce fichier est remplacé donc ne le modifiez pas != Comment configurer google drive pour recevoir les ventes ? =Télécharger le fichier <a href="https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc">https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc</a>Envoyer ce fichier dans votre google drive et noter votre nouvelle cle de fichier (dans mon fichier, à titre d'exemple, la clé est : 0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc cela se lit dans l'url)Ne changer pas les entetes et attention à ce que ce soit la feuille numéro 1 du classeur !!
+= Autre question ? =Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.= Vous ne comprenez pas ce charabia ? =Nous pouvons installer le plugin pour vous, la marche à suivre est indiquée ici : http://wpcb.fr/support/== Screenshots ==1. Réglages du module2. Réglages ATOS3. Réglages Chèque ou Virement
 4. Réglages Paypal
 5. Réglages Systempay Cyberplus (Banque Populaire)
 6. Réglages Mailchimp
 7. Placer le shortcode wpcb sur une page / Options de paiement8. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
 == Changelog ==
-= 2.3.2 =* Ajout du mode de livraison Mini-max de la poste pour les petits objets
+= 2.3.3 =* Mise à jour non-indispensable si ça marche chez vous !* Ajout du mode debug avancé pour plus de contrôle sur atos.* Mise à jour de la documentation= 2.3.2 =* Ajout du mode de livraison Mini-max de la poste pour les petits objets
 = 2.3.1 =
 * Correction d'un bug pour certains serveurs (maj non-indispensable si ça marche chez vous!)
 

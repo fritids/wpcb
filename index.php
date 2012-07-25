@@ -4,12 +4,10 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3.2
+Version: 2.3.3
 Author: 6WWW
 Author URI: http://6www.net
 */
-
-
 
 register_deactivation_hook( __FILE__, 'wpcb_deactivate' );
 function wpcb_deactivate(){
@@ -52,11 +50,6 @@ function wpcb_update(){
   }
   // nothing found, you may advice the user to install the ZF plugin
   define('WP_ZEND_FRAMEWORK', false);
-  
-  
-
-  
-  
 }
 
 // Lors de la desinstallation : 
@@ -70,6 +63,7 @@ function wpcb_delete_plugin_options() {
 	delete_option('wpcb_systempaycyberplus');
 	delete_option('wpcb_livraison');
 	delete_option('wpcb_mailchimp');
+	delete_option('wpcb_trello');
 	delete_option('wpcb_dev');
 	wpcb_deactivate(); // Do the delete file
 }
@@ -110,6 +104,7 @@ function wpcb_display() {
 			<a style="font-size:11px;" href="?page=wpcb&tab=systempaycyberplus" class="nav-tab <?php echo $active_tab == 'systempaycyberplus' ? 'nav-tab-active' : ''; ?>">Systempay Cyberplus</a>
 			<a style="font-size:11px;" href="?page=wpcb&tab=livraison" class="nav-tab <?php echo $active_tab == 'livraison' ? 'nav-tab-active' : ''; ?>">Livraison</a>
 			<a style="font-size:11px;" href="?page=wpcb&tab=mailchimp" class="nav-tab <?php echo $active_tab == 'mailchimp' ? 'nav-tab-active' : ''; ?>">Mailchimp</a>
+			<a style="font-size:11px;" href="?page=wpcb&tab=trello" class="nav-tab <?php echo $active_tab == 'trello' ? 'nav-tab-active' : ''; ?>">Trello</a>
             <a style="font-size:11px;" href="?page=wpcb&tab=dev" class="nav-tab <?php echo $active_tab == 'dev' ? 'nav-tab-active' : ''; ?>">Dev</a>
         </h2>  
   
@@ -125,6 +120,7 @@ function wpcb_display() {
 		elseif( $active_tab == 'systempaycyberplus'){settings_fields( 'wpcb_systempaycyberplus');do_settings_sections('wpcb_systempaycyberplus');}
 		elseif( $active_tab == 'livraison' ) {settings_fields( 'wpcb_livraison' );do_settings_sections( 'wpcb_livraison' );}
 		elseif( $active_tab == 'mailchimp' ) {settings_fields( 'wpcb_mailchimp' );do_settings_sections( 'wpcb_mailchimp' );}
+		elseif( $active_tab == 'trello' ) {settings_fields( 'wpcb_trello' );do_settings_sections( 'wpcb_trello' );}
 	    elseif( $active_tab == 'dev' ) {settings_fields( 'wpcb_dev' ); do_settings_sections( 'wpcb_dev' );}
 	    submit_button();
 	    ?>
@@ -872,7 +868,24 @@ function wpcb_dev_callback() {
     echo '<p>Options pour developper</p>';
     echo '<p>Aidez-nous dans le développement sur <a href="https://github.com/6WWW/wpcb">Github</a></p>';
     echo '<ul>';
-		echo '<li><p>Plugin version : '.$wpcb_dev['version'].'</li>';
+		if (!$wpcb_general){
+		echo '<li><span style="color:red">Vous n\'avez pas sauvegardé les options générales !</span></li>';
+		}
+		else {
+			echo '<li><span style="color:green">Options générales sauvegardées</span></li>';
+		}
+		if (!$wpcb_atos){
+		echo '<li><span style="color:red">Vous n\'avez pas sauvegardé les options atos !</span></li>';
+		}
+		else {
+			echo '<li><span style="color:green">Options atos sauvegardées</span></li>';
+		}
+		if (!$wpcb_dev){
+		echo '<li><span style="color:red">Vous n\'avez pas sauvegardé les options dev (Pas très grave)</span></li>';
+		}
+		else {
+			echo '<li><span style="color:green">Options dev sauvegardées</span></li>';
+		}
 		echo '<li><p>Dossier Plugin : '.dirname(__FILE__).'</p></li>';
 		echo '<li><p>Racine wordpress : '.dirname(dirname(dirname(dirname(__FILE__)))).'</p></li>';
 		if	((isset($_GET['action'])) && ($_GET['action']=='copymerchants')){
@@ -885,7 +898,8 @@ function wpcb_dev_callback() {
 		echo '<li>Copier les fichiers merchants <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=sandbox'));
 		echo '<li>Tester votre fichier ipn atos <a href="'.$nonce_url.'">en cliquant ici</a> (Cela va mettre Ã  jour log.txt et google drive)</li>';
-		echo '<li>'.$wpcb_atos['automatic_response_url'].'</li>';
+		echo '<li>Automatic response production : '.$wpcb_atos['automatic_response_url'].'</li>';
+		echo '<li>Automatic response debug : '.$wpcb_atos['automatic_response_url'].'/debug=1</li>';
 		if ((isset($_GET['action'])) && ($_GET['action']=='sandbox')){
 			$post_data['DATA']='Dummy'; //Needed
 			$post_data['sandbox']='NULL!1!2!'.$wpcb_atos['merchant_id'].'!fr!100!8755900!CB!10-02-2012!11:50!10-02-2012!004!certif!22!978!4974!545!1!22!Comp!CompInfo!return!caddie!Merci!fr!fr!001!8787084074894!my@email.com!1.10.21.192!30!direct!data';
@@ -898,10 +912,8 @@ function wpcb_dev_callback() {
 }
 
 function wpcb_version_callback(){  
-    $options = get_option( 'wpcb_dev');  
-    $val = $plugin_data['Version']; 
-    if(isset($options['version'])){$val = $options['version'];}
-        echo '<input type="hidden" id="version" name="wpcb_dev[version]" value="' . $val. '" />';
+    $plugin_data=get_plugin_data( __FILE__,false);
+    echo '<input type="text" id="version" name="wpcb_dev[version]" value="' . $plugin_data['Version']. '" readonly />';
 }
 function wpcb_mode_debugatos_callback($args){  
     $options = get_option( 'wpcb_dev');  
@@ -1099,7 +1111,7 @@ add_action( 'admin_init', 'wpcb_intialize_mailchimp_options' );
 
 
 function wpcb_mailchimp_callback() {  
-    echo '<p>Réglage des options pour le paiement par mailchimp bancaire</p>';  
+    echo '<p>Réglage des options pour Mailchimp</p>';  
 }
 
 
@@ -1147,6 +1159,12 @@ function add_to_mailchimp($a){
 	}
 	}
 }
+
+
+// Trello :
+// include('trello.php');
+
+
 function get_Signature($field,$key) {
 
 		ksort($field); // tri des paramétres par ordre alphabétique
