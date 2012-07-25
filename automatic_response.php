@@ -19,6 +19,7 @@ if (($wpcb_dev_options['mode_demo']) && (array_key_exists('mode_demo', $wpcb_dev
 	$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
 	$path_bin_response=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/response";
 	$logfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/logfile.txt";
+}
 else{
 	$pathfile=$wpcb_cb_options['pathfile'];
 	$path_bin_response=$wpcb_cb_options['path_bin_response'];
