@@ -961,7 +961,7 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 	if ($_GET['action']=='CB'){
 		$wpcb_atos = get_option ( 'wpcb_atos' );
 		// cf. Dictionnaire des Données Atos :
-		if ((array_key_exists('mode_demo', $wpcb_dev)) && ($wpcb_dev['mode_demo'])){
+		if (($wpcb_dev['mode_demo']) && (array_key_exists('mode_demo', $wpcb_dev)) ){
 			$merchant_id="082584341411111";
 			$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
 			$path_bin_request =dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request";
