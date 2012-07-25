@@ -992,7 +992,9 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 		$parm="$parm advert=".$wpcb_atos['advert'];
 		if ($wpcb_dev['mode_debugatos']){
 			//Va afficher sur la page ou se trouve le shortcode les parametres.
-			$parm_pretty=str_replace(' ','<br/>',$parm);echo '<p>You see this because you are in debug mode :</p><pre>'.$parm_pretty.'</pre><p>End of debug mode</p>';
+			$parm_pretty=str_replace(' ','<br/>',$parm);
+			echo '<p>You see this because you are in debug mode :</p><pre>'.$parm_pretty.'<br/>path_bin_request='.$path_bin_request.'</pre>';
+			echo'<p>End of debug mode</p>';
 		}
 		$result=exec("$path_bin_request $parm");
 		$tableau=explode ("!","$result");
