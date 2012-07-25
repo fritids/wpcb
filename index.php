@@ -961,7 +961,7 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 	if ($_GET['action']=='CB'){
 		$wpcb_atos = get_option ( 'wpcb_atos' );
 		// cf. Dictionnaire des Données Atos :
-		if ((array_key_exists('mode_demo', $wpcb_dev)) && ($wpcb_dev['mode_demo'])){
+		if (($wpcb_dev['mode_demo']) && (array_key_exists('mode_demo', $wpcb_dev)) ){
 			$merchant_id="082584341411111";
 			$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
 			$path_bin_request =dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request";
@@ -1200,7 +1200,8 @@ function get_Signature($field,$key) {
 		}
 
 
-add_action('init','check_ipn');
+add_action('init','check_ipn');
+
 function check_ipn(){
 	global $wpdb, $purchase_log, $wpsc_cart;
 	$wpcb_atos = get_option ( 'wpcb_atos' );
@@ -1394,18 +1395,27 @@ function check_ipn(){
 			}
 	}
 	}// Fin du atos
-	elseif ($_GET['ipn']=='systempaycyberplus'){
-				$message='';
-				 foreach($_POST as $key => $value){
-					$message.= $key.'->'.$value."\n";
-				}
+	elseif ($_GET['ipn']=='systempaycyberplus'){
+
+				$message='';
+
+				 foreach($_POST as $key => $value){
+
+					$message.= $key.'->'.$value."\n";
+
+				}
+
 				mail($purch_log_email,'ipn systempay cyberplus',$message);
-				$wpcb_systempaycyberplus = get_option('wpcb_systempaycyberplus');
-				$control = Check_Signature(uncharm($_POST),$wpcb_systempaycyberplus['certificat']);
+				$wpcb_systempaycyberplus = get_option('wpcb_systempaycyberplus');
+
+				$control = Check_Signature(uncharm($_POST),$wpcb_systempaycyberplus['certificat']);
+
 				if($control == 'true'){
-					$sessionid=$_POST['vads_order_id'];
+					$sessionid=$_POST['vads_order_id'];
+
 					if($_POST['vads_result'] == "00"){
-						switch ($_POST['vads_auth_mode']){
+						switch ($_POST['vads_auth_mode']){
+
 							case "FULL":
 								$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
 								$purchase_log = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1",ARRAY_A) ; // Ne pas enlever car global !
@@ -1415,20 +1425,30 @@ function check_ipn(){
 								transaction_results($sessionid,false);					
 							break;
 							case "MARK":
-							break;
-						}
-					}
+							break;
+
+						}
+
+					}
+
 					else{	//failed
 						$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);		
 						$wpsc_cart->empty_cart();
 						//http://matale.fr/?cbListener=systempay_cyberplus&mode=test
-						}
-				}
-				else {
-				mail($purch_log_email,'ipn systempay cyberplus signature non valide',$message);
-				}
-				if($transauthorised==false){
-
+						}
+
+				}
+
+				else {
+
+				mail($purch_log_email,'ipn systempay cyberplus signature non valide',$message);
+
+				}
+
+				if($transauthorised==false){
+
+
+
 				}			
 }// Fin du ipn=systempaycyberplus
 elseif ($_GET['ipn']=='paypal'){

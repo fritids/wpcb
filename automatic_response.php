@@ -15,18 +15,16 @@ print_r($wpcb_dev_options);
 }
 $purch_log_email=get_option('purch_log_email');
 if (!$purch_log_email){$purch_log_email=get_bloginfo('admin_email');}
-if ($wpcb_dev_options){
-if ((array_key_exists('mode_demo', $wpcb_dev_options)) && ($wpcb_dev_options['mode_demo'])){ // Ce Kit de demo a du vous etre envoyé par la banque
+if (($wpcb_dev_options['mode_demo']) && (array_key_exists('mode_demo', $wpcb_dev_options)) ){// Ce Kit de demo a du vous etre envoyé par la banque
 	$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
 	$path_bin_response=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/response";
 	$logfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/logfile.txt";
-}
 else{
 	$pathfile=$wpcb_cb_options['pathfile'];
 	$path_bin_response=$wpcb_cb_options['path_bin_response'];
 	$logfile=$wpcb_cb_options['logfile'];
 }
-}
+
 // Initialisation du chemin du fichier de log :
 if (isset($_POST['DATA'])){
 	$data=escapeshellcmd($_POST['DATA']);
