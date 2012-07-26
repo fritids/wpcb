@@ -91,7 +91,7 @@ function wpcb_apiKey_trello_callback(){
     $val =''; 
     if(isset($options['apiKey'])){$val = $options['apiKey'];}
         echo '<input type="text"  size="75" id="apiKey" name="wpcb_trello[apiKey]" value="' . $val . '" />';
-		echo '(voir ici : <a hre="https://trello.com/docs/gettingstarted/index.html#getting-an-application-key" target="_blank">https://trello.com/docs/gettingstarted/index.html#getting-an-application-key</a>)';
+		echo '(voir ici : <a href="https://trello.com/docs/gettingstarted/index.html#getting-an-application-key" target="_blank">https://trello.com/docs/gettingstarted/index.html#getting-an-application-key</a>)';
 }
 
 function wpcb_token_trello_callback(){  
