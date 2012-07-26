@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3.3
+Version: 2.3.4
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -240,6 +240,21 @@ function wpcb_general_callback() {
 		echo "</ol>";
 		echo '<p>La clé API vous donne accès à de nombreuses fonctionnalitées supplémentaires listée <a target="_blank" href="http://wordpress.org/extend/plugins/wpcb/">ici</a></p>';
 		echo '<p>Ca ne coute que 5€ HT et m\'aide à maintenir mes plugins à jour.</p><p>Vous pouvez la commander <a target="_blank" href="http://wpcb.fr/api-key/">ici</a></p>';
+		
+		// Get trello token. and redirect
+		echo '
+		<script>
+var url=window.location;  
+var anchor=url.hash; //anchor with the # character  
+var anchor2=url.hash.substring(1); //anchor without the # character
+var elem = anchor2.split("=");
+anchorname = elem[0];
+anchorvalue = elem[1];
+if (anchorname=="token") {window.location = "http://wpcb.fr/dev/wp-admin/plugins.php?page=wpcb&tab=trello&token="+anchorvalue;}
+</script>';
+
+		
+		
 } // end wpcb_general_callback  
   
 /* ------------------------------------------------------------------------ * 
@@ -1164,7 +1179,7 @@ function add_to_mailchimp($a){
 
 
 // Trello :
-// include('trello.php');
+ include('trello.php');
 
 
 function get_Signature($field,$key) {

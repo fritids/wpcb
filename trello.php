@@ -8,9 +8,10 @@ function wpcb_intialize_trello_options() {
     if(false == get_option( 'wpcb_trello' )){add_option( 'wpcb_trello' );}
 	add_settings_section('trello_settings_section','trello Options','wpcb_trello_callback','wpcb_trello');
 	add_settings_field('add_to_trello','Ajouter les contacts à trello','wpcb_add_to_trello_callback','wpcb_trello','trello_settings_section');
-	add_settings_field('listid','List ID','wpcb_listid_trello_callback','wpcb_trello','trello_settings_section');
-	add_settings_field('apikey','Clé API trello','wpcb_apikey_trello_callback','wpcb_trello','trello_settings_section');
+	add_settings_field('apiKey','Clé API trello','wpcb_apiKey_trello_callback','wpcb_trello','trello_settings_section');
 	add_settings_field('token','Token trello','wpcb_token_trello_callback','wpcb_trello','trello_settings_section');
+	add_settings_field('boardid','Board','wpcb_boardid_trello_callback','wpcb_trello','trello_settings_section');
+	add_settings_field('listid','List','wpcb_listid_trello_callback','wpcb_trello','trello_settings_section');
 	register_setting('wpcb_trello','wpcb_trello','');
 } 
 add_action( 'admin_init', 'wpcb_intialize_trello_options' );  
@@ -19,17 +20,17 @@ add_action( 'admin_init', 'wpcb_intialize_trello_options' );
 
 function wpcb_trello_callback() {  
     echo '<p>Réglage des options pour Trello</p>';
+	echo '<p>Sur certains site, il faut cliquer plusieurs fois sur "Sauvegarder"</p>';
 	$options = get_option( 'wpcb_trello'); 
-	$connectionInfos=checkConnection($options['apikey'],$options['token']);
-	$memberInfos=getMembersInfos($options['apikey'],$options['token'],$connectionInfos->idMember);
-	$connected=false;
+	$connectionInfos=checkConnection($options['apiKey'],$options['token']);
+	$memberInfos=getMembersInfos($options['apiKey'],$options['token'],$connectionInfos->idMember);
 	if ($memberInfos->fullName){
-		echo '<p>Connected</p>';
+		echo '<p>Connected as '.$memberInfos->fullName.'</p>';
 	}
 	else {
 		echo '<p>Not Connected</p>';
-		$nonce_url=urlencode(wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=trello&action=updatetoken')));
-		echo '<a href="https://trello.com/1/authorize?key='.$options['apikey'].'&return_url='.$nonce_url.'&name= WPCB&expiration=30days&response_type=token&scope=read,write">Connect</a>';
+		$nonce_url=wp_nonce_url(add_query_arg( array('tab' => 'trello', 'action' => 'updatetoken'), admin_url( 'plugins.php?page=wpcb')));
+		echo '<a href="https://trello.com/1/authorize?key='.$options['apiKey'].'&return_url='.$nonce_url.'&name=WPCB&expiration=never&response_type=token&scope=read,write">Connect</a>';
 	}
 }
 
@@ -41,46 +42,110 @@ function wpcb_add_to_trello_callback($args){
     echo $html;
 }
 
-function wpcb_listid_trello_callback(){  
-    $options = get_option( 'wpcb_trello');  
-    $val ="b2c48b296a"; 
-    if(isset($options['listid'])){$val = $options['listid'];}
-        echo '<input type="text"  size="75"id="listid" name="wpcb_trello[listid]" value="' . $val . '" />';
+function wpcb_boardid_trello_callback(){  
+    $options = get_option( 'wpcb_trello');
+	
+	$connectionInfos=checkConnection($options['apiKey'],$options['token']);
+	$memberInfos=getMembersInfos($options['apiKey'],$options['token'],$connectionInfos->idMember);
+
+	if ($memberInfos->fullName){
+		echo '<SELECT name="wpcb_trello[boardid]" id="wpcb_trello[boardid]">';
+		foreach ($memberInfos->boards as $board){
+			echo '<OPTION VALUE="'.$board->id.'"'; 
+			if ($options['boardid']==$board->id){echo ' SELECTED ';}
+			echo '>'.$board->name.'</OPTION>';
+		}
+		echo '</SELECT>';
+	}
+	else {
+		echo 'Connect first using the link above';
+	}
 }
 
-function wpcb_apikey_trello_callback(){  
+
+function wpcb_listid_trello_callback(){  
     $options = get_option( 'wpcb_trello');  
-    $val ='g0ffbb747d15113611308102b53601ff-us2'; 
-    if(isset($options['apikey'])){$val = $options['apikey'];}
-        echo '<input type="text"  size="75"id="apikey" name="wpcb_trello[apikey]" value="' . $val . '" />';
+    $val ="";
+	if ($options['boardid']){
+		$lists=cURL_GET_trello('','https://api.trello.com/1/boards/'.$options['boardid'].'/lists',$options['apiKey'],$options['token']);
+		if ($lists){
+		echo '<SELECT name="wpcb_trello[listid]" id="wpcb_trello[listid]">';
+		foreach ($lists as $list){
+			echo '<OPTION VALUE="'.$list->id.'"';
+			if ($options['listid']==$list->id){echo ' SELECTED ';}
+			echo '>'.$list->name.'</OPTION>';
+		}
+		echo '</select>';
+		} //end of if lists
+		else {
+			echo '<p>No list has been found in the boardid : '.$boardid.'</p>';
+		}
+	}
+	else {
+		echo '<p>Choose a board before</p>';
+	}
+}
+
+function wpcb_apiKey_trello_callback(){  
+    $options = get_option( 'wpcb_trello');  
+    $val =''; 
+    if(isset($options['apiKey'])){$val = $options['apiKey'];}
+        echo '<input type="text"  size="75" id="apiKey" name="wpcb_trello[apiKey]" value="' . $val . '" />';
+		echo '(voir ici : <a hre="https://trello.com/docs/gettingstarted/index.html#getting-an-application-key" target="_blank">https://trello.com/docs/gettingstarted/index.html#getting-an-application-key</a>)';
 }
 
 function wpcb_token_trello_callback(){  
     $options = get_option( 'wpcb_trello');  
-    $val ='g0ffbb747d15113611308102b53601ff-us2'; 
+    $val =''; 
+	if ($_GET['token']){
+		$options['token']=$_GET['token'];
+		update_option('wpcb_trello',$options);
+		//$val = $_GET['token'];
+	}
     if(isset($options['token'])){$val = $options['token'];}
-        echo '<input type="text"  size="75"id="token" name="wpcb_trello[token]" value="' . $val . '" />';
+        echo '<input type="text"  size="75" id="token" name="wpcb_trello[token]" value="' . $val . '" readonly/>';
 }
 
 add_action('wpsc_submit_checkout','add_to_trello');
 function add_to_trello($a){
 	global $wpdb;
-	$wpcb_trello = get_option ( 'wpcb_trello' );
-	if ($wpcb_trello['add_to_trello']){
-	$listid = $wpcb_trello['listid'];
-	$apikey=$wpcb_trello['apiKey'];
+	$options = get_option ( 'wpcb_trello' );
+	if ($options['add_to_trello']){
 	$log_id=$a['purchase_log_id'];
+	
+	//$purchase = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE id=".$log_id." LIMIT 1",ARRAY_A);
+	$cart = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CART_CONTENTS . "` WHERE `purchaseid` = '{$log_id}'" , ARRAY_A );
+	$detail='Order #'.$log_id.' ';
+	if ( $cart != null) {
+		foreach ( $cart as $row ) {
+		$detail.=$row['quantity'].'x '.$row['name'].'('.$row['price'].'€ p.u.) & ';
+		}
+	}
+	$detail = substr($detail, 0, -3);
+	
+	
 	$email_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$log_id." AND form_id=9 LIMIT 1",ARRAY_A);
 	$lastname_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$log_id." AND form_id=3 LIMIT 1",ARRAY_A) ;
 	$firstname_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$log_id." AND form_id=2 LIMIT 1",ARRAY_A) ;
-	$email=$email_a['value'];$firstname=$firstname_a['value'];$lastname=$lastname_a['value'];
-	if($email){   
-		if(preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*$/i", $email)){
-			require_once('MCAPI.class.php');	
-			$api = new MCAPI($apikey);		
-			$merge_vars = array('FNAME'=>$firstname,'LNAME'=>$lastname); 
-			$api->listSubscribe($listid, $email,$merge_vars,'',false,true);
-		}
+	$mobile_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$log_id." AND form_id=18 LIMIT 1",ARRAY_A);
+	$email=$email_a['value'];
+	$firstname=$firstname_a['value'];
+	$lastname=$lastname_a['value'];
+	$mobile=$mobile_a['value'];
+	
+	$data = array(
+		'idList' => $options['listid'],
+		'name' => $detail
+	);
+	$card=cURL_POST_trello($data,'https://trello.com/1/cards/',$options['apiKey'],$options['token']);
+	// Add a comment to the card so that wo not send the message again
+	$url='https://trello.com/1/cards/'.$card->id.'/actions/comments';
+	$comments[] = array('text'=>'email:'.$email);
+	$comments[]= array('text'=>'firstname:'.$firstname);
+	$comments[] = array('text'=>'lastname:'.$lastname);
+	$comments[] = array('text'=>'mobile:'.$mobile);
+	foreach ($comments as $comment){
+		$result=cURL_POST_trello($comment,$url,$options['apiKey'],$options['token']);
 	}
 	}
 }
