@@ -1,4 +1,4 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimpRequires at least: 2.7Tested up to: 3.3Stable tag: 2.3.3
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypalRequires at least: 2.7Tested up to: 3.3Stable tag: 2.3.4
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
 Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
@@ -6,21 +6,19 @@ Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à ve
 Calcul de frais de port au départ de la France (colis, chronopost, Mondial Relay et d'autres à venir...)
 Fonctionne pour de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
 * et de nombreuses autres banques basée sur la technologie ATOS SIPS ou SYSTEMPAY CYBERPLUS
-
+= Paypal =
 Système Paypal fonctionel (avec option sandbox!)
 
-Livraison :
-
+= Livraison et calcul automatique des frais de port =
+Les frais de port ne sont pas paramétrables, ils sont calculés en fonction des poids des produits et des tarifs de la poste.
 * La Poste Colis* Mini-max
 * Lettre Prioritaire
 * Lettre Verte
 * Enveloppe Document (France, Union Européenne, Outre-Mer & Reste du monde)
 * Chronopost
 * Mondial Relais
+= Ajout dans trello =Toutes les ventes s'ajoutent dans votre tableau de bord Trello !
 
-= Attention =
-Version Beta !
-La dernière version stable : http://downloads.wordpress.org/plugin/wpcb.1.1.9.zip
 
 = Pour les détenteurs d'une clé API =
 * Support pour la mise en place du plugin par email.
@@ -28,7 +26,7 @@ La dernière version stable : http://downloads.wordpress.org/plugin/wpcb.1.1.9.z
 * Ajout dans google drive de toutes vos ventes !
 * Ajout de tous vos acheteurs dans votre outil de mailling MailChimp
 = A venir pour les détenteurs d'une clé API =
-* Sauter l'étape de clic sur l'icone des cartes ou du bouton paypal (comme woocommerce)* Ajout des ventes dans trello (http://trello.com)
+* Sauter l'étape de clic sur l'icone des cartes ou du bouton paypal (comme woocommerce)
 == Installation ==1. Envoyer `wpcb` vers le dossier `/wp-content/plugins/`2. Activer le plugin dans le menu 'Extensions' de Wordpress3. Placer `[wpcb]` sur une (et une seule!) page
 4. Régler les paramètres suivant les indications
 5. Rendez-vous sur http://wpcb.fr/api-key pour débloquer les options pro
@@ -113,7 +111,7 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 6. Réglages Mailchimp
 7. Placer le shortcode wpcb sur une page / Options de paiement8. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
 == Changelog ==
-= 2.3.3 =* Mise à jour non-indispensable si ça marche chez vous !* Ajout du mode debug avancé pour plus de contrôle sur atos.* Mise à jour de la documentation= 2.3.2 =* Ajout du mode de livraison Mini-max de la poste pour les petits objets
+= 2.3.4 =* Vos ventes s'ajoutent dasn votre tableau de bord trello : http://trello.com= 2.3.3 =* Mise à jour non-indispensable si ça marche chez vous !* Ajout du mode debug avancé pour plus de contrôle sur atos.* Mise à jour de la documentation= 2.3.2 =* Ajout du mode de livraison Mini-max de la poste pour les petits objets
 = 2.3.1 =
 * Correction d'un bug pour certains serveurs (maj non-indispensable si ça marche chez vous!)
 
