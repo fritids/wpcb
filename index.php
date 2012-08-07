@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3.6
+Version: 2.3.7
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -195,7 +195,7 @@ function wpcb_general_callback() {
 			echo '<li><span style="color:green">Votre clé API est valide -> OK!</span></li>';
 		}
 		else {
-			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">fonctions supplémentaires</a> en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
+			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">fonctions supplémentaires</a> en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> valable 1 an. C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
 		}
 		// END OF API
 		if (WP_ZEND_FRAMEWORK){
@@ -233,7 +233,7 @@ function wpcb_general_callback() {
 		// Todo : catch error if spreadsheetKey is wrong
 		}
 		else{
-		echo '<li><span style="color:red">Install Zend first : http://h6e.net/wiki/wordpress/plugins/zend-framework and buy an api key to have acces to <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">new features</a></span></li>';	
+		echo '<li><span style="color:red">Install Zend first : <a href="http://wordpress.org/extend/plugins/zend-framework/" target="_blank">http://wordpress.org/extend/plugins/zend-framework/</a> and buy an api key to have acces to <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">new features</a></span></li>';	
 		}
 		
 		echo "<li>Remplissez les autres onglets d'options.</li>";
