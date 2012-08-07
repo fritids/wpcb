@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3.6
+Version: 2.3.8
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -195,7 +195,7 @@ function wpcb_general_callback() {
 			echo '<li><span style="color:green">Votre clé API est valide -> OK!</span></li>';
 		}
 		else {
-			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">fonctions supplémentaires</a> en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
+			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">fonctions supplémentaires</a> en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> valable 1 an. C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
 		}
 		// END OF API
 		if (WP_ZEND_FRAMEWORK){
@@ -233,7 +233,7 @@ function wpcb_general_callback() {
 		// Todo : catch error if spreadsheetKey is wrong
 		}
 		else{
-		echo '<li><span style="color:red">Install Zend first : http://h6e.net/wiki/wordpress/plugins/zend-framework and buy an api key to have acces to <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">new features</a></span></li>';	
+		echo '<li><span style="color:red">Install Zend first : <a href="http://wordpress.org/extend/plugins/zend-framework/" target="_blank">http://wordpress.org/extend/plugins/zend-framework/</a> and buy an api key to have acces to <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">new features</a></span></li>';	
 		}
 		
 		echo "<li>Remplissez les autres onglets d'options.</li>";
@@ -334,7 +334,8 @@ function wpcb_atos_callback() {
 		echo '<p>Installation : Copier les fichiers atos <a href="'.$nonce_url.'">en cliquant ici</a></p>';
      }
 	else {
-				echo '<p>Verifier que en cliquant <a href="'.site_url('automatic_response.php').'">ici</a> vous avez une page blanche</p>';
+			    $options = get_option( 'wpcb_atos');
+				echo '<p>Verifier que en cliquant <a href="'.$options['automatic_response_url'].'">ici</a> vous avez une page blanche</p>';
 	}
 	if	((isset($_GET['action'])) && ($_GET['action']=='copyautomaticresponse')){
 		copy(dirname(__FILE__).'/automatic_response.php',dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
@@ -398,7 +399,7 @@ function wpcb_automatic_response_url_callback() {
     $options = get_option( 'wpcb_atos');  
     $defaultval = site_url('/automatic_response.php'); 
     if (isset($options['automatic_response_url'])){$val=$options['automatic_response_url'];}else{$val=$defaultval;}
-    echo '<input type="text"  size="75" id="automatic_response_url" name="wpcb_atos[automatic_response_url]" value="' . $val . '" placeholder="'.$defaultval.'"/>';  
+    echo '<input type="text"  size="75" id="automatic_response_url" name="wpcb_atos[automatic_response_url]" value="' . $val . '" placeholder="'.$defaultval.'"/> (il vaut mieux ne pas changer cela!)';  
 }
 function wpcb_language_callback() {  
     $options = get_option( 'wpcb_atos');  
@@ -912,6 +913,15 @@ function wpcb_dev_callback() {
 		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=copymerchants'));
 		echo '<li>Copier les fichiers merchants <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=sandbox'));
+		
+		$nonce_url=admin_url( 'plugins.php?page=wpcb&tab=dev&action=copyautomaticresponse');
+		echo '<p>Installation : Copier les fichiers atos <a href="'.$nonce_url.'">en cliquant ici</a></p>';
+
+		if	((isset($_GET['action'])) && ($_GET['action']=='copyautomaticresponse')){
+			copy(dirname(__FILE__).'/automatic_response.php',dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
+		}
+		
+		
 		echo '<li>Tester votre fichier ipn atos <a href="'.$nonce_url.'">en cliquant ici</a> (Cela va mettre Ã  jour log.txt et google drive)</li>';
 		echo '<li>Automatic response production : '.$wpcb_atos['automatic_response_url'].'</li>';
 		echo '<li>Automatic response debug : '.$wpcb_atos['automatic_response_url'].'/debug=1</li>';
