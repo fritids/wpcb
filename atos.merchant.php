@@ -22,17 +22,23 @@ class wpsc_merchant_atos extends wpsc_merchant {
 		$options = get_option('wpcb_options');
 		// Trouver la page où le shortcode [wpcb] se situe. Bug si plusieurs fois le shortcode [wpcb], à résoudre todo
 		$wpcb_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[wpcb]%' AND `post_status`='publish'");
-		if ((array_key_exists('test', $options)) && ($options['test'])){
-			// Mode test, on considère que la CB a été acceptée automatiquement.
-			// Affiche la page de la fin de transaction et on met à jour la base de donnée avec un vente réussie
-			$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
-			// redirection is inside transaction result :
-			transaction_results($sessionid,false);
+		if ($options){
+			if ((array_key_exists('test', $options)) && ($options['test'])){
+				// Mode test, on considère que la CB a été acceptée automatiquement.
+				// Affiche la page de la fin de transaction et on met à jour la base de donnée avec un vente réussie
+				$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
+				// redirection is inside transaction result :
+				transaction_results($sessionid,false);
+			}
+			else {// Affiche les icônes des cartes bancaires :
+				$action='CB';
+				// On va vers la page ou se trouve le shortcode
+				wp_redirect(site_url('?p='.$wpcb_checkout_page->ID.'&sessionid='.$sessionid.'&action='.$action));
+			}
 		}
-		else {// Affiche les icônes des cartes bancaires :
-			$action='CB';
-			// On va vers la page ou se trouve le shortcode
-			wp_redirect(site_url('?p='.$wpcb_checkout_page->ID.'&sessionid='.$sessionid.'&action='.$action));
+		else {
+			// C'est une erreur, il faut régler les options avant. Ne doit pas se produire normalement.
+			wp_redirect(site_url('?action=ReglerLesOptionsAvantTout'));			
 		}
 		exit;
 	} // end of submit function
