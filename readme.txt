@@ -1,4 +1,4 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypalRequires at least: 2.7Tested up to: 3.3Stable tag: 2.3.4
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypalRequires at least: 2.7Tested up to: 3.3Stable tag: 2.3.5
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
 Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
@@ -111,6 +111,9 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 6. Réglages Mailchimp
 7. Placer le shortcode wpcb sur une page / Options de paiement8. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
 == Changelog ==
+
+= 2.3.5 =
+* Correction d'un bug notifié par : http://wordpress.org/support/topic/plugin-wpcb-incomplete-transaction-when-paying-with-credit-card Merci !
 = 2.3.4 =* Vos ventes s'ajoutent dasn votre tableau de bord trello : http://trello.com= 2.3.3 =* Mise à jour non-indispensable si ça marche chez vous !* Ajout du mode debug avancé pour plus de contrôle sur atos.* Mise à jour de la documentation= 2.3.2 =* Ajout du mode de livraison Mini-max de la poste pour les petits objets
 = 2.3.1 =
 * Correction d'un bug pour certains serveurs (maj non-indispensable si ça marche chez vous!)

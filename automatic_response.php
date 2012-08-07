@@ -165,7 +165,7 @@ if (isset($_POST['DATA'])){
 	 }
 	else{
 		// Ok, Sauvegarde dans la base de donnée du shop.
-		if ($response_code==00) {
+		if ($response['code']==00) {
 			$message="-----------SALES----------------------------\n";
 			foreach ($response as $k => $v) {
 				$message.= $k." = ".$v."\n";
