@@ -105,6 +105,7 @@ function wpcb_display() {
 			<a style="font-size:11px;" href="?page=wpcb&tab=livraison" class="nav-tab <?php echo $active_tab == 'livraison' ? 'nav-tab-active' : ''; ?>">Livraison</a>
 			<a style="font-size:11px;" href="?page=wpcb&tab=mailchimp" class="nav-tab <?php echo $active_tab == 'mailchimp' ? 'nav-tab-active' : ''; ?>">Mailchimp</a>
 			<a style="font-size:11px;" href="?page=wpcb&tab=trello" class="nav-tab <?php echo $active_tab == 'trello' ? 'nav-tab-active' : ''; ?>">Trello</a>
+			<a style="font-size:11px;" href="?page=wpcb&tab=misc" class="nav-tab <?php echo $active_tab == 'misc' ? 'nav-tab-active' : ''; ?>">Autres</a>
             <a style="font-size:11px;" href="?page=wpcb&tab=dev" class="nav-tab <?php echo $active_tab == 'dev' ? 'nav-tab-active' : ''; ?>">Dev</a>
         </h2>  
   
@@ -121,6 +122,7 @@ function wpcb_display() {
 		elseif( $active_tab == 'livraison' ) {settings_fields( 'wpcb_livraison' );do_settings_sections( 'wpcb_livraison' );}
 		elseif( $active_tab == 'mailchimp' ) {settings_fields( 'wpcb_mailchimp' );do_settings_sections( 'wpcb_mailchimp' );}
 		elseif( $active_tab == 'trello' ) {settings_fields( 'wpcb_trello' );do_settings_sections( 'wpcb_trello' );}
+	    elseif( $active_tab == 'misc' ) {settings_fields( 'wpcb_misc' ); do_settings_sections( 'wpcb_misc' );}
 	    elseif( $active_tab == 'dev' ) {settings_fields( 'wpcb_dev' ); do_settings_sections( 'wpcb_dev' );}
 	    submit_button();
 	    ?>
@@ -1583,5 +1585,143 @@ if ( is_admin() )
 
 
 
+
+/** 
+* Misc options
+*/  
+function wpcb_intialize_misc_options() {  
+    if(false == get_option( 'wpcb_misc' )){add_option( 'wpcb_misc' );}
+	add_settings_section('misc_settings_section','Options diverses','wpcb_misc_callback','wpcb_misc');
+	// Add the fields :
+	add_settings_field('display_number_sales','Afficher le nombre de vente','wpcb_display_number_sales_callback','wpcb_misc','misc_settings_section');
+		add_settings_field('display_number_sales_label','Texte devant le nombre de vente','wpcb_display_number_sales_label_callback','wpcb_misc','misc_settings_section');
+			add_settings_field('display_countdown','Afficher le compte à rebours','wpcb_display_countdown_callback','wpcb_misc','misc_settings_section');
+	register_setting('wpcb_misc','wpcb_misc','');
+} // end wpcb_intialize_atos_options  
+add_action( 'admin_init', 'wpcb_intialize_misc_options' );  
+
+function wpcb_misc_callback() {
+	$wpcb_misc = get_option ( 'wpcb_misc' );
+    //echo '<p>Options diverses</p>';
+}
+
+function wpcb_display_number_sales_label_callback(){  
+    $options = get_option( 'wpcb_misc');  
+    $val ='Nombre de ventes :'; 
+    if(isset($options['display_number_sales_label'])){$val = $options['display_number_sales_label'];}
+        echo '<input type="text"  size="75" id="display_number_sales_label" name="wpcb_misc[display_number_sales_label]" value="' . $val . '" />';
+}
+
+function wpcb_display_number_sales_callback($args){  
+    $options = get_option( 'wpcb_misc');  
+	$html = '<input type="checkbox" id="display_number_sales" name="wpcb_misc[display_number_sales]" value="1" ' . checked(1, $options['display_number_sales'], false) . '/>';  
+    $html .= '<label for="display_number_sales"> '  . $args[0] . '</label>';
+    $html .= '<br/>Dans les réglages avancés de chaque produit, vous pouvez ajouter un multiplicateur pour l\'affichage du nombre de vente en ajoutant le meta : g:NumberOfSalesMultiplier puit la valeur du multiplicateur';   
+    echo $html;
+}
+
+function wpcb_display_countdown_callback($args){  
+    $options = get_option( 'wpcb_misc');  
+	$html = '<input type="checkbox" id="display_countdown" name="wpcb_misc[display_countdown]" value="1" ' . checked(1, $options['display_countdown'], false) . '/>';  
+    $html .= '<label for="display_countdown"> '  . $args[0] . '</label>';
+    $html .= '<br/>Dans les réglages avancés de chaque produit, vous pouvez ajouter un compte à rebours de fin de vente en ajoutant le meta : g:TargetDate puit la valeur de la date de fin dans le format 31-12-2020 23:00 UTC+0200 <br/>Le produit passe en brouille quand la vente est terminée. Nécessite l\'installation du plugin : <a href="http://wordpress.org/extend/plugins/wordpress-countdown-widget/">http://wordpress.org/extend/plugins/wordpress-countdown-widget/</a>';   
+    echo $html;
+}
+
+
+
+$wpcb_misc = get_option( 'wpcb_misc');
+if ($wpcb_misc['display_number_sales']){
+add_action('wpsc_product_addons','show_number_of_sales');}
+function show_number_of_sales($productid){
+	$wpcb_misc = get_option( 'wpcb_misc');
+	global $wpdb;
+	// Toutes les ventes réussies :
+	$ventesreussies = $wpdb->get_results( "SELECT id FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE processed=2" );
+	//print_r($ventesreussies);
+	if ($ventesreussies){
+		foreach ($ventesreussies as $ventereussie){
+			$purchaseid = $ventereussie->id;
+			// Pour chaque vente réussie compter le nombre d'article correspondant à ce produit
+			$produitsvendus = $wpdb->get_results( "SELECT quantity FROM `".WPSC_TABLE_CART_CONTENTS."` WHERE purchaseid=".$purchaseid.' AND prodid='.$productid );
+			if ($produitsvendus){
+				foreach ($produitsvendus as $produitvendu){
+					$qty=$produitvendu->quantity;
+				}	
+			}
+			else {
+				$qty=0;	
+			}
+		}	
+	}
+	$NumberOfSalesMultiplier = get_post_meta($productid, 'g:NumberOfSalesMultiplier',true);
+	if ($NumberOfSalesMultiplier){
+	}
+	else {
+		$NumberOfSalesMultiplier=1;
+	}
+	$qtyToDisplay=round($NumberOfSalesMultiplier*$qty);
+	echo $wpcb_misc['display_number_sales_label'].' '.$qtyToDisplay;
+}
+
+if ($wpcb_misc['display_countdown']){
+add_action('wpsc_product_addons','display_countdown');
+add_action('init','remove_ventes_terminees');}
+
+function display_countdown($productid){
+	$wpcb_misc = get_option( 'wpcb_misc');
+	$TargetDate = get_post_meta($productid, 'g:TargetDate',true);
+	if ($TargetDate){
+		$TargetDateTimestamp=strtotime($TargetDate);
+		$date=date('d F Y',$TargetDateTimestamp);
+		$hour=date('H',$TargetDateTimestamp);
+		$minutes=date('i',$TargetDateTimestamp);
+		$seconds=date('s',$TargetDateTimestamp);
+		//echo $date.'*'.$hour.':'.$minutes;
+    	echo '<div class="countdown-container" style="">';
+		if(function_exists("shailan_CountdownWidget_shortcode")){
+		  $countdown = array(
+		    'title'     => '',
+		    'event'     => 'Avant la fin de la vente privée',
+		    'date'      => $date,
+		    'hour'      => $hour,
+		    'minutes'   => $minutes,
+		    'seconds'   => $seconds,
+		    'format'    => 'dHMS',
+		    'link'      => true, // set true to remove link, false to support me
+		  );  
+		  echo shailan_CountdownWidget_shortcode($countdown);
+		}
+		echo '</div>';
+	}
+	else {
+
+	}
+}
+
+function remove_ventes_terminees(){
+	global $wpdb;
+	 $loop = new WP_Query( array( 'post_type' => 'wpsc-product', 'posts_per_page' => -1 ) );
+    while ( $loop->have_posts() ) : $loop->the_post();
+ 	$productid = get_the_ID();
+ 	$TargetDate = get_post_meta($productid, 'g:TargetDate',true);
+ 	if ($TargetDate){
+ 	$TargetDateTimestamp=strtotime($TargetDate);
+ 	//echo $TargetDate.'/';
+ 	$now=time()+2*60*60;
+ 	//echo date('m/d/Y h:i A',$now);
+ 	if ($now>$TargetDateTimestamp){
+ 		$wpdb->query("UPDATE wp_posts SET post_status = 'draft' WHERE (ID =".$productid." and post_status = 'publish')") ;
+ 	}
+ 	}
+ 	endwhile;
+}
+
+add_action('init','ShowHelp');
+function ShowHelp(){
+	if ($_GET['action']=='ReglerLesOptionsAvantTout'){
+		echo '<pre>Sauvegarder les options suivant les indications <a href="'.admin_url('/plugins.php?page=wpcb&tab=dev').'">ici</a></pre>';
+	}	
+}
 
 ?>
