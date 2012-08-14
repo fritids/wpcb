@@ -1,9 +1,9 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypalRequires at least: 2.7Tested up to: 3.3Stable tag: 2.3.6
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypalRequires at least: 2.7Tested up to: 3.4.1Stable tag: 2.3.9
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
 Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
 == Description ==Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
-Calcul de frais de port au départ de la France (colis, chronopost, Mondial Relay et d'autres à venir...)
+Calcul automatique de frais de port au départ de la France (colis, chronopost, Mondial Relay et d'autres à venir...)
 Fonctionne pour de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
 * et de nombreuses autres banques basée sur la technologie ATOS SIPS ou SYSTEMPAY CYBERPLUS
 = Paypal =
@@ -19,6 +19,14 @@ Les frais de port ne sont pas paramétrables, ils sont calculés en fonction des
 * Mondial Relais
 = Ajout dans trello =Toutes les ventes s'ajoutent dans votre tableau de bord Trello !
 
+= Affichage du nombre de ventes =
+
+Vous pouvez afficher aux visiteurs le nombre de vente de chaque produit
+
+= Compte à rebours =
+
+Vous pouvez afficher un compte à rebours sur vos produits (vente flash par exemple). Necessite le plugin : http://wordpress.org/extend/plugins/wordpress-countdown-widget/
+En plus de l'affichage du compte à rebours, le produit est désactivé quand le temps est écoulé.
 
 = Pour les détenteurs d'une clé API =
 * Support pour la mise en place du plugin par email.
@@ -32,6 +40,10 @@ Les frais de port ne sont pas paramétrables, ils sont calculés en fonction des
 5. Rendez-vous sur http://wpcb.fr/api-key pour débloquer les options pro
 
 == Frequently Asked Questions ==
+
+= Quel type de fichier dois-je télécharger chez ma banque ? =
+
+Quand vous avez le choix entre .php, .jsp, .asp, .aspx ou standard, choisissez .php .
 
 = Que faire des fichiers envoyé par ma banque ? =
 
@@ -70,7 +82,11 @@ Le mode test permet de vérifier automatiquement le paiement sans passer par l'�
 
 = A quoi sert le mode demo ? =
 Le mode demo permet d'utiliser le kit de démo fournit par votre banque. (Ne marche pas toujours très bien...)
-= Y-a-t-il un mode debug ? =Oui, editer wp-config.php à la racine de votre site et mettez la variable globale WP_DEBUG = true . = Autre question ? =
+= Y-a-t-il un mode debug ? =Oui, editer wp-config.php à la racine de votre site et mettez la variable globale WP_DEBUG = true . 
+
+= Pourquoi me renvoit-t-ton sur monsite.fr?action=ReglerLesOptionsAvantTout ? =
+Vous devez vous rendre dans l'onglet Dev des réglages de wpcb pour vérifier que vous avez sauvegardé tous les options ! Sinon cliquez bien sur les gros boutton bleu de chaque onglet !
+= Autre question ? =
 Merci de poser vos questions sur le forum en cliquant à droite sur le bouton vert ->
 
 Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.
@@ -104,13 +120,31 @@ Numéro de commande : %purchase_id%
 %product_list%%total_shipping%%total_price%
 Les prix sont TTC.
 Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Email, Coordonnées postales, etc.'
-= Ou placer le fichier automatic_response.php ? =Ce fichier est automatiquement copié à la racine de votre blog wordpress c'est à dire à coté du fichier wp-config.phpSi cela n'est pas fait, faite le manuellement.A la désinstallation du plugin, ce fichier est supprimé.A chaque mise-à jour ce fichier est remplacé donc ne le modifiez pas != Comment configurer google drive pour recevoir les ventes ? =Télécharger le fichier <a href="https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc">https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc</a>Envoyer ce fichier dans votre google drive et noter votre nouvelle cle de fichier (dans mon fichier, à titre d'exemple, la clé est : 0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc cela se lit dans l'url)Ne changer pas les entetes et attention à ce que ce soit la feuille numéro 1 du classeur !!
+= Ou placer le fichier automatic_response.php ? =Ce fichier est automatiquement copié à la racine de votre blog wordpress c'est à dire à coté du fichier wp-config.phpSi cela n'est pas fait, faite le manuellement.A la désinstallation du plugin, ce fichier est supprimé.A chaque mise-à jour ce fichier est remplacé donc ne le modifiez pas != Comment configurer google drive pour recevoir les ventes ? =Télécharger le fichier <a href="https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc">https://docs.google.com/spreadsheet/ccc?key=0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc</a>Envoyer ce fichier dans votre google drive et noter votre nouvelle cle de fichier (dans mon fichier, à titre d'exemple, la clé est : 0AkLWPxefL-fydHllcFJKTzFLaGdRUG5tbXM1dWJCVWc cela se lit dans l'url)Ne changer pas les entetes et attention à ce que ce soit la feuille numéro 1 du classeur !!
+
+= Mes ventes restent incomplètes après le paiement par Carte Bancaire, que faire ? =
+
+* Vérifier que vous avez une page blanche en cliquant sur le lien dans l'onglet Atos
+* Vérifier que le fichier automatic_response.php à la racine de votre site (en ftp) est bien en droits 604
+* Faire une demande de support sur http://wpcb.fr/support
 = Autre question ? =Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.= Vous ne comprenez pas ce charabia ? =Nous pouvons installer le plugin pour vous, la marche à suivre est indiquée ici : http://wpcb.fr/support/== Screenshots ==1. Réglages du module2. Réglages ATOS3. Réglages Chèque ou Virement
 4. Réglages Paypal
 5. Réglages Systempay Cyberplus (Banque Populaire)
 6. Réglages Mailchimp
 7. Placer le shortcode wpcb sur une page / Options de paiement8. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
 == Changelog ==
+
+= 2.3.9 =
+* Ajout du compte à rebours de vente
+* Ajout de l'affichage du nombre de vente
+* Ajout d'icônes de cartes bancaires manquantes
+
+= 2.3.8 =
+* Mise à jour de compatibilité avec la version 3.4.1 de Wordpress
+* Amélioration du débug pour le support
+
+= 2.3.7 =
+* Correction d'un warning (bug notifié ici : http://wordpress.org/support/topic/plugin-wpcb-warning-array_key_exists-ligne-25-atosmerchantphp)
 
 = 2.3.6 =
 * Correction d'un bug notifié par : http://wordpress.org/support/topic/plugin-wpcb-incomplete-transaction-when-paying-with-credit-card Merci !
