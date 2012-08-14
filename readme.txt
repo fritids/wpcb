@@ -132,6 +132,7 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 5. Réglages Systempay Cyberplus (Banque Populaire)
 6. Réglages Mailchimp
 7. Placer le shortcode wpcb sur une page / Options de paiement8. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
+9. Réglage du multiplicateur d'affichage du nombre de vente et réglage du compte à rebours de vente
 == Changelog ==
 
 = 2.3.9 =
