@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3.9
+Version: 2.3.10
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -1479,7 +1479,10 @@ foreach ($_POST as $key => $value){
 	$req .= "&$key=$value";
 } 
 // Post back to PayPal to validate 
-$header .= "POST /cgi-bin/webscr HTTP/1.0\r\n"; 
+$header .= "POST /cgi-bin/webscr HTTP/1.0\r\n";
+if ($wpcb_paypal['sandbox_paypal']){ 
+$header .= "Host: www.sandbox.paypal.com\r\n";
+}
 $header .= "Content-Type: application/x-www-form-urlencoded\r\n"; 
 $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 if ($wpcb_paypal['sandbox_paypal']){ 
@@ -1509,10 +1512,6 @@ else{
 			}//End if completed
 		}
 		elseif (strcmp ($res, "INVALID") == 0){
-			// If 'INVALID', send an email. TODO: Log for manual investigation. 
-			if (WP_DEBUG){
-				wp_mail($purch_log_email, "Live-INVALID IPN",$req);
-			}
 			$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);
 		}  
 	}
