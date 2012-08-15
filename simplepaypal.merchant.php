@@ -5,7 +5,7 @@ $nzshpcrt_gateways[$num] = array(
 'api_version' => 2.0,
 'class_name' => 'wpsc_merchant_simplepaypal',
 'has_recurring_billing' => true,
-'display_name' => $options['wpec_display_name'],
+'display_name' => 'Paypal Sécurisé',
 'wp_admin_cannot_cancel' => false,
 'requirements' => array(),'form' => 'form_simplepaypal',
 'internalname' => 'simplepaypal',
