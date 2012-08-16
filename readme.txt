@@ -50,6 +50,7 @@ Quand vous avez le choix entre .php, .jsp, .asp, .aspx ou standard, choisissez .
 Configurer correctement vos dossiers/fichiers obtenus par votre banque (dossier crypté)
 Pour les banques ATOS SIPS : 
 Sur votre ftp, dans un dossier (non visible depuis Internet exemple unb dossier cgi-bin ou apache à coté de votre dossier www) vous devez avoir :
+
 * parcom.nomdelabanque 
 * parcom.005009461540411 (votre numéro de marchand à la place de celui là) (le contenu du fichier n'a pas a être modifé)
 * log.txt
@@ -57,6 +58,7 @@ Sur votre ftp, dans un dossier (non visible depuis Internet exemple unb dossier 
 * pathfile (à modifier suivant cet exemple !!! )
 * request
 * response
+
 Note : les fichiers call_request.php, call_response.php et call_auto_response.php dans le package fourni par la banque ne sont pas necessaires car wpcb les remplace.
 
 http://6www.net/blog/wp-content/uploads/2011/05/snap13-05-2011-12.30.5308-07-2011-14.20.411.png
@@ -86,6 +88,12 @@ Le mode demo permet d'utiliser le kit de démo fournit par votre banque. (Ne mar
 
 = Pourquoi me renvoit-t-ton sur monsite.fr?action=ReglerLesOptionsAvantTout ? =
 Vous devez vous rendre dans l'onglet Dev des réglages de wpcb pour vérifier que vous avez sauvegardé tous les options ! Sinon cliquez bien sur les gros boutton bleu de chaque onglet !
+
+= Je lis : "Error calling the atos api : exec request not found", alors que le fichier est bien là, pourquoi ? =
+Il faut bien mettre le fichier request en droit chmod 755 !
+
+= Si mon certif a une extension php que faire ? =
+Supprimer l'extension puis supprimer les 8 premières lignes de ce fichier et les deux dernières. Ensuite dans votre fichier pathfile rajouter un # espace devant F_CTYPE!php! : # F_CTYPE!php! (pour commenter la ligne)
 = Autre question ? =
 Merci de poser vos questions sur le forum en cliquant à droite sur le bouton vert ->
 

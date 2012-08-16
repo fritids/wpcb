@@ -315,9 +315,9 @@ function wpcb_intialize_atos_options() {
 	add_settings_field('language','language (fr)','wpcb_language_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('payment_means','payment_means','wpcb_payment_means_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('header_flag','header_flag (no)','wpcb_header_flag_callback','wpcb_atos','atos_settings_section');
-	add_settings_field('advert','advert','wpcb_advert_callback','wpcb_atos','atos_settings_section');
-	add_settings_field('logo_id','logo_id','wpcb_logo_id_callback','wpcb_atos','atos_settings_section');
-	add_settings_field('logo_id2','logo_id2','wpcb_logo_id2_callback','wpcb_atos','atos_settings_section');
+	add_settings_field('advert','Image au centre (advert)','wpcb_advert_callback','wpcb_atos','atos_settings_section');
+	add_settings_field('logo_id','Image de gauche (logo_id)','wpcb_logo_id_callback','wpcb_atos','atos_settings_section');
+	add_settings_field('logo_id2','Image de droite (logo_id2)','wpcb_logo_id2_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('wpec_atos_display_name','wpec_atos_display_name','wpcb_wpec_atos_display_name_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('wpec_atos_gateway_image','wpec_atos_gateway_image','wpcb_wpec_atos_gateway_image_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('logfile','logfile','wpcb_logfile_callback','wpcb_atos','atos_settings_section');
