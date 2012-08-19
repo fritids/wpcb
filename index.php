@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3.6
+Version: 2.3.11
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -105,6 +105,7 @@ function wpcb_display() {
 			<a style="font-size:11px;" href="?page=wpcb&tab=livraison" class="nav-tab <?php echo $active_tab == 'livraison' ? 'nav-tab-active' : ''; ?>">Livraison</a>
 			<a style="font-size:11px;" href="?page=wpcb&tab=mailchimp" class="nav-tab <?php echo $active_tab == 'mailchimp' ? 'nav-tab-active' : ''; ?>">Mailchimp</a>
 			<a style="font-size:11px;" href="?page=wpcb&tab=trello" class="nav-tab <?php echo $active_tab == 'trello' ? 'nav-tab-active' : ''; ?>">Trello</a>
+			<a style="font-size:11px;" href="?page=wpcb&tab=misc" class="nav-tab <?php echo $active_tab == 'misc' ? 'nav-tab-active' : ''; ?>">Autres</a>
             <a style="font-size:11px;" href="?page=wpcb&tab=dev" class="nav-tab <?php echo $active_tab == 'dev' ? 'nav-tab-active' : ''; ?>">Dev</a>
         </h2>  
   
@@ -121,6 +122,7 @@ function wpcb_display() {
 		elseif( $active_tab == 'livraison' ) {settings_fields( 'wpcb_livraison' );do_settings_sections( 'wpcb_livraison' );}
 		elseif( $active_tab == 'mailchimp' ) {settings_fields( 'wpcb_mailchimp' );do_settings_sections( 'wpcb_mailchimp' );}
 		elseif( $active_tab == 'trello' ) {settings_fields( 'wpcb_trello' );do_settings_sections( 'wpcb_trello' );}
+	    elseif( $active_tab == 'misc' ) {settings_fields( 'wpcb_misc' ); do_settings_sections( 'wpcb_misc' );}
 	    elseif( $active_tab == 'dev' ) {settings_fields( 'wpcb_dev' ); do_settings_sections( 'wpcb_dev' );}
 	    submit_button();
 	    ?>
@@ -136,7 +138,11 @@ function wpcb_initialize_general_options() {
   add_settings_field('emailapiKey','Email associé à la Clé API','wpcb_emailapiKey_callback','wpcb_general','general_settings_section',array('description' ));  
   add_settings_field('googleemail','Email Google Drive (ou Google App)','wpcb_googleemail_callback','wpcb_general','general_settings_section',array('description' ));  
   add_settings_field('googlepassword','Password associé Gmail ou Google Apps','wpcb_googlepassword_callback','wpcb_general','general_settings_section',array('description' ));  
-  add_settings_field('spreadsheetKey','spreadsheetKey','wpcb_spreadsheetKey_callback','wpcb_general','general_settings_section',array('description' ));  
+  add_settings_field('spreadsheetKey','spreadsheetKey for log','wpcb_spreadsheetKey_callback','wpcb_general','general_settings_section',array('description' ));  
+    add_settings_field('AddSalesCheckbox','Add Sales to Google spreadsheet','wpcb_AddSalesCheckbox_callback','wpcb_general','general_settings_section',array('The sales will be added to your google spreadsheet' ));
+  add_settings_field('AllSales_spreadsheetKey','spreadsheetKey for All Sales','wpcb_AllSales_spreadsheetKey_callback','wpcb_general','general_settings_section',array('description' ));
+      add_settings_field('AddSalesNotificationCheckbox','Notify me when a Sales is added to Google spreadsheet','wpcb_AddSalesNotificationCheckbox_callback','wpcb_general','general_settings_section',array('You will get an email when a sale is added to Google spreadsheet' ));
+  
   register_setting('wpcb_general','wpcb_general'); 
 } 
 add_action('admin_init', 'wpcb_initialize_general_options');  
@@ -195,7 +201,7 @@ function wpcb_general_callback() {
 			echo '<li><span style="color:green">Votre clé API est valide -> OK!</span></li>';
 		}
 		else {
-			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">fonctions supplémentaires</a> en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
+			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">fonctions supplémentaires</a> en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> valable 1 an. C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
 		}
 		// END OF API
 		if (WP_ZEND_FRAMEWORK){
@@ -233,7 +239,7 @@ function wpcb_general_callback() {
 		// Todo : catch error if spreadsheetKey is wrong
 		}
 		else{
-		echo '<li><span style="color:red">Install Zend first : http://h6e.net/wiki/wordpress/plugins/zend-framework and buy an api key to have acces to <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">new features</a></span></li>';	
+		echo '<li><span style="color:red">Install Zend first : <a href="http://wordpress.org/extend/plugins/zend-framework/" target="_blank">http://wordpress.org/extend/plugins/zend-framework/</a> and buy an api key to have acces to <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">new features</a></span></li>';	
 		}
 		
 		echo "<li>Remplissez les autres onglets d'options.</li>";
@@ -291,7 +297,27 @@ function wpcb_spreadsheetKey_callback(){
     if(isset($options['spreadsheetKey'])){$val = $options['spreadsheetKey'];}
         echo '<input type="text"  size="75"id="spreadsheetKey" name="wpcb_general[spreadsheetKey]" value="' . $val . '" />';
 }  
-  
+
+function wpcb_AddSalesCheckbox_callback($args){  
+    $options = get_option( 'wpcb_general');  
+	$html = '<input type="checkbox" id="AddSalesCheckbox" name="wpcb_general[AddSalesCheckbox]" value="1" ' . checked(1, $options['AddSalesCheckbox'], false) . '/>';  
+    $html .= '<label for="AddSalesCheckbox"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+
+function wpcb_AllSales_spreadsheetKey_callback(){  
+    $options = get_option( 'wpcb_general');  
+    $val = '0AkLWPxefL-fydENzRXpjdEk0OVBsQ2ZmYWFrMGp3QVE'; 
+    if(isset($options['AllSales_spreadsheetKey'])){$val = $options['AllSales_spreadsheetKey'];}
+        echo '<input type="text"  size="75" id="AllSales_spreadsheetKey" name="wpcb_general[AllSales_spreadsheetKey]" value="' . $val . '" />';
+}  
+
+function wpcb_AddSalesNotificationCheckbox_callback($args){  
+    $options = get_option( 'wpcb_general');  
+	$html = '<input type="checkbox" id="AddSalesNotificationCheckbox" name="wpcb_general[AddSalesNotificationCheckbox]" value="1" ' . checked(1, $options['AddSalesNotificationCheckbox'], false) . '/>';  
+    $html .= '<label for="AddSalesNotificationCheckbox"> '  . $args[0] . '</label>';   
+    echo $html;
+}
 
 /** 
 * CB options
@@ -313,9 +339,9 @@ function wpcb_intialize_atos_options() {
 	add_settings_field('language','language (fr)','wpcb_language_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('payment_means','payment_means','wpcb_payment_means_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('header_flag','header_flag (no)','wpcb_header_flag_callback','wpcb_atos','atos_settings_section');
-	add_settings_field('advert','advert','wpcb_advert_callback','wpcb_atos','atos_settings_section');
-	add_settings_field('logo_id','logo_id','wpcb_logo_id_callback','wpcb_atos','atos_settings_section');
-	add_settings_field('logo_id2','logo_id2','wpcb_logo_id2_callback','wpcb_atos','atos_settings_section');
+	add_settings_field('advert','Image au centre (advert)','wpcb_advert_callback','wpcb_atos','atos_settings_section');
+	add_settings_field('logo_id','Image de gauche (logo_id)','wpcb_logo_id_callback','wpcb_atos','atos_settings_section');
+	add_settings_field('logo_id2','Image de droite (logo_id2)','wpcb_logo_id2_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('wpec_atos_display_name','wpec_atos_display_name','wpcb_wpec_atos_display_name_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('wpec_atos_gateway_image','wpec_atos_gateway_image','wpcb_wpec_atos_gateway_image_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('logfile','logfile','wpcb_logfile_callback','wpcb_atos','atos_settings_section');
@@ -334,7 +360,8 @@ function wpcb_atos_callback() {
 		echo '<p>Installation : Copier les fichiers atos <a href="'.$nonce_url.'">en cliquant ici</a></p>';
      }
 	else {
-				echo '<p>Verifier que en cliquant <a href="'.site_url('automatic_response.php').'">ici</a> vous avez une page blanche</p>';
+			    $options = get_option( 'wpcb_atos');
+				echo '<p>Verifier que en cliquant <a href="'.$options['automatic_response_url'].'">ici</a> vous avez une page blanche</p>';
 	}
 	if	((isset($_GET['action'])) && ($_GET['action']=='copyautomaticresponse')){
 		copy(dirname(__FILE__).'/automatic_response.php',dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
@@ -398,7 +425,7 @@ function wpcb_automatic_response_url_callback() {
     $options = get_option( 'wpcb_atos');  
     $defaultval = site_url('/automatic_response.php'); 
     if (isset($options['automatic_response_url'])){$val=$options['automatic_response_url'];}else{$val=$defaultval;}
-    echo '<input type="text"  size="75" id="automatic_response_url" name="wpcb_atos[automatic_response_url]" value="' . $val . '" placeholder="'.$defaultval.'"/>';  
+    echo '<input type="text"  size="75" id="automatic_response_url" name="wpcb_atos[automatic_response_url]" value="' . $val . '" placeholder="'.$defaultval.'"/> (il vaut mieux ne pas changer cela!)';  
 }
 function wpcb_language_callback() {  
     $options = get_option( 'wpcb_atos');  
@@ -912,6 +939,15 @@ function wpcb_dev_callback() {
 		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=copymerchants'));
 		echo '<li>Copier les fichiers merchants <a href="'.$nonce_url.'">en cliquant ici</a></li>';
 		$nonce_url=wp_nonce_url(admin_url( 'plugins.php?page=wpcb&tab=dev&action=sandbox'));
+		
+		$nonce_url=admin_url( 'plugins.php?page=wpcb&tab=dev&action=copyautomaticresponse');
+		echo '<p>Installation : Copier les fichiers atos <a href="'.$nonce_url.'">en cliquant ici</a></p>';
+
+		if	((isset($_GET['action'])) && ($_GET['action']=='copyautomaticresponse')){
+			copy(dirname(__FILE__).'/automatic_response.php',dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
+		}
+		
+		
 		echo '<li>Tester votre fichier ipn atos <a href="'.$nonce_url.'">en cliquant ici</a> (Cela va mettre Ã  jour log.txt et google drive)</li>';
 		echo '<li>Automatic response production : '.$wpcb_atos['automatic_response_url'].'</li>';
 		echo '<li>Automatic response debug : '.$wpcb_atos['automatic_response_url'].'/debug=1</li>';
@@ -1467,7 +1503,10 @@ foreach ($_POST as $key => $value){
 	$req .= "&$key=$value";
 } 
 // Post back to PayPal to validate 
-$header .= "POST /cgi-bin/webscr HTTP/1.0\r\n"; 
+$header .= "POST /cgi-bin/webscr HTTP/1.0\r\n";
+if ($wpcb_paypal['sandbox_paypal']){ 
+$header .= "Host: www.sandbox.paypal.com\r\n";
+}
 $header .= "Content-Type: application/x-www-form-urlencoded\r\n"; 
 $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 if ($wpcb_paypal['sandbox_paypal']){ 
@@ -1497,10 +1536,6 @@ else{
 			}//End if completed
 		}
 		elseif (strcmp ($res, "INVALID") == 0){
-			// If 'INVALID', send an email. TODO: Log for manual investigation. 
-			if (WP_DEBUG){
-				wp_mail($purch_log_email, "Live-INVALID IPN",$req);
-			}
 			$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);
 		}  
 	}
@@ -1572,6 +1607,232 @@ if ( is_admin() )
 	add_action( 'in_plugin_update_message-' . plugin_basename(__FILE__), 'my_update_notice' );
 
 
+
+
+/** 
+* Misc options
+*/  
+function wpcb_intialize_misc_options() {  
+    if(false == get_option( 'wpcb_misc' )){add_option( 'wpcb_misc' );}
+	add_settings_section('misc_settings_section','Options diverses','wpcb_misc_callback','wpcb_misc');
+	// Add the fields :
+	add_settings_field('display_number_sales','Afficher le nombre de vente','wpcb_display_number_sales_callback','wpcb_misc','misc_settings_section');
+		add_settings_field('display_number_sales_label','Texte devant le nombre de vente','wpcb_display_number_sales_label_callback','wpcb_misc','misc_settings_section');
+			add_settings_field('display_countdown','Afficher le compte à rebours','wpcb_display_countdown_callback','wpcb_misc','misc_settings_section');
+	register_setting('wpcb_misc','wpcb_misc','');
+} // end wpcb_intialize_atos_options  
+add_action( 'admin_init', 'wpcb_intialize_misc_options' );  
+
+function wpcb_misc_callback() {
+	$wpcb_misc = get_option ( 'wpcb_misc' );
+    //echo '<p>Options diverses</p>';
+}
+
+function wpcb_display_number_sales_label_callback(){  
+    $options = get_option( 'wpcb_misc');  
+    $val ='Nombre de ventes :'; 
+    if(isset($options['display_number_sales_label'])){$val = $options['display_number_sales_label'];}
+        echo '<input type="text"  size="75" id="display_number_sales_label" name="wpcb_misc[display_number_sales_label]" value="' . $val . '" />';
+}
+
+function wpcb_display_number_sales_callback($args){  
+    $options = get_option( 'wpcb_misc');  
+	$html = '<input type="checkbox" id="display_number_sales" name="wpcb_misc[display_number_sales]" value="1" ' . checked(1, $options['display_number_sales'], false) . '/>';  
+    $html .= '<label for="display_number_sales"> '  . $args[0] . '</label>';
+    $html .= '<br/>Dans les réglages avancés de chaque produit, vous pouvez ajouter un multiplicateur pour l\'affichage du nombre de vente en ajoutant le meta : g:NumberOfSalesMultiplier puit la valeur du multiplicateur';   
+    echo $html;
+}
+
+function wpcb_display_countdown_callback($args){  
+    $options = get_option( 'wpcb_misc');  
+	$html = '<input type="checkbox" id="display_countdown" name="wpcb_misc[display_countdown]" value="1" ' . checked(1, $options['display_countdown'], false) . '/>';  
+    $html .= '<label for="display_countdown"> '  . $args[0] . '</label>';
+    $html .= '<br/>Dans les réglages avancés de chaque produit, vous pouvez ajouter un compte à rebours de fin de vente en ajoutant le meta : g:TargetDate puit la valeur de la date de fin dans le format 31-12-2020 23:00 UTC+0200 <br/>Le produit passe en brouille quand la vente est terminée. Nécessite l\'installation du plugin : <a href="http://wordpress.org/extend/plugins/wordpress-countdown-widget/">http://wordpress.org/extend/plugins/wordpress-countdown-widget/</a>';   
+    echo $html;
+}
+
+
+
+$wpcb_misc = get_option( 'wpcb_misc');
+if ($wpcb_misc['display_number_sales']){
+add_action('wpsc_product_addons','show_number_of_sales');}
+function show_number_of_sales($productid){
+	$wpcb_misc = get_option( 'wpcb_misc');
+	global $wpdb;
+	// Toutes les ventes réussies :
+	$ventesreussies = $wpdb->get_results( "SELECT id FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE processed=2" );
+	//print_r($ventesreussies);
+	if ($ventesreussies){
+		foreach ($ventesreussies as $ventereussie){
+			$purchaseid = $ventereussie->id;
+			// Pour chaque vente réussie compter le nombre d'article correspondant à ce produit
+			$produitsvendus = $wpdb->get_results( "SELECT quantity FROM `".WPSC_TABLE_CART_CONTENTS."` WHERE purchaseid=".$purchaseid.' AND prodid='.$productid );
+			if ($produitsvendus){
+				foreach ($produitsvendus as $produitvendu){
+					$qty=$produitvendu->quantity;
+				}	
+			}
+			else {
+				$qty=0;	
+			}
+		}	
+	}
+	$NumberOfSalesMultiplier = get_post_meta($productid, 'g:NumberOfSalesMultiplier',true);
+	if ($NumberOfSalesMultiplier){
+	}
+	else {
+		$NumberOfSalesMultiplier=1;
+	}
+	$qtyToDisplay=round($NumberOfSalesMultiplier*$qty);
+	echo $wpcb_misc['display_number_sales_label'].' '.$qtyToDisplay;
+}
+
+if ($wpcb_misc['display_countdown']){
+add_action('wpsc_product_addons','display_countdown');
+add_action('init','remove_ventes_terminees');}
+
+function display_countdown($productid){
+	$wpcb_misc = get_option( 'wpcb_misc');
+	$TargetDate = get_post_meta($productid, 'g:TargetDate',true);
+	if ($TargetDate){
+		$TargetDateTimestamp=strtotime($TargetDate);
+		$date=date('d F Y',$TargetDateTimestamp);
+		$hour=date('H',$TargetDateTimestamp);
+		$minutes=date('i',$TargetDateTimestamp);
+		$seconds=date('s',$TargetDateTimestamp);
+		//echo $date.'*'.$hour.':'.$minutes;
+    	echo '<div class="countdown-container" style="">';
+		if(function_exists("shailan_CountdownWidget_shortcode")){
+		  $countdown = array(
+		    'title'     => '',
+		    'event'     => 'Avant la fin de la vente privée',
+		    'date'      => $date,
+		    'hour'      => $hour,
+		    'minutes'   => $minutes,
+		    'seconds'   => $seconds,
+		    'format'    => 'dHMS',
+		    'link'      => true, // set true to remove link, false to support me
+		  );  
+		  echo shailan_CountdownWidget_shortcode($countdown);
+		}
+		echo '</div>';
+	}
+	else {
+
+	}
+}
+
+function remove_ventes_terminees(){
+	global $wpdb;
+	 $loop = new WP_Query( array( 'post_type' => 'wpsc-product', 'posts_per_page' => -1 ) );
+    while ( $loop->have_posts() ) : $loop->the_post();
+ 	$productid = get_the_ID();
+ 	$TargetDate = get_post_meta($productid, 'g:TargetDate',true);
+ 	if ($TargetDate){
+ 	$TargetDateTimestamp=strtotime($TargetDate);
+ 	//echo $TargetDate.'/';
+ 	$now=time()+2*60*60;
+ 	//echo date('m/d/Y h:i A',$now);
+ 	if ($now>$TargetDateTimestamp){
+ 		$wpdb->query("UPDATE wp_posts SET post_status = 'draft' WHERE (ID =".$productid." and post_status = 'publish')") ;
+ 	}
+ 	}
+ 	endwhile;
+}
+
+add_action('init','ShowHelp');
+function ShowHelp(){
+	if ($_GET['action']=='ReglerLesOptionsAvantTout'){
+		echo '<pre>Sauvegarder les options suivant les indications <a href="'.admin_url('/plugins.php?page=wpcb&tab=dev').'">ici</a></pre>';
+	}	
+}
+
+$wpcb_general = get_option( 'wpcb_general');
+if ($wpcb_general['AddSalesCheckbox']){
+	add_action('wpsc_confirm_checkout','AddSaleToGoogleSpreadsheet');
+}
+
+function AddSaleToGoogleSpreadsheet($purchase_log_id){
+	// This is triggered when a sales is completed and also when the state is change to Completed in the admin
+	global $wpdb;
+	$purchase_log = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `id`= %s LIMIT 1", $purchase_log_id ), ARRAY_A );
+	$is_transaction = wpsc_check_purchase_processed($purchase_log['processed']);
+	$debug.='$purchase_log_id='.$purchase_log_id."\r\n";
+	$debug.='$is_transaction='.$is_transaction."\r\n";
+	
+	$wpcb_general = get_option( 'wpcb_general');
+	//print_r($wpcb_general);
+	
+	$email_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$purchase_log_id." AND form_id=9 LIMIT 1",ARRAY_A);
+	$lastname_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$purchase_log_id." AND form_id=3 LIMIT 1",ARRAY_A) ;
+	$firstname_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$purchase_log_id." AND form_id=2 LIMIT 1",ARRAY_A) ;
+	$email=$email_a['value'];$firstname=$firstname_a['value'];$lastname=$lastname_a['value'];
+	$purchase = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE id=".$purchase_log_id." LIMIT 1",ARRAY_A);
+	$cart = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CART_CONTENTS . "` WHERE `purchaseid` = '{$purchase_log_id}'" , ARRAY_A );
+	$detail='';
+	if ( $cart != null) {
+		foreach ( $cart as $row ) {
+			$detail.=$row['quantity'].'x '.$row['name'].'('.$row['price'].' p.u.) & ';
+		}
+			//$row['name'] 		$row['price']
+	}
+	$detail=substr($detail, 0, -3);
+
+	$rowData=array('purchase'=>$purchase_log_id,'email'=>$email,'nom'=>$lastname,'firstname'=>$firstname,'totalprice'=>$purchase['totalprice'],'gateway'=>$purchase['gateway'],'promocode'=>$purchase['discount_data'],'discount'=>$purchase['discount_value'],'cart'=>$detail,'processed'=>$purchase['processed']);
+	$debug.='Content of new item in the spreadsheet ->'."\r\n";
+	foreach ($rowData as $key=>$value){
+		$debug.=$key.'=>'.$value. "\r\n";
+	}
+		
+	//Add to Sales in google doc using Zend :
+	if (WP_ZEND_FRAMEWORK){
+		$service = Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
+		$client = Zend_Gdata_ClientLogin::getHttpClient($wpcb_general['googleemail'], $wpcb_general['googlepassword'], $service);
+		$spreadsheetService = new Zend_Gdata_Spreadsheets($client);
+		
+		// Document Query :
+		$query_worksheet = new Zend_Gdata_Spreadsheets_DocumentQuery();
+		$query_worksheet->setSpreadsheetKey($wpcb_general['AllSales_spreadsheetKey']);
+		$feed = $spreadsheetService->getWorksheetFeed($query_worksheet);
+		// Par default : Sheet1 :
+		foreach($feed->entries as $entry){
+			$worksheetId=basename($entry->id);
+			break;
+		}
+		// Ensuite on cherche si Sales exist pas
+		foreach($feed->entries as $entry){
+			if ($entry->title->text=='Sales'){$worksheetId=basename($entry->id);}
+		}
+
+		// LIst Query : 
+		$query = new Zend_Gdata_Spreadsheets_ListQuery();
+		$query->setSpreadsheetKey($wpcb_general['AllSales_spreadsheetKey']);
+		//$worksheetId='od6';
+		$query->setWorksheetId($worksheetId);
+		$query->setSpreadsheetQuery('purchase='.$purchase_log_id);
+		$listFeed = $spreadsheetService->getListFeed($query);
+		$already_exist=false;
+		foreach ($listFeed->entries as $listFeed_entry){
+			$CurrentrowData = $listFeed_entry->getCustom();
+			$debug.='It already exists with the old values : ';
+			foreach($CurrentrowData as $customEntry) {
+	 	 		$debug.=$customEntry->getColumnName() . " = " . $customEntry->getText(). "\r\n";
+	 	 		//echo '<pre>'.$customEntry->getColumnName() . " = " . $customEntry->getText().'</pre>';
+	 	 	}
+	 	 	$already_exist=true;
+	 	 	$updatedListEntry = $spreadsheetService->updateRow($listFeed_entry,$rowData);
+	 	 	$debug = 'A sale has been updated.'."\r\n\r\n".$debug;
+		}
+		if (!$already_exist){
+			// Insert :
+			$debug = 'A new sale has been added !'."\r\n\r\n".$debug;
+			$insertedListEntry = $spreadsheetService->insertRow($rowData,$wpcb_general['AllSales_spreadsheetKey'],$worksheetId);	
+		}
+	}
+	if ($wpcb_general['AddSalesNotificationCheckbox']){
+		wp_mail($wpcb_general['googleemail'],'Notification from WPCB',$debug);
+	}
+}
 
 
 ?>
