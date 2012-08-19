@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3.10
+Version: 2.3.11
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -138,7 +138,11 @@ function wpcb_initialize_general_options() {
   add_settings_field('emailapiKey','Email associé à la Clé API','wpcb_emailapiKey_callback','wpcb_general','general_settings_section',array('description' ));  
   add_settings_field('googleemail','Email Google Drive (ou Google App)','wpcb_googleemail_callback','wpcb_general','general_settings_section',array('description' ));  
   add_settings_field('googlepassword','Password associé Gmail ou Google Apps','wpcb_googlepassword_callback','wpcb_general','general_settings_section',array('description' ));  
-  add_settings_field('spreadsheetKey','spreadsheetKey','wpcb_spreadsheetKey_callback','wpcb_general','general_settings_section',array('description' ));  
+  add_settings_field('spreadsheetKey','spreadsheetKey for log','wpcb_spreadsheetKey_callback','wpcb_general','general_settings_section',array('description' ));  
+    add_settings_field('AddSalesCheckbox','Add Sales to Google spreadsheet','wpcb_AddSalesCheckbox_callback','wpcb_general','general_settings_section',array('The sales will be added to your google spreadsheet' ));
+  add_settings_field('AllSales_spreadsheetKey','spreadsheetKey for All Sales','wpcb_AllSales_spreadsheetKey_callback','wpcb_general','general_settings_section',array('description' ));
+      add_settings_field('AddSalesNotificationCheckbox','Notify me when a Sales is added to Google spreadsheet','wpcb_AddSalesNotificationCheckbox_callback','wpcb_general','general_settings_section',array('You will get an email when a sale is added to Google spreadsheet' ));
+  
   register_setting('wpcb_general','wpcb_general'); 
 } 
 add_action('admin_init', 'wpcb_initialize_general_options');  
@@ -293,7 +297,27 @@ function wpcb_spreadsheetKey_callback(){
     if(isset($options['spreadsheetKey'])){$val = $options['spreadsheetKey'];}
         echo '<input type="text"  size="75"id="spreadsheetKey" name="wpcb_general[spreadsheetKey]" value="' . $val . '" />';
 }  
-  
+
+function wpcb_AddSalesCheckbox_callback($args){  
+    $options = get_option( 'wpcb_general');  
+	$html = '<input type="checkbox" id="AddSalesCheckbox" name="wpcb_general[AddSalesCheckbox]" value="1" ' . checked(1, $options['AddSalesCheckbox'], false) . '/>';  
+    $html .= '<label for="AddSalesCheckbox"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+
+function wpcb_AllSales_spreadsheetKey_callback(){  
+    $options = get_option( 'wpcb_general');  
+    $val = '0AkLWPxefL-fydENzRXpjdEk0OVBsQ2ZmYWFrMGp3QVE'; 
+    if(isset($options['AllSales_spreadsheetKey'])){$val = $options['AllSales_spreadsheetKey'];}
+        echo '<input type="text"  size="75" id="AllSales_spreadsheetKey" name="wpcb_general[AllSales_spreadsheetKey]" value="' . $val . '" />';
+}  
+
+function wpcb_AddSalesNotificationCheckbox_callback($args){  
+    $options = get_option( 'wpcb_general');  
+	$html = '<input type="checkbox" id="AddSalesNotificationCheckbox" name="wpcb_general[AddSalesNotificationCheckbox]" value="1" ' . checked(1, $options['AddSalesNotificationCheckbox'], false) . '/>';  
+    $html .= '<label for="AddSalesNotificationCheckbox"> '  . $args[0] . '</label>';   
+    echo $html;
+}
 
 /** 
 * CB options
@@ -1722,5 +1746,93 @@ function ShowHelp(){
 		echo '<pre>Sauvegarder les options suivant les indications <a href="'.admin_url('/plugins.php?page=wpcb&tab=dev').'">ici</a></pre>';
 	}	
 }
+
+$wpcb_general = get_option( 'wpcb_general');
+if ($wpcb_general['AddSalesCheckbox']){
+	add_action('wpsc_confirm_checkout','AddSaleToGoogleSpreadsheet');
+}
+
+function AddSaleToGoogleSpreadsheet($purchase_log_id){
+	// This is triggered when a sales is completed and also when the state is change to Completed in the admin
+	global $wpdb;
+	$purchase_log = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `id`= %s LIMIT 1", $purchase_log_id ), ARRAY_A );
+	$is_transaction = wpsc_check_purchase_processed($purchase_log['processed']);
+	$debug.='$purchase_log_id='.$purchase_log_id."\r\n";
+	$debug.='$is_transaction='.$is_transaction."\r\n";
+	
+	$wpcb_general = get_option( 'wpcb_general');
+	//print_r($wpcb_general);
+	
+	$email_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$purchase_log_id." AND form_id=9 LIMIT 1",ARRAY_A);
+	$lastname_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$purchase_log_id." AND form_id=3 LIMIT 1",ARRAY_A) ;
+	$firstname_a = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_SUBMITED_FORM_DATA."` WHERE log_id=".$purchase_log_id." AND form_id=2 LIMIT 1",ARRAY_A) ;
+	$email=$email_a['value'];$firstname=$firstname_a['value'];$lastname=$lastname_a['value'];
+	$purchase = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE id=".$purchase_log_id." LIMIT 1",ARRAY_A);
+	$cart = $wpdb->get_results( "SELECT * FROM `" . WPSC_TABLE_CART_CONTENTS . "` WHERE `purchaseid` = '{$purchase_log_id}'" , ARRAY_A );
+	$detail='';
+	if ( $cart != null) {
+		foreach ( $cart as $row ) {
+			$detail.=$row['quantity'].'x '.$row['name'].'('.$row['price'].' p.u.) & ';
+		}
+			//$row['name'] 		$row['price']
+	}
+	$detail=substr($detail, 0, -3);
+
+	$rowData=array('purchase'=>$purchase_log_id,'email'=>$email,'nom'=>$lastname,'firstname'=>$firstname,'totalprice'=>$purchase['totalprice'],'gateway'=>$purchase['gateway'],'promocode'=>$purchase['discount_data'],'discount'=>$purchase['discount_value'],'cart'=>$detail,'processed'=>$purchase['processed']);
+	$debug.='Content of new item in the spreadsheet ->'."\r\n";
+	foreach ($rowData as $key=>$value){
+		$debug.=$key.'=>'.$value. "\r\n";
+	}
+		
+	//Add to Sales in google doc using Zend :
+	if (WP_ZEND_FRAMEWORK){
+		$service = Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME;
+		$client = Zend_Gdata_ClientLogin::getHttpClient($wpcb_general['googleemail'], $wpcb_general['googlepassword'], $service);
+		$spreadsheetService = new Zend_Gdata_Spreadsheets($client);
+		
+		// Document Query :
+		$query_worksheet = new Zend_Gdata_Spreadsheets_DocumentQuery();
+		$query_worksheet->setSpreadsheetKey($wpcb_general['AllSales_spreadsheetKey']);
+		$feed = $spreadsheetService->getWorksheetFeed($query_worksheet);
+		// Par default : Sheet1 :
+		foreach($feed->entries as $entry){
+			$worksheetId=basename($entry->id);
+			break;
+		}
+		// Ensuite on cherche si Sales exist pas
+		foreach($feed->entries as $entry){
+			if ($entry->title->text=='Sales'){$worksheetId=basename($entry->id);}
+		}
+
+		// LIst Query : 
+		$query = new Zend_Gdata_Spreadsheets_ListQuery();
+		$query->setSpreadsheetKey($wpcb_general['AllSales_spreadsheetKey']);
+		//$worksheetId='od6';
+		$query->setWorksheetId($worksheetId);
+		$query->setSpreadsheetQuery('purchase='.$purchase_log_id);
+		$listFeed = $spreadsheetService->getListFeed($query);
+		$already_exist=false;
+		foreach ($listFeed->entries as $listFeed_entry){
+			$CurrentrowData = $listFeed_entry->getCustom();
+			$debug.='It already exists with the old values : ';
+			foreach($CurrentrowData as $customEntry) {
+	 	 		$debug.=$customEntry->getColumnName() . " = " . $customEntry->getText(). "\r\n";
+	 	 		//echo '<pre>'.$customEntry->getColumnName() . " = " . $customEntry->getText().'</pre>';
+	 	 	}
+	 	 	$already_exist=true;
+	 	 	$updatedListEntry = $spreadsheetService->updateRow($listFeed_entry,$rowData);
+	 	 	$debug = 'A sale has been updated.'."\r\n\r\n".$debug;
+		}
+		if (!$already_exist){
+			// Insert :
+			$debug = 'A new sale has been added !'."\r\n\r\n".$debug;
+			$insertedListEntry = $spreadsheetService->insertRow($rowData,$wpcb_general['AllSales_spreadsheetKey'],$worksheetId);	
+		}
+	}
+	if ($wpcb_general['AddSalesNotificationCheckbox']){
+		wp_mail($wpcb_general['googleemail'],'Notification from WPCB',$debug);
+	}
+}
+
 
 ?>

@@ -1,4 +1,4 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypalRequires at least: 2.7Tested up to: 3.4.1Stable tag: 2.3.10
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypalRequires at least: 2.7Tested up to: 3.4.1Stable tag: 2.3.11
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
 Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
@@ -18,6 +18,8 @@ Les frais de port ne sont pas paramétrables, ils sont calculés en fonction des
 * Chronopost
 * Mondial Relais
 = Ajout dans trello =Toutes les ventes s'ajoutent dans votre tableau de bord Trello !
+
+= Ajout dans google spreadsheet =Toutes les ventes s'ajoutent dans votre tableau google spreadsheet (excel en ligne) !
 
 = Affichage du nombre de ventes =
 
@@ -142,6 +144,9 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 7. Placer le shortcode wpcb sur une page / Options de paiement8. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
 9. Réglage du multiplicateur d'affichage du nombre de vente et réglage du compte à rebours de vente
 == Changelog ==
+
+= 2.3.11 =
+* Toutes les ventes réussies s'ajoutent dans le tableau google spreadsheet
 
 = 2.3.10 =
 * Correction d'un bug avec atos en mode sandbox
