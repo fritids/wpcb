@@ -1,4 +1,4 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypalRequires at least: 2.7Tested up to: 3.4.1Stable tag: 2.3.11
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypal, ExpeditorRequires at least: 2.7Tested up to: 3.4.1Stable tag: 2.4
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
 Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
@@ -6,7 +6,10 @@ Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à ve
 Calcul automatique de frais de port au départ de la France (colis, chronopost, Mondial Relay et d'autres à venir...)
 Fonctionne pour de nombreuses banques françaises :* Banque Populaire (CyberPlus, tm)* Société Générale (Sogenactif, tm)* Crédit Lyonnais (Sherlock, tm)* Crédit du Nord (Webaffaires, tm)* CCF (Elysnet, tm)* BNP (Mercanet, tm)
 * et de nombreuses autres banques basée sur la technologie ATOS SIPS ou SYSTEMPAY CYBERPLUS
-= Paypal =
+
+= Gestion des factures =
+Préfixe de facture et numéro de facture incremental.
+Le lien vers la facture peut être envoyé dans l'email au client pour qu'il l'imprime.= Paypal =
 Système Paypal fonctionel (avec option sandbox!)
 
 = Livraison et calcul automatique des frais de port =
@@ -17,6 +20,10 @@ Les frais de port ne sont pas paramétrables, ils sont calculés en fonction des
 * Enveloppe Document (France, Union Européenne, Outre-Mer & Reste du monde)
 * Chronopost
 * Mondial Relais
+
+= Customisation de l'email de confirmation =
+Vous pouvez utiliser %billingfirstname%, etc pour personaliser votre email de confirmation !
+Voir la faq pour les shortcodes disponibles.
 = Ajout dans trello =Toutes les ventes s'ajoutent dans votre tableau de bord Trello !
 
 = Ajout dans google spreadsheet =Toutes les ventes s'ajoutent dans votre tableau google spreadsheet (excel en ligne) !
@@ -35,13 +42,36 @@ En plus de l'affichage du compte à rebours, le produit est désactivé quand le
 * Calcul des frais de port !
 * Ajout dans google drive de toutes vos ventes !
 * Ajout de tous vos acheteurs dans votre outil de mailling MailChimp
+* Télécharge le csv prêt à envoyer à Coliposte avec le logiciel Expeditor (Beta)
 = A venir pour les détenteurs d'une clé API =
-* Sauter l'étape de clic sur l'icone des cartes ou du bouton paypal (comme woocommerce)
-== Installation ==1. Envoyer `wpcb` vers le dossier `/wp-content/plugins/`2. Activer le plugin dans le menu 'Extensions' de Wordpress3. Placer `[wpcb]` sur une (et une seule!) page
-4. Régler les paramètres suivant les indications
-5. Rendez-vous sur http://wpcb.fr/api-key pour débloquer les options pro
+* Sauter l'étape de clic sur l'icone des cartes ou du bouton paypal (comme woocommerce)
+== Installation ==1. Envoyer `wpcb` vers le dossier `/wp-content/plugins/`2. Activer le plugin dans le menu 'Extensions' de Wordpress
+3. Régler les paramètres suivant les indications
+4. Rendez-vous sur http://wpcb.fr/api-key pour débloquer les options pro
 
 == Frequently Asked Questions ==
+
+= Comment télcharger le fichier CSV pour Expéditor (Coliposte) ? =
+Aller sur http://monsite.fr/wp-admin/index.php?page=wpsc-purchase-logs
+Tout en bas télécharge le csv pour Coliposte. 
+
+= Comment personaliser l'email de confirmation = 
+
+Aller sur http://monsite.fr/wp-admin/options-general.php?page=wpsc-settings&tab=admin
+Shortcode disponibles : 4ème colonne de la page http://monsite.fr/wp-admin/options-general.php?page=wpsc-settings&tab=checkout
+
+Cher %billingfirstname% %billinglastname%,
+Nous vous remercions pour votre commande ...
+
+= Comment ajouter le lien vers la facture dans l'email de confirmation ? =
+
+Aller sur http://monsite.fr/wp-admin/options-general.php?page=wpsc-settings&tab=admin
+Saisir : Vous pouvez télécharger votre facture ici : %facture%
+
+= Comment personaliser l'entête de la facture et le préfixe ? =
+
+Rendez-vous ici : http://monsite.fr/wp-admin/plugins.php?page=wpcb&tab=misc
+
 
 = Quel type de fichier dois-je télécharger chez ma banque ? =
 
@@ -71,12 +101,6 @@ Url serveur : http://monsite.fr/?gateway=systempaycyberplus
 = Comment activer/déscativer le paiement par carte bancaire ? =
 Réglages > Boutique > Paiements
 http://6www.net/blog/wp-content/uploads/2011/05/snap13-05-2011-12.30.5308-07-2011-17.30.06.png
-
-= Comment personaliser la page des icones de cartes bancaires ? =
-Créer une page WordPress avec le shortcode : '[wpcb]'.
-Vous venez de créer la page qui affichera les icônes des cartes bleues une fois que le client aura cliqué sur Achat(Voir l'image ci-dessous, partie droite). Vous pouvez ajouter du texte comme bon vous semble sur cette page.
-
-http://6www.net/blog/wp-content/uploads/2011/05/snap13-05-2011-12.30.5308-07-2011-17.24.50.png
 
 = Comment identifier le reçu Systempay Cyberplus avec la commande wpec ? =
 Le numéro de référence commande correspond au numéro de commande de wpec
@@ -140,10 +164,15 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 = Autre question ? =Attention : Nous ne sommes pas responsable de la mauvaise utilisation du plugin WPCB mis à votre disposition gratuitement et toujours en phase d'amélioration. Vous l'utilisez en tout conscience et vous vous assurez de la protection de vos pages internet.= Vous ne comprenez pas ce charabia ? =Nous pouvons installer le plugin pour vous, la marche à suivre est indiquée ici : http://wpcb.fr/support/== Screenshots ==1. Réglages du module2. Réglages ATOS3. Réglages Chèque ou Virement
 4. Réglages Paypal
 5. Réglages Systempay Cyberplus (Banque Populaire)
-6. Réglages Mailchimp
-7. Placer le shortcode wpcb sur une page / Options de paiement8. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
-9. Réglage du multiplicateur d'affichage du nombre de vente et réglage du compte à rebours de vente
+6. Réglages Mailchimp7. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
+8. Réglage du multiplicateur d'affichage du nombre de vente et réglage du compte à rebours de vente
 == Changelog ==
+
+= 2.4 =
+* Plus besoin de placer le shortcode wpcb sur une page (Ne pas mettre à jour si tout marche chez vous!)
+* Fix un bug dans l'affichage du nombre de vente
+* Système de facturation (suivant les normes françaises cad incrémentation du numéro de facture)
+* Peronalisation avancé de l'email de confirmation d'achat avec lien vers la facture
 
 = 2.3.11 =
 * Toutes les ventes réussies s'ajoutent dans le tableau google spreadsheet

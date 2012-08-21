@@ -10,15 +10,14 @@ $nzshpcrt_gateways[$num] = array(
 'requirements' => array(),'form' => 'form_systempaycyberplus',
 'internalname' => 'systempaycyberplus',
 'submit_function' => 'submit_systempaycyberplus',
-'image' => $wpcb_systempaycyberplus_options['wpec_gateway_image_systempaycyberplus']
+'image' => $wpcb_systempaycyberplus_options['wpec_gateway_image']
 );
 
 class wpsc_merchant_systempaycyberplus extends wpsc_merchant {
 	function submit(){
 		global $wpdb,$purchase_log;
 		$sessionid=$this->cart_data['session_id'];
-		$simple_paypal_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[wpcb]%' AND `post_status`='publish' LIMIT 1");
-		wp_redirect(site_url('?p='.$simple_paypal_checkout_page->ID.'&action=systempaycyberplus&sessionid='.$sessionid));
+		wp_redirect(site_url('?action=securepayment&gateway=systempaycyberplus&sessionid='.$sessionid));
 		exit;
 	}// end of submit
 } //end of class

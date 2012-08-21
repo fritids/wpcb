@@ -25,7 +25,9 @@ else{
 	$path_bin_response=$wpcb_cb_options['path_bin_response'];
 	$logfile=$wpcb_cb_options['logfile'];
 }
-
+if ($wpcb_dev_options['mode_debugatos']){
+	wp_mail($purch_log_email,'Email envoyé depuis le auto_response','Found');
+}
 // Initialisation du chemin du fichier de log :
 if (isset($_POST['DATA'])){
 	$data=escapeshellcmd($_POST['DATA']);
@@ -110,7 +112,7 @@ if (isset($_POST['DATA'])){
 				}
 			}
 			else {
-				if (WP_DEBUG){
+				if ($wpcb_dev_options['mode_debugatos']){
 				wp_mail($purch_log_email,'Email envoyé depuis le auto_response','Mauvais login/mot de pass google dans les options du plugin wpcb');
 				}
 			}
@@ -157,7 +159,7 @@ if (isset($_POST['DATA'])){
 			fwrite($fp,$message);
 			fclose ($fp); 
 		}
-		if (WP_DEBUG){
+		if ($wpcb_dev_options['mode_debugatos']){
 			wp_mail($purch_log_email,'Email envoyé depuis le auto_response car il y a une erreur avec un paiement Atos',$message);
 		}
 		$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);
@@ -176,7 +178,7 @@ if (isset($_POST['DATA'])){
 				fwrite($fp,$message);
 				fclose($fp);
 			}
-			if (WP_DEBUG){
+			if ($wpcb_dev_options['mode_debugatos']){
 				wp_mail($purch_log_email,'Email pour vous dire qu\'un paiement est arrivé !',$message);
 			}
 			$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
@@ -191,7 +193,7 @@ if (isset($_POST['DATA'])){
 }// Fin du vrai achat
 	}// Fin du isset POST DATA
 else{
-	if (WP_DEBUG){
+	if ($wpcb_dev_options['mode_debugatos']){
 			wp_mail($purch_log_email,'Qqn a accéder à cette page sans utiliser le module de CB','Rien de grave, c\'est peut-etre un robot google !');
 		}
 }

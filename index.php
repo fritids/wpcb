@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.3.11
+Version: 2.3.10
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -65,6 +65,9 @@ function wpcb_delete_plugin_options() {
 	delete_option('wpcb_mailchimp');
 	delete_option('wpcb_trello');
 	delete_option('wpcb_dev');
+	delete_option('wpcb_misc');
+	delete_option('wpcb_dev');
+	delete_option('wpcb_facture_current_billing_number');
 	wpcb_deactivate(); // Do the delete file
 }
 
@@ -1618,7 +1621,9 @@ function wpcb_intialize_misc_options() {
 	// Add the fields :
 	add_settings_field('display_number_sales','Afficher le nombre de vente','wpcb_display_number_sales_callback','wpcb_misc','misc_settings_section');
 		add_settings_field('display_number_sales_label','Texte devant le nombre de vente','wpcb_display_number_sales_label_callback','wpcb_misc','misc_settings_section');
-			add_settings_field('display_countdown','Afficher le compte à rebours','wpcb_display_countdown_callback','wpcb_misc','misc_settings_section');
+		add_settings_field('display_countdown','Afficher le compte à rebours','wpcb_display_countdown_callback','wpcb_misc','misc_settings_section');
+				add_settings_field('facture_prefixe','Préfixe devant le numéro de facture','wpcb_facture_prefixe_callback','wpcb_misc','misc_settings_section');
+		add_settings_field('facture_header','S\'affiche en haut de la facture','wpcb_facture_header_callback','wpcb_misc','misc_settings_section');
 	register_setting('wpcb_misc','wpcb_misc','');
 } // end wpcb_intialize_atos_options  
 add_action( 'admin_init', 'wpcb_intialize_misc_options' );  
@@ -1651,6 +1656,20 @@ function wpcb_display_countdown_callback($args){
     echo $html;
 }
 
+function wpcb_facture_header_callback() {  
+    $options = get_option( 'wpcb_misc');  
+    $facture_header = "SIRET hhh TEL 06"; 
+    if(isset($options['facture_header'])){$facture_header = $options['facture_header'];}
+    echo '<textarea type="textarea" id="facture_header" name="wpcb_misc[facture_header]" rows="7" cols="50">'.$options['facture_header'] .'</textarea>';  
+}
+
+
+function wpcb_facture_prefixe_callback(){  
+    $options = get_option( 'wpcb_misc');  
+    $val ='WEB'; 
+    if(isset($options['facture_prefixe'])){$val = $options['facture_prefixe'];}
+        echo '<input type="text"  size="75" id="facture_prefixe" name="wpcb_misc[facture_prefixe]" value="' . $val . '" />';
+}
 
 
 $wpcb_misc = get_option( 'wpcb_misc');
@@ -1660,20 +1679,23 @@ function show_number_of_sales($productid){
 	$wpcb_misc = get_option( 'wpcb_misc');
 	global $wpdb;
 	// Toutes les ventes réussies :
-	$ventesreussies = $wpdb->get_results( "SELECT id FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE processed=2" );
+	$ventesreussies = $wpdb->get_results( "SELECT id FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE processed=3" );
 	//print_r($ventesreussies);
+	$qty=0;
 	if ($ventesreussies){
 		foreach ($ventesreussies as $ventereussie){
 			$purchaseid = $ventereussie->id;
+			//echo "Purchase id = ".$purchaseid.'<br/>';
 			// Pour chaque vente réussie compter le nombre d'article correspondant à ce produit
 			$produitsvendus = $wpdb->get_results( "SELECT quantity FROM `".WPSC_TABLE_CART_CONTENTS."` WHERE purchaseid=".$purchaseid.' AND prodid='.$productid );
 			if ($produitsvendus){
 				foreach ($produitsvendus as $produitvendu){
-					$qty=$produitvendu->quantity;
+					$qty=$qty+$produitvendu->quantity;
+					//echo "Qty".$qty;
 				}	
 			}
 			else {
-				$qty=0;	
+				//Nothing	
 			}
 		}	
 	}
@@ -1834,5 +1856,395 @@ function AddSaleToGoogleSpreadsheet($purchase_log_id){
 	}
 }
 
+
+function wpcb_display_payment_icon_page_content($content) {
+	$message.=$content;
+	global $wpdb, $purchase_log, $wpsc_cart;
+  if ($_GET['action'] == 'securepayment') {
+
+	$sessionid=$_GET['sessionid'];
+	$wpcb_general = get_option( 'wpcb_general' );
+	$wpcb_dev=get_option( 'wpcb_dev' );
+    
+	$purch_log_email=get_option('purch_log_email');
+	if (!$purch_log_email){$purch_log_email=get_bloginfo('admin_email');}
+	if ($_GET['gateway']=='atos'){
+		$wpcb_atos = get_option ( 'wpcb_atos' );
+		// cf. Dictionnaire des Données Atos :
+		if (($wpcb_dev['mode_demo']) && (array_key_exists('mode_demo', $wpcb_dev)) ){
+			$merchant_id="082584341411111";
+			$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
+			$path_bin_request =dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request";
+		}
+		else{
+			$merchant_id=$wpcb_atos['merchant_id'];	
+			$pathfile=$wpcb_atos['pathfile'];
+			$path_bin_request=$wpcb_atos['path_bin_request'];
+		}
+		$parm="merchant_id=". $merchant_id;
+		$parm="$parm merchant_country=".$wpcb_atos['merchant_country'];
+		$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1") ;
+		$amount= ($purchase_log->totalprice)*100;
+		$amount=str_pad($amount,3,"0",STR_PAD_LEFT);
+		$parm="$parm amount=".$amount;
+		$parm="$parm currency_code=".$wpcb_atos['currency_code'];
+		$parm="$parm pathfile=". $pathfile;
+		$questionmarkishere=strpos($wpcb_atos['normal_return_url'],'?');
+		if ($questionmarkishere){$char='&';}else{$char='?';}
+		$parm="$parm normal_return_url=".$wpcb_atos['normal_return_url'].$char."sessionid=".$sessionid;
+		$parm="$parm cancel_return_url=".$wpcb_atos['cancel_return_url'];
+		$parm="$parm automatic_response_url=".$wpcb_atos['automatic_response_url'];
+		$parm="$parm language=".$wpcb_atos['language'];
+		$parm="$parm payment_means=".$wpcb_atos['payment_means'];
+		$parm="$parm header_flag=".$wpcb_atos['header_flag'];
+		$parm="$parm order_id=$sessionid";
+		$parm="$parm logo_id2=".$wpcb_atos['logo_id2'];
+		$parm="$parm advert=".$wpcb_atos['advert'];
+		if ($wpcb_dev['mode_debugatos']){
+			//Va afficher sur la page ou se trouve le shortcode les parametres.
+			$parm_pretty=str_replace(' ','<br/>',$parm);
+			echo '<p>You see this because you are in debug mode :</p><pre>'.$parm_pretty.'<br/>path_bin_request='.$path_bin_request.'</pre>';
+			echo'<p>End of debug mode</p>';
+		}
+		$result=exec("$path_bin_request $parm");
+		$tableau=explode ("!","$result");
+		$code=$tableau[1];
+		$error=$tableau[2];
+		if (($code=="") && ($error=="")){
+			$message="<p>".__('Error calling the atos api : exec request not found','wpcb')."  $path_bin_request</p>";
+			$message.= "<p>".__('Thank you for reporting this error to:','wpcb')." ".$purch_log_email."</p>";
+		}
+		elseif ($code != 0){
+			$message="<p>".__('Atos API error : ','wpcb')." $error</p>";
+			$message.= "<p>".__('Thank you for reporting this error to:','wpcb')." ".$purch_log_email."</p>";
+		}
+		else{
+			// Affiche le formulaire avec le choix des cartes bancaires :
+			$message = $tableau[3];
+		}
+		// End of atos
+	}
+	elseif ($_GET['gateway']=='paypal'){
+	$wpcb_paypal = get_option ( 'wpcb_paypal' );
+	$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1") ;
+		if ($wpcb_paypal['sandbox_paypal']){
+			$message='<form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">';
+		}
+		else{
+			$message='<form action="https://www.paypal.com/cgi-bin/webscr" method="post">';
+		}
+		$message.='<input type="hidden" name="cmd" value="_xclick">';
+		$message.='<input type="hidden" name="business" value="'.$wpcb_paypal['business'].'">';
+		$message.='<input type="hidden" name="lc" value="FR">';
+		$message.='<input type="hidden" name="item_name" value="Commande #'.$purchase_log->id.'">';
+		$message.='<input type="hidden" name="item_number" value="'.$sessionid.'">';
+		$amount=number_format($purchase_log->totalprice,2);
+		$message.='<input type="hidden" name="amount" value="'.$amount.'">';
+		$message.='<input type="hidden" name="no_note" value="1">';
+		$message.='<input type="hidden" name="return" value="'.$wpcb_paypal['return'].'">';
+		$message.='<input type="hidden" name="cancel_return" value="'.$wpcb_paypal['cancel_return'].'">';
+		$message.='<input type="hidden" name="notify_url" value="'.$wpcb_paypal['notify_url'].'">';
+		$message.='<input type="hidden" name="no_shipping" value="1"><input type="hidden" name="currency_code" value="EUR"><input type="hidden" name="button_subtype" value="services"><input type="hidden" name="no_note" value="0"><input type="hidden" name="bn" value="PP-BuyNowBF:btn_paynowCC_LG.gif:NonHostedGuest"><input type="image" src="https://www.paypalobjects.com/fr_FR/FR/i/btn/btn_paynowCC_LG.gif" border="0" name="submit" alt="PayPal - la solution de paiement en ligne la plus simple et la plus sécurisée !"><img alt="" border="0" src="https://www.paypalobjects.com/fr_XC/i/scr/pixel.gif" width="1" height="1"></form>';
+	}
+	elseif ($_GET['gateway']=='systempaycyberplus'){
+	$wpcb_systempaycyberplus = get_option('wpcb_systempaycyberplus');
+	$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1") ;
+	
+	$systempay_cyberplus_args = array(
+                'vads_site_id' => $wpcb_systempaycyberplus['identifiant'],
+				'vads_ctx_mode' => 'TEST',
+				'vads_version' => 'V2',
+				'vads_language' => 'fr',
+				'vads_currency' => '978',
+				'vads_amount' => $purchase_log->totalprice*100,
+				'vads_page_action' => 'PAYMENT',
+				'vads_action_mode' => 'INTERACTIVE',
+				'vads_payment_config' => 'SINGLE',
+				'vads_capture_delay' => '',
+				'vads_order_id' =>$sessionid,
+				'vads_cust_id' => $purchase_log->id,
+				'vads_redirect_success_timeout' => '5',
+				'vads_redirect_success_message' => 'Redirection vers la boutique dans quelques instants',
+				'vads_redirect_error_timeout' => '5',
+				'vads_redirect_error_message' => 'Redirection vers la boutique dans quelques instants',
+				'vads_trans_id' => str_pad(rand(0, 8999).date('d'), 6, "0", STR_PAD_LEFT),
+				'vads_trans_date' => gmdate("YmdHis")
+				);
+			$signature=get_Signature($systempay_cyberplus_args,$wpcb_systempaycyberplus['certificat']);
+			$systempay_cyberplus_args['signature']= $signature;
+				
+            $message='<form action="https://paiement.systempay.fr/vads-payment/" method="post">';
+            foreach($systempay_cyberplus_args as $key => $value){
+                $message.= "<input type='hidden' name='$key' value='$value'/>";
+            }
+			$message.='<input  type="image" src="'.$wpcb_systempaycyberplus['wpec_gateway_image_systempaycyberplus'].'" alt="Payer" value="submit">';
+			$message.='</form>';	
+	}
+	elseif ($_GET['gateway']=='normal_return'){
+		// Pas utilisé pour l'instant
+		$wpsc_cart->empty_cart();
+	}
+	elseif ($_GET['gateway']=='cancel_return'){
+		// Pas utilisé pour l'instant
+		$wpsc_cart->empty_cart();
+	}
+	elseif ($_GET['gateway']=='sandbox'){
+	
+	
+	
+	}
+	else{
+		//Appel direct à cette page
+		$message='<p>'.__('Direct call to this page not allowed','wpcb').'</p>';
+		// Add here some code if you want to test some php for wpec :
+		$wpsc_cart->empty_cart();
+	}
+  }
+	return $message;
+}
+add_filter( 'the_content', 'wpcb_display_payment_icon_page_content' );
+
+function wpcb_display_payment_icon_page_title($title, $id) {
+    global $id;
+    $intheloop=in_the_loop(); 
+	if ($intheloop && $id && ($_GET['action'] == 'securepayment')){
+	$title='Paiement Sécurisé';
+    }
+else {
+	// Nothing
+}
+    return $title;
+    
+}
+add_filter('the_title', 'wpcb_display_payment_icon_page_title', 10, 2);
+
+
+add_action('wpsc_purchase_logs_list_table_after','display_download_csv_for_coliposte');
+
+function display_download_csv_for_coliposte(){
+	echo '<p>';
+	echo '<a class="admin_download" href="'.esc_url( add_query_arg( 'action', 'download_csv_coliposte' ) ).'" >';
+	echo '<img class="wpsc_pushdown_img" src="'.WPSC_CORE_IMAGES_URL.'/download.gif" />';
+	echo "<span>Télécharger le csv pour Coliposte</span>";
+	echo '</a>';
+	$wpsc_checkout_form_fields=get_option('wpsc_checkout_form_fields');
+	print_r($wpsc_checkout_form_fields);
+	$wpsc_checkout_form_fields=unserialize($wpsc_checkout_form_fields[0]);
+	print_r($wpsc_checkout_form_fields);
+}
+
+add_action('wpsc_sales_log_process_bulk_action','download_csv_for_coliposte');
+function download_csv_for_coliposte($current_action){
+
+ if ( 'download_csv_coliposte' == $current_action ) {
+         
+         
+
+	global $wpdb, $wpsc_gateways;
+	get_currentuserinfo();
+	$count = 0;
+	if ( current_user_can( 'manage_options' ) ) {
+		if ( isset( $_REQUEST['start_timestamp'] ) && isset( $_REQUEST['end_timestamp'] ) ) {
+			$start_timestamp = $_REQUEST['start_timestamp'];
+			$end_timestamp = $_REQUEST['end_timestamp'];
+			$start_end_sql = "SELECT * FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `date` BETWEEN '%d' AND '%d' ORDER BY `date` DESC";
+			$start_end_sql = apply_filters( 'wpsc_purchase_log_start_end_csv', $start_end_sql );
+			$data = $wpdb->get_results( $wpdb->prepare( $start_end_sql, $start_timestamp, $end_timestamp ), ARRAY_A );
+			$csv_name = 'Purchase Log ' . date( "M-d-Y", $start_timestamp ) . ' to ' . date( "M-d-Y", $end_timestamp ) . '.csv';
+		} elseif ( isset( $_REQUEST['m'] ) ) {
+			$year = (int) substr( $_REQUEST['m'], 0, 4);
+			$month = (int) substr( $_REQUEST['m'], -2 );
+			$month_year_sql = "
+				SELECT *
+				FROM " . WPSC_TABLE_PURCHASE_LOGS . "
+				WHERE YEAR(FROM_UNIXTIME(date)) = %d AND MONTH(FROM_UNIXTIME(date)) = %d
+			";
+			$month_year_sql = apply_filters( 'wpsc_purchase_log_month_year_csv', $month_year_sql );
+			$data = $wpdb->get_results( $wpdb->prepare( $month_year_sql, $year, $month ), ARRAY_A );
+			$csv_name = 'Coliposte Purchase Log ' . $month . '/' . $year . '.csv';
+		} else {
+			$sql = apply_filters( 'wpsc_purchase_log_month_year_csv', "SELECT * FROM " . WPSC_TABLE_PURCHASE_LOGS );
+			$data = $wpdb->get_results( $sql, ARRAY_A );
+			$csv_name = "All Purchase Logs Coliposte.csv";
+		}
+
+		$form_sql = "SELECT * FROM `" . WPSC_TABLE_CHECKOUT_FORMS . "` WHERE `active` = '1' AND `type` != 'heading' ORDER BY `checkout_order` DESC;";
+		$form_data = $wpdb->get_results( $form_sql, ARRAY_A );
+		$csv = 'Purchase ID, Price, Firstname, Lastname, Email, Order Status, Data, ';
+
+		$headers = "\"Purchase ID\",\"Purchase Total\","; //capture the headers
+		$headers2  ="\"Payment Gateway\",";
+		$headers2 .="\"Payment Status\",\"Purchase Date\",\"Total Weight (gram)\",";
+
+		$output = '';
+
+		foreach ( (array)$data as $purchase ) {
+			$form_headers = '';
+			$output .= "\"" . $purchase['id'] . "\","; //Purchase ID
+			$output .= "\"" . $purchase['totalprice'] . "\","; //Purchase Total
+			foreach ( (array)$form_data as $form_field ) {
+				$form_headers .="\"".$form_field['unique_name']."\",";
+				$collected_data_sql = "SELECT * FROM `" . WPSC_TABLE_SUBMITED_FORM_DATA . "` WHERE `log_id` = '" . $purchase['id'] . "' AND `form_id` = '" . $form_field['id'] . "' LIMIT 1";
+				$collected_data = $wpdb->get_results( $collected_data_sql, ARRAY_A );
+				$collected_data = $collected_data[0];
+				$output .= "\"" . $collected_data['value'] . "\","; // get form fields
+			}
+
+			if ( isset( $wpsc_gateways[$purchase['gateway']] ) && isset( $wpsc_gateways[$purchase['gateway']]['display_name'] ) )
+				$output .= "\"" . $wpsc_gateways[$purchase['gateway']]['display_name'] . "\","; //get gateway name
+			else
+				$output .= "\"\",";
+
+
+			$status_name = wpsc_find_purchlog_status_name( $purchase['processed'] );
+
+			$output .= "\"" . $status_name . "\","; //get purchase status
+			$output .= "\"" . date( "jS M Y", $purchase['date'] ) . "\","; //date
+			
+			// Compute the total weight :
+			$cartsql = "SELECT `prodid`, `quantity` FROM `" . WPSC_TABLE_CART_CONTENTS . "` WHERE `purchaseid`=" . $purchase['id']; 
+			$cart = $wpdb->get_results( $cartsql, ARRAY_A );
+			$total_weight=0;
+			foreach ( $cart as $item ) {
+				$product_meta = get_metadata('post',$item['prodid']);
+				$wpsc_product_metadata = unserialize($product_meta["_wpsc_product_metadata"][0]);
+				$weightvalue=wpsc_convert_weight($wpsc_product_metadata["weight"],'pound', 'gram');
+				if( !empty( $weightvalue ) ){
+					$weight_for_this_item=$item['quantity']*$weightvalue;
+					$total_weight += $weight_for_this_item;
+				}
+			}			
+			$output .=  "\"" . $total_weight . "\","; //get total weight
+			$cartsql = "SELECT `prodid`, `quantity`, `name` FROM `" . WPSC_TABLE_CART_CONTENTS . "` WHERE `purchaseid`=" . $purchase['id'] . "";
+			$cart = $wpdb->get_results( $cartsql, ARRAY_A );
+
+
+			if( $count < count( $cart ) )
+			    $count = count( $cart );
+			// Go through all products in cart and display quantity and sku
+			foreach ( (array)$cart as $item ) {
+				$skuvalue = get_product_meta( $item['prodid'], 'sku', true );
+				if( empty( $skuvalue ) )
+				    $skuvalue = __( 'N/A', 'wpsc' );
+				$output .= "\"" . $item['quantity'] . "\",";
+				$output .= "\"" . str_replace( '"', '\"', $item['name'] ) . "\"";
+				$output .= "," . $skuvalue."," ;
+			}
+			$output .= "\n"; // terminates the row/line in the CSV file
+		}
+		// Get the most number of products and create a header for them
+		$headers3 = "";
+		for( $i = 0; $i < $count; $i++ ){
+			$headers3 .= "\"Quantity\",\"Product Name\",\"SKU\"";
+			if( $i < ( $count - 1 ) )
+			    $headers3 .= ",";
+		}
+
+		$headers = apply_filters( 'wpsc_purchase_log_csv_headers', $headers . $form_headers . $headers2 . $headers3, $data, $form_data );
+		$output = apply_filters( 'wpsc_purchase_log_csv_output', $output, $data, $form_data );
+		header( 'Content-Type: text/csv' );
+		header( 'Content-Disposition: inline; filename="' . $csv_name . '"' );
+		echo $headers . "\n". $output;
+		exit;
+	}
+
+         
+         
+         
+         
+      }
+}
+
+
+add_filter('wpsc_transaction_result_message','wpsc_transaction_result_message_callback');
+add_filter('wpsc_transaction_result_message_html','wpsc_transaction_result_message_callback');
+
+function wpsc_transaction_result_message_callback($message){
+	global $wpdb, $purchase_log;
+	//GET CUSTOMER DETAILS
+			$result_checkout_forms = $wpdb->get_results("SELECT * FROM `". WPSC_TABLE_CHECKOUT_FORMS ."` WHERE active = '1'",ARRAY_A);
+			foreach ( $result_checkout_forms as $row_checkout_forms){
+				$result_customer = $wpdb->get_results("SELECT * FROM ". WPSC_TABLE_SUBMITED_FORM_DATA ." WHERE log_id =". $purchase_log['id']." AND form_id=".$row_checkout_forms['id'],ARRAY_A);
+				foreach ( $result_customer as $row_customer){
+					$message = str_replace( '%'.$row_checkout_forms['unique_name'].'%', $row_customer['value'], $message );
+				}
+			}
+	return $message;
+}
+
+
+// Facturation :
+// Todo : better link
+
+add_filter('wpsc_transaction_result_report','wpsc_transaction_result_message_facture_link_callback');
+add_filter('wpsc_transaction_result_message','wpsc_transaction_result_message_facture_link_callback');
+add_filter('wpsc_transaction_result_message_html','wpsc_transaction_result_message_facture_link_callback');
+
+function wpsc_transaction_result_message_facture_link_callback($message){
+	global $wpdb, $purchase_log;
+	$purchase_log_id=$purchase_log['id'];
+// Need the session id :
+	$session_id=$wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `id`= %s LIMIT 1", $purchase_log_id ) );
+	$sessionid=$session_id->sessionid;
+	$url=plugins_url('facture.php?id='.$sessionid,__FILE__);
+	$message = str_replace( '%facture%',$url, $message );
+	return $message;
+}
+
+
+add_action('wpsc_confirm_checkout','wpcb_inc_billing_number');
+function wpcb_inc_billing_number($purchase_log_id){
+	global $wpdb;
+	$q="SELECT * FROM `".WPSC_TABLE_META."` WHERE `object_id` ='". $purchase_log_id."' AND `object_type`='wpcb_purchase' AND `meta_key`='wpcb_billing_number' LIMIT 1";
+	$billing_number = $wpdb->get_row($q);
+	if ($billing_number != null) {
+	// Do nothing
+
+	} 
+	else {
+		// Insert a new meta
+		$current_billing_number=get_option('wpcb_facture_current_billing_number');
+		if (!$current_billing_number){
+			$current_billing_number=1;
+		}
+		else {
+			$current_billing_number +=1;
+		}
+	   	update_option('wpcb_facture_current_billing_number',$current_billing_number);
+	    	
+		$wpdb->insert( WPSC_TABLE_META, array( 'object_type' => 'wpcb_purchase', 'object_id' => $purchase_log_id, 'meta_key' => 'wpcb_billing_number', 'meta_value' => $current_billing_number ) );
+	}
+
+}
+add_action('wpsc_billing_details_top','add_facture_link');
+function add_facture_link(){
+	global $wpdb;
+	$options = get_option( 'wpcb_misc');  
+	$purchase_log_id=$_GET['id'];
+	// Need the session id :
+	$session_id=$wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPSC_TABLE_PURCHASE_LOGS . "` WHERE `id`= %s LIMIT 1", $purchase_log_id ) );
+	$sessionid=$session_id->sessionid;
+	// Find the billing number
+	$q="SELECT * FROM `".WPSC_TABLE_META."` WHERE `object_id` ='". $purchase_log_id."' AND `object_type`='wpcb_purchase' AND `meta_key`='wpcb_billing_number' LIMIT 1";
+	$billing_number = $wpdb->get_row($q);
+	if ($billing_number != null) {
+			$current_billing_number=$billing_number->meta_value;
+	} else {
+		// Insert a new meta
+		// Should not occur since they are added before
+		$current_billing_number=get_option('wpcb_facture_current_billing_number');
+		if (!$current_billing_number){
+			$current_billing_number=1;
+		}
+		else {
+			$current_billing_number +=1;
+		}
+		update_option('wpcb_facture_current_billing_number',$current_billing_number);
+		//Insert in sql
+		$wpdb->insert( WPSC_TABLE_META, array( 'object_type' => 'wpcb_purchase', 'object_id' => $purchase_log_id, 'meta_key' => 'wpcb_billing_number', 'meta_value' => $current_billing_number ) );
+	}
+	$url=plugins_url('facture.php?id='.$sessionid,__FILE__);
+	echo '<a href="'.$url.'">Facture #'.$options['facture_prefixe'].str_pad($current_billing_number, 10, "0", STR_PAD_LEFT).'</a>';
+}
 
 ?>

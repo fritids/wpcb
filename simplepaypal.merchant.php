@@ -1,5 +1,5 @@
 <?php
-$options = get_option('simplepaypal_options');
+$options = get_option('wpcb_paypal');
 $nzshpcrt_gateways[$num] = array(
 'name' => 'Paypal (WPCB)',
 'api_version' => 2.0,
@@ -10,17 +10,14 @@ $nzshpcrt_gateways[$num] = array(
 'requirements' => array(),'form' => 'form_simplepaypal',
 'internalname' => 'simplepaypal',
 'submit_function' => 'submit_simplepaypal',
-'image' => $options['wpec_gateway_image_paypal']
+'image' => $options['wpec_gateway_image']
 );
 
 class wpsc_merchant_simplepaypal extends wpsc_merchant {
 	function submit(){
-		global $wpdb,$purchase_log;
-		// Trouver la page où le shortcode [simple_paypal] se situe.
-		// Bug si plusieurs fois le shortcode [simple_paypal], à résoudre
-		$sessionid=$this->cart_data['session_id'];
-		$simple_paypal_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[wpcb]%' AND `post_status`='publish' LIMIT 1");
-		wp_redirect(site_url('?p='.$simple_paypal_checkout_page->ID.'&action=paypal&sessionid='.$sessionid));
+		global $wpdb,$purchase_log;
+		$sessionid=$this->cart_data['session_id'];
+		wp_redirect(site_url('?action=securepayment&gateway=paypal&sessionid='.$sessionid));
 		exit;
 	}// end of submit
 } //end of class
