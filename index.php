@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.4.1
+Version: 2.4.2
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -1882,11 +1882,10 @@ function AddSaleToGoogleSpreadsheet($purchase_log_id){
 
 
 function wpcb_display_payment_icon_page_content($content) {
+	global $wpdb, $purchase_log, $wpsc_cart;
+  	if ($_GET['action'] == 'securepayment') {
 	$wpcb_atos = get_option ( 'wpcb_atos' );
 	$message.=$wpcb_atos['display_before_creditcardlogo'].'<br/>';
-	global $wpdb, $purchase_log, $wpsc_cart;
-  if ($_GET['action'] == 'securepayment') {
-
 	$sessionid=$_GET['sessionid'];
 	$wpcb_general = get_option( 'wpcb_general' );
 	$wpcb_dev=get_option( 'wpcb_dev' );
@@ -2023,6 +2022,9 @@ function wpcb_display_payment_icon_page_content($content) {
 		// Add here some code if you want to test some php for wpec :
 		$wpsc_cart->empty_cart();
 	}
+  }
+  else {
+  $message=$content;	
   }
 	return $message;
 }
