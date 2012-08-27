@@ -19,7 +19,7 @@ class wpsc_merchant_atos extends wpsc_merchant {
 	function submit(){
 		global $wpdb,$purchase_log,$wpsc_cart;
 		$sessionid=$this->cart_data['session_id'];
-		$options = get_option('wpcb_options');
+		$options = get_option('wpcb_dev');
 		if ($options){
 			if ((array_key_exists('test', $options)) && ($options['test'])){
 				// Mode test, on considère que la CB a été acceptée automatiquement.
