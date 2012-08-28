@@ -29,7 +29,15 @@ class wpsc_merchant_atos extends wpsc_merchant {
 				transaction_results($sessionid,false);
 			}
 			else {// Affiche les icônes des cartes bancaires :
-				wp_redirect(site_url('?action=securepayment&gateway=atos&sessionid='.$sessionid));
+			
+				if ((array_key_exists('mode_shortcode', $options)) && ($options['mode_shortcode'])){
+				// Trouver la page oÃ¹ le shortcode [wpcb] se situe. Bug si plusieurs fois le shortcode [wpcb], Ã  rÃ©soudre todo
+				$wpcb_checkout_page=$wpdb->get_row("SELECT ID FROM $wpdb->posts WHERE `post_content` LIKE '%[wpcb]%' AND `post_status`='publish'");
+				wp_redirect(site_url('?p='.$wpcb_checkout_page->ID.'&sessionid='.$sessionid.'&action=CB'));
+				}
+				else {
+					wp_redirect(site_url('?action=securepayment&gateway=atos&sessionid='.$sessionid));
+				}
 			}
 		}
 		else {

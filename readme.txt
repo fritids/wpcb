@@ -1,4 +1,4 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypal, ExpeditorRequires at least: 2.7Tested up to: 3.4.1Stable tag: 2.4.2
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypal, ExpeditorRequires at least: 2.7Tested up to: 3.4.1Stable tag: 2.4.3
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
 Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
@@ -172,6 +172,10 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 == Changelog ==
 
 = 2.4.3 =
+
+* Il est à nouveau possible d'utiliser le shortcode wpcb
+
+= 2.4.2 =
 
 * Bug corrigé, affiche toujours un text erroné
 

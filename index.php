@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.4.2
+Version: 2.4.3
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -923,6 +923,7 @@ function wpcb_intialize_dev_options() {
 	add_settings_field('mode_demo','Mode Démo','wpcb_mode_demo_callback','wpcb_dev','dev_settings_section');
 	add_settings_field('mode_debugatos','Mode Debug Atos','wpcb_mode_debugatos_callback','wpcb_dev','dev_settings_section');
 	add_settings_field('mode_test','Mode Test','wpcb_mode_test_callback','wpcb_dev','dev_settings_section');
+	add_settings_field('mode_shortcode','Utilisez la page avec le shortcode [wpcb]','wpcb_mode_shortcode_callback','wpcb_dev','dev_settings_section');
 	register_setting('wpcb_dev','wpcb_dev','');
 } // end wpcb_intialize_atos_options  
 add_action( 'admin_init', 'wpcb_intialize_dev_options' );  
@@ -1009,6 +1010,12 @@ function wpcb_mode_test_callback($args){
     $options = get_option( 'wpcb_dev');  
 	$html = '<input type="checkbox" id="mode_test" name="wpcb_dev[mode_test]" value="1" ' . checked(1, $options['mode_test'], false) . '/>';  
     $html .= '<label for="mode_test"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_mode_shortcode_callback($args){  
+    $options = get_option( 'wpcb_dev');  
+	$html = '<input type="checkbox" id="mode_shortcode" name="wpcb_dev[mode_shortcode]" value="1" ' . checked(1, $options['mode_shortcode'], false) . '/>';  
+    $html .= '<label for="mode_shortcode"> '  . $args[0] . '</label>';   
     echo $html;
 }
 
@@ -1882,9 +1889,10 @@ function AddSaleToGoogleSpreadsheet($purchase_log_id){
 
 
 function wpcb_display_payment_icon_page_content($content) {
-	global $wpdb, $purchase_log, $wpsc_cart;
-  	if ($_GET['action'] == 'securepayment') {
 	$wpcb_atos = get_option ( 'wpcb_atos' );
+	$message=$content;
+	global $wpdb, $purchase_log, $wpsc_cart;
+	if ($_GET['action'] == 'securepayment') {
 	$message.=$wpcb_atos['display_before_creditcardlogo'].'<br/>';
 	$sessionid=$_GET['sessionid'];
 	$wpcb_general = get_option( 'wpcb_general' );
@@ -2022,9 +2030,6 @@ function wpcb_display_payment_icon_page_content($content) {
 		// Add here some code if you want to test some php for wpec :
 		$wpsc_cart->empty_cart();
 	}
-  }
-  else {
-  $message=$content;	
   }
 	return $message;
 }
