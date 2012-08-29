@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.4
+Version: 2.4.4
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -50,6 +50,11 @@ function wpcb_update(){
   }
   // nothing found, you may advice the user to install the ZF plugin
   define('WP_ZEND_FRAMEWORK', false);
+  	$merchantfiles=array('atos','cheque','virement','simplepaypal','systempaycyberplus');
+	foreach ($merchantfiles as $merchantfile){
+		copy(dirname(__FILE__).'/'.$merchantfile.'.merchant.php',dirname(dirname(__FILE__)).'/wp-e-commerce/wpsc-merchants/'.$merchantfile.'.merchant.php');
+	}
+	copy(dirname(__FILE__).'/automatic_response.php',dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
 }
 
 // Lors de la desinstallation : 
@@ -348,7 +353,9 @@ function wpcb_intialize_atos_options() {
 	add_settings_field('wpec_atos_display_name','wpec_atos_display_name','wpcb_wpec_atos_display_name_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('wpec_atos_gateway_image','wpec_atos_gateway_image','wpcb_wpec_atos_gateway_image_callback','wpcb_atos','atos_settings_section');
 	add_settings_field('logfile','logfile','wpcb_logfile_callback','wpcb_atos','atos_settings_section');
-	
+	add_settings_field('title_page_logo_cb','Titre de la page des logos CB','wpcb_title_page_logo_cb_callback','wpcb_atos','atos_settings_section');	
+	add_settings_field('display_before_creditcardlogo','Texte de la page avant les logos CB','wpcb_display_before_creditcardlogo_callback','wpcb_atos','atos_settings_section');	
+
 
 	register_setting('wpcb_atos','wpcb_atos','');
 } // end wpcb_intialize_atos_options  
@@ -487,6 +494,22 @@ function wpcb_logfile_callback(){
     echo '<input type="text" '.$style.' size="75"id="logfile" name="wpcb_atos[logfile]" value="' . $val . '" />';  
 }
 
+function wpcb_title_page_logo_cb_callback(){  
+    $options = get_option( 'wpcb_atos');  
+    $val = 'Paiment sécurisé'; 
+    if(isset($options['title_page_logo_cb'])){$val = $options['title_page_logo_cb'];}
+    echo '<input type="text" '.$style.' size="75" id="title_page_logo_cb" name="wpcb_atos[title_page_logo_cb]" value="' . $val . '" />';  
+}
+
+
+
+function wpcb_display_before_creditcardlogo_callback() {  
+    $options = get_option( 'wpcb_atos');  
+    $val = "Cliquez sur la carte de votre choix ci dessous, vous allez être redirigé vers le site sécurisé Atos."; 
+    if(isset($options['display_before_creditcardlogo'])){$val = $options['display_before_creditcardlogo'];}
+    echo '<textarea type="textarea" id="display_before_creditcardlogo" name="wpcb_atos[display_before_creditcardlogo]" rows="7" cols="50">'.$val .'</textarea>';  
+}
+
 /** 
 * Cheque options
 */  
@@ -502,6 +525,7 @@ add_action('admin_init', 'wpcb_intialize_cheque_options');
 function wpcb_cheque_callback() {  
     echo '<p>Réglage des options pour le paiement par chèque</p>';  
 }
+
 
 function wpcb_displaycheque_callback() {  
     $options = get_option( 'wpcb_cheque');  
@@ -896,9 +920,9 @@ function wpcb_intialize_dev_options() {
 	add_settings_section('dev_settings_section','dev Options','wpcb_dev_callback','wpcb_dev');
 	// Add the fields :
 	add_settings_field('version','Version Plugin','wpcb_version_callback','wpcb_dev','dev_settings_section');
-	add_settings_field('mode_demo','Mode Démo','wpcb_mode_demo_callback','wpcb_dev','dev_settings_section');
 	add_settings_field('mode_debugatos','Mode Debug Atos','wpcb_mode_debugatos_callback','wpcb_dev','dev_settings_section');
 	add_settings_field('mode_test','Mode Test','wpcb_mode_test_callback','wpcb_dev','dev_settings_section');
+	add_settings_field('mode_shortcode','Utilisez la page avec le shortcode [wpcb]','wpcb_mode_shortcode_callback','wpcb_dev','dev_settings_section');
 	register_setting('wpcb_dev','wpcb_dev','');
 } // end wpcb_intialize_atos_options  
 add_action( 'admin_init', 'wpcb_intialize_dev_options' );  
@@ -975,16 +999,17 @@ function wpcb_mode_debugatos_callback($args){
     $html .= '<label for="mode_debugatos"> '  . $args[0] . '</label>';   
     echo $html;
 }
-function wpcb_mode_demo_callback($args){  
-    $options = get_option( 'wpcb_dev');  
-	$html = '<input type="checkbox" id="mode_demo" name="wpcb_dev[mode_demo]" value="1" ' . checked(1, $options['mode_demo'], false) . '/>';  
-    $html .= '<label for="mode_demo"> '  . $args[0] . '</label>';   
-    echo $html;
-}
+
 function wpcb_mode_test_callback($args){  
     $options = get_option( 'wpcb_dev');  
 	$html = '<input type="checkbox" id="mode_test" name="wpcb_dev[mode_test]" value="1" ' . checked(1, $options['mode_test'], false) . '/>';  
     $html .= '<label for="mode_test"> '  . $args[0] . '</label>';   
+    echo $html;
+}
+function wpcb_mode_shortcode_callback($args){  
+    $options = get_option( 'wpcb_dev');  
+	$html = '<input type="checkbox" id="mode_shortcode" name="wpcb_dev[mode_shortcode]" value="1" ' . checked(1, $options['mode_shortcode'], false) . '/>';  
+    $html .= '<label for="mode_shortcode"> '  . $args[0] . '</label>';   
     echo $html;
 }
 
@@ -1015,16 +1040,10 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 	if ($_GET['action']=='CB'){
 		$wpcb_atos = get_option ( 'wpcb_atos' );
 		// cf. Dictionnaire des Données Atos :
-		if (($wpcb_dev['mode_demo']) && (array_key_exists('mode_demo', $wpcb_dev)) ){
-			$merchant_id="082584341411111";
-			$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
-			$path_bin_request =dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request";
-		}
-		else{
-			$merchant_id=$wpcb_atos['merchant_id'];	
-			$pathfile=$wpcb_atos['pathfile'];
-			$path_bin_request=$wpcb_atos['path_bin_request'];
-		}
+
+		$merchant_id=$wpcb_atos['merchant_id'];	
+		$pathfile=$wpcb_atos['pathfile'];
+		$path_bin_request=$wpcb_atos['path_bin_request'];
 		$parm="merchant_id=". $merchant_id;
 		$parm="$parm merchant_country=".$wpcb_atos['merchant_country'];
 		$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1") ;
@@ -1269,16 +1288,9 @@ function check_ipn(){
 	
 	// Automatic Response ATOS :
 	if ($_GET['ipn']=='atos'){
-	if ((array_key_exists('mode_demo', $wpcb_dev)) && ($wpcb_dev['mode_demo'])){ // Ce Kit de demo a du vous etre envoyé par la banque
-		$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
-		$path_bin_response=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/response";
-		$logfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/logfile.txt";
-	}
-	else{
 		$pathfile=$wpcb_atos['pathfile'];
 		$path_bin_response=$wpcb_atos['path_bin_response'];
 		$logfile=$wpcb_atos['logfile'];
-	}
 	
 	// Initialisation du chemin du fichier de log :
 	if (isset($_POST['DATA'])){
@@ -1858,10 +1870,11 @@ function AddSaleToGoogleSpreadsheet($purchase_log_id){
 
 
 function wpcb_display_payment_icon_page_content($content) {
-	$message.=$content;
+	$wpcb_atos = get_option ( 'wpcb_atos' );
+	$message=$content;
 	global $wpdb, $purchase_log, $wpsc_cart;
-  if ($_GET['action'] == 'securepayment') {
-
+	if ($_GET['action'] == 'securepayment') {
+	$message.=$wpcb_atos['display_before_creditcardlogo'].'<br/>';
 	$sessionid=$_GET['sessionid'];
 	$wpcb_general = get_option( 'wpcb_general' );
 	$wpcb_dev=get_option( 'wpcb_dev' );
@@ -1869,18 +1882,9 @@ function wpcb_display_payment_icon_page_content($content) {
 	$purch_log_email=get_option('purch_log_email');
 	if (!$purch_log_email){$purch_log_email=get_bloginfo('admin_email');}
 	if ($_GET['gateway']=='atos'){
-		$wpcb_atos = get_option ( 'wpcb_atos' );
-		// cf. Dictionnaire des Données Atos :
-		if (($wpcb_dev['mode_demo']) && (array_key_exists('mode_demo', $wpcb_dev)) ){
-			$merchant_id="082584341411111";
-			$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
-			$path_bin_request =dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/request";
-		}
-		else{
 			$merchant_id=$wpcb_atos['merchant_id'];	
 			$pathfile=$wpcb_atos['pathfile'];
 			$path_bin_request=$wpcb_atos['path_bin_request'];
-		}
 		$parm="merchant_id=". $merchant_id;
 		$parm="$parm merchant_country=".$wpcb_atos['merchant_country'];
 		$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1") ;
@@ -1904,7 +1908,7 @@ function wpcb_display_payment_icon_page_content($content) {
 			//Va afficher sur la page ou se trouve le shortcode les parametres.
 			$parm_pretty=str_replace(' ','<br/>',$parm);
 			echo '<p>You see this because you are in debug mode :</p><pre>'.$parm_pretty.'<br/>path_bin_request='.$path_bin_request.'</pre>';
-			echo'<p>End of debug mode</p>';
+			echo '<p>End of debug mode</p>';
 		}
 		$result=exec("$path_bin_request $parm");
 		$tableau=explode ("!","$result");
@@ -1920,7 +1924,7 @@ function wpcb_display_payment_icon_page_content($content) {
 		}
 		else{
 			// Affiche le formulaire avec le choix des cartes bancaires :
-			$message = $tableau[3];
+			$message.= $tableau[3];
 		}
 		// End of atos
 	}
@@ -1928,10 +1932,10 @@ function wpcb_display_payment_icon_page_content($content) {
 	$wpcb_paypal = get_option ( 'wpcb_paypal' );
 	$purchase_log=$wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1") ;
 		if ($wpcb_paypal['sandbox_paypal']){
-			$message='<form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">';
+			$message.='<form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">';
 		}
 		else{
-			$message='<form action="https://www.paypal.com/cgi-bin/webscr" method="post">';
+			$message.='<form action="https://www.paypal.com/cgi-bin/webscr" method="post">';
 		}
 		$message.='<input type="hidden" name="cmd" value="_xclick">';
 		$message.='<input type="hidden" name="business" value="'.$wpcb_paypal['business'].'">';
@@ -2004,11 +2008,12 @@ function wpcb_display_payment_icon_page_content($content) {
 }
 add_filter( 'the_content', 'wpcb_display_payment_icon_page_content' );
 
-function wpcb_display_payment_icon_page_title($title, $id) {
+function @wpcb_display_payment_icon_page_title($title, $id) {
     global $id;
     $intheloop=in_the_loop(); 
 	if ($intheloop && $id && ($_GET['action'] == 'securepayment')){
-	$title='Paiement Sécurisé';
+		$options=get_option('wpcb_atos');
+		$title=$options['title_page_logo_cb'];
     }
 else {
 	// Nothing

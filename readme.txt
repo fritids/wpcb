@@ -1,4 +1,4 @@
-=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypal, ExpeditorRequires at least: 2.7Tested up to: 3.4.1Stable tag: 2.4
+=== WPCB ===Contributors: 6WWWDonate link: http://wpcb.fr/donate/Tags: wp-e-commerce, atos, sips, carte bancaire, wpcb, mercanet, 6WWW, mailchimp, trello, paypal, ExpeditorRequires at least: 2.7Tested up to: 3.4.1Stable tag: 2.4.4
 
 Paiement par cartes bancaires (majoritée des banques françaises), paypal, chèques et virement pour le plugin WP e-Commerce.
 Calcul de frais de port basé sur la poste (colis, chronopost, et d'autres à venir...)
@@ -118,6 +118,9 @@ Vous devez vous rendre dans l'onglet Dev des réglages de wpcb pour vérifier qu
 = Je lis : "Error calling the atos api : exec request not found", alors que le fichier est bien là, pourquoi ? =
 Il faut bien mettre le fichier request en droit chmod 755 !
 
+= Je lis : "Error calling the atos api : response request not found", alors que le fichier est bien là, pourquoi ? =
+Il faut bien mettre le fichier response en droit chmod 755 !
+
 = Si mon certif a une extension php que faire ? =
 Supprimer l'extension puis supprimer les 8 premières lignes de ce fichier et les deux dernières. Ensuite dans votre fichier pathfile rajouter un # espace devant F_CTYPE!php! : # F_CTYPE!php! (pour commenter la ligne)
 = Autre question ? =
@@ -167,6 +170,25 @@ Note : les coordonnées de l'acheteur s'ajoute au dessus de ce message : Nom, Em
 6. Réglages Mailchimp7. Livraison Poste française (Colis, chronopost, et d'autres mode de livraison à venir)
 8. Réglage du multiplicateur d'affichage du nombre de vente et réglage du compte à rebours de vente
 == Changelog ==
+
+= 2.4.4 =
+
+* Correction d'un bug qui empeche le panier de se vider.
+* Suppression du mode demo atos (pas necessaire)
+
+= 2.4.3 =
+
+* Il est à nouveau possible d'utiliser le shortcode wpcb
+
+= 2.4.2 =
+
+* Bug corrigé, affiche toujours un text erroné
+
+= 2.4.1 =
+
+* Suppression de la fonction ajout des reponses Atos dans google qui bloquer la vente en incomplete chez certaines personnes
+* Correction d'un bug qui afficher Corriger les Options avant tout
+* Ajout de deux champs pour modifier le titre de la page de paiement et le contenu avant les icones de CB
 
 = 2.4 =
 * Plus besoin de placer le shortcode wpcb sur une page (Ne pas mettre à jour si tout marche chez vous!)
