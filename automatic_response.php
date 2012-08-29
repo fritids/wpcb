@@ -15,16 +15,10 @@ if ($_GET['debug']==1){
 }
 $purch_log_email=get_option('purch_log_email');
 if (!$purch_log_email){$purch_log_email=get_bloginfo('admin_email');}
-if (($wpcb_dev_options['mode_demo']) && (array_key_exists('mode_demo', $wpcb_dev_options)) ){// Ce Kit de demo a du vous etre envoyé par la banque
-	$pathfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/pathfile";
-	$path_bin_response=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/response";
-	$logfile=dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/cgi-bin/demo/logfile.txt";
-}
-else{
-	$pathfile=$wpcb_cb_options['pathfile'];
-	$path_bin_response=$wpcb_cb_options['path_bin_response'];
-	$logfile=$wpcb_cb_options['logfile'];
-}
+
+$pathfile=$wpcb_cb_options['pathfile'];
+$path_bin_response=$wpcb_cb_options['path_bin_response'];
+$logfile=$wpcb_cb_options['logfile'];
 
 if ($wpcb_dev_options['mode_debugatos']){
 	$log.='$pathfile'.$pathfile."\n";
@@ -155,7 +149,8 @@ if ($wpcb_dev_options['mode_debugatos']){
 else{
 	// si pas post data do nothing !
 }
-
-
+$url = site_url();
+wp_redirect($url);
+Exit;
 //wp_mail($purch_log_email,'Automatic Response was called',$log);
 ?>
