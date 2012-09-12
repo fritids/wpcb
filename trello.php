@@ -22,7 +22,7 @@ function wpcb_trello_callback() {
     echo '<p>Réglage des options pour Trello</p>';
 	echo '<p>Sur certains site, il faut cliquer plusieurs fois sur "Sauvegarder"</p>';
 	$options = get_option( 'wpcb_trello'); 
-	$connectionInfos=checkConnection($options['apiKey'],$options['token']);
+	$connectionInfos=wpcb_trello_checkConnection($options['apiKey'],$options['token']);
 	$memberInfos=getMembersInfos($options['apiKey'],$options['token'],$connectionInfos->idMember);
 	if ($memberInfos->fullName){
 		echo '<p>Connected as '.$memberInfos->fullName.'</p>';
@@ -45,7 +45,7 @@ function wpcb_add_to_trello_callback($args){
 function wpcb_boardid_trello_callback(){  
     $options = get_option( 'wpcb_trello');
 	
-	$connectionInfos=checkConnection($options['apiKey'],$options['token']);
+	$connectionInfos=wpcb_trello_checkConnection($options['apiKey'],$options['token']);
 	$memberInfos=getMembersInfos($options['apiKey'],$options['token'],$connectionInfos->idMember);
 
 	if ($memberInfos->fullName){
@@ -157,7 +157,7 @@ function getMembersInfos($key,$token,$idMember){
 	return $memberInfos;
 }
 
-function checkConnection($key,$token){
+function wpcb_trello_checkConnection($key,$token){
 	$url='https://trello.com/1/tokens/'.$token;
 	$connectionInfos=cURL_GET_trello('',$url,$key,$token);
 	return $connectionInfos;
