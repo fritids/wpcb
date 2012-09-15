@@ -974,7 +974,7 @@ function wpcb_dev_callback() {
 			copy(dirname(__FILE__).'/automatic_response.php',dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
 		}
 		
-		
+		$nonce_url=admin_url( 'plugins.php?page=wpcb&tab=dev&action=sandbox');
 		echo '<li>Tester votre fichier ipn atos <a href="'.$nonce_url.'">en cliquant ici</a> (Cela va mettre Ã  jour log.txt et google drive)</li>';
 		echo '<li>Automatic response production : '.$wpcb_atos['automatic_response_url'].'</li>';
 		echo '<li>Automatic response debug : '.$wpcb_atos['automatic_response_url'].'/debug=1</li>';
@@ -982,7 +982,7 @@ function wpcb_dev_callback() {
 			$post_data['DATA']='Dummy'; //Needed
 			$post_data['sandbox']='NULL!1!2!'.$wpcb_atos['merchant_id'].'!fr!100!8755900!CB!10-02-2012!11:50!10-02-2012!004!certif!22!978!4974!545!1!22!Comp!CompInfo!return!caddie!Merci!fr!fr!001!8787084074894!my@email.com!1.10.21.192!30!direct!data';
 			$response=wp_remote_post($wpcb_atos['automatic_response_url'],array('body' =>$post_data));
-			//print_r($response);
+			print_r($response);
 		}
 		echo '</ul>';
 		echo '<p> Changelog Version trunk :</p>';

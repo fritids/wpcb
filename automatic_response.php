@@ -149,8 +149,8 @@ if ($wpcb_dev_options['mode_debugatos']){
 else{
 	// si pas post data do nothing !
 }
-$url = site_url();
-wp_redirect($url);
-Exit;
+//$url = site_url();
+//wp_redirect($url);
+//Exit;
 //wp_mail($purch_log_email,'Automatic Response was called',$log);
 ?>
