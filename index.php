@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.4.6
+Version: 2.4.7
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -201,16 +201,16 @@ function wpcb_general_callback() {
 			echo '<li><span style="color:red">Vous devez placer le shortcode [wpcb] quelque part sur votre site</span></li>';
 		}
 		// API
-		$post_data['apiKey']=$wpcb_general['apiKey'];
-		$post_data['emailapiKey']=$wpcb_general['emailapiKey'];
-		$response=wp_remote_post('http://wpcb.fr/api/wpcb/valid.php',array('body' =>$post_data));
-		$valid=unserialize($response['body']);
-		if ($valid[0]){
-			echo '<li><span style="color:green">Votre clé API est valide -> OK!</span></li>';
-		}
-		else {
-			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">fonctions supplémentaires</a> en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> valable 1 an. C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
-		}
+//		$post_data['apiKey']=$wpcb_general['apiKey'];
+//		$post_data['emailapiKey']=$wpcb_general['emailapiKey'];
+//		$response=wp_remote_post('http://wpcb.fr/api/wpcb/valid.php',array('body' =>$post_data));
+//		$valid=unserialize($response['body']);
+//		if ($valid[0]){
+//			echo '<li><span style="color:green">Votre clé API est valide -> OK!</span></li>';
+//		}
+//		else {
+//			echo '<li><span style="color:red">Optionel : Vous pouvez débloquer l\'assistance et des <a href="http://wordpress.org/extend/plugins/wpcb/" target="_blank">fonctions supplémentaires</a> en <a href="http://wpcb.fr/api-key/" target="_blank">achetant une clé API</a></span> valable 1 an. C\'est pas cher et ça m\'aide à améliorer mes plugins.</li>';
+//		}
 		// END OF API
 		if (WP_ZEND_FRAMEWORK){
 			echo '<li><span style="color:green">Zend is installed -> Ok !</span></li>';
@@ -252,8 +252,6 @@ function wpcb_general_callback() {
 		
 		echo "<li>Remplissez les autres onglets d'options.</li>";
 		echo "</ol>";
-		echo '<p>La clé API vous donne accès à de nombreuses fonctionnalitées supplémentaires listée <a target="_blank" href="http://wordpress.org/extend/plugins/wpcb/">ici</a></p>';
-		echo '<p>Ca ne coute que 5€ HT et m\'aide à maintenir mes plugins à jour.</p><p>Vous pouvez la commander <a target="_blank" href="http://wpcb.fr/api-key/">ici</a></p>';
 		
 		// Get trello token. and redirect
 		echo '
@@ -369,10 +367,6 @@ function wpcb_atos_callback() {
 		$nonce_url=admin_url( 'plugins.php?page=wpcb&tab=atos&action=copyautomaticresponse');
 		echo '<p>Installation : Copier les fichiers atos <a href="'.$nonce_url.'">en cliquant ici</a></p>';
      }
-	else {
-			    $options = get_option( 'wpcb_atos');
-				echo '<p>Verifier que en cliquant <a href="'.$options['automatic_response_url'].'">ici</a> vous avez une page blanche</p>';
-	}
 	if	((isset($_GET['action'])) && ($_GET['action']=='copyautomaticresponse')){
 		copy(dirname(__FILE__).'/automatic_response.php',dirname(dirname(dirname(dirname(__FILE__)))).'/automatic_response.php');
 	}
@@ -708,22 +702,22 @@ include('mondialrelay.php');
 function wpcb_livraison_callback() {  
     echo '<p>Réglage des options pour la livraison</p>';  
     // API
-    $wpcb_general=get_option('wpcb_general');
-		$post_data['apiKey']=$wpcb_general['apiKey'];
-		$post_data['emailapiKey']=$wpcb_general['emailapiKey'];
-		$response=wp_remote_post('http://wpcb.fr/api/wpcb/valid.php',array('body' =>$post_data));
-		$valid=unserialize($response['body']);
-		if ($valid[0]){
-			echo '<p><span style="color:green">Votre clé API est valide -> OK!</span></p>';
-		}
-		else {
-			echo '<p><span style="color:red">Optionel : Vous pouvez débloquer les options de livraison et calcul de frais de port en achetant une clé API</a>.</span> C\'est pas cher et ça m\'aide à améliorer mes plugins.</p>';
-		}
+    //$wpcb_general=get_option('wpcb_general');
+	//	$post_data['apiKey']=$wpcb_general['apiKey'];
+	//	$post_data['emailapiKey']=$wpcb_general['emailapiKey'];
+	//	$response=wp_remote_post('http://wpcb.fr/api/wpcb/valid.php',array('body' =>$post_data));
+	//	$valid=unserialize($response['body']);
+	//	if ($valid[0]){
+	//		echo '<p><span style="color:green">Votre clé API est valide -> OK!</span></p>';
+	//	}
+	//	else {
+	//		echo '<p><span style="color:red">Optionel : Vous pouvez débloquer les options de livraison et calcul de frais de port en achetant une clé API</a>.</span> C\'est pas cher et ça m\'aide à améliorer mes plugins.</p>';
+	//	}
 		// END OF API
-		echo '<p>Si les tarifs (donnés à titre indicatif) ont changé, merci de me le notifier à thomas@6www.net. </p>';
-		echo 'Si vous ne disposez pas d\'un compte pro Mondial Relay vous devez vous rendre sur <a href="http://www.mondialrelay.fr/espaces/particulier/v1/login.aspx" target="_blank">cette page</a> pour envoyer votre colis.<br />';
+		echo '<p><span style="color:red">Les tarifs livraison ne seront plus mis à jour, nous ne déveleppons que des systèmes de livraison personalisés (c\'est à dire que c\'est vous qui choisissez le tarif de vos envois). Pour faire une demande de devis : thomas@6www.net</span></p>';
+		echo '<p>Si vous ne disposez pas d\'un compte pro Mondial Relay vous devez vous rendre sur <a href="http://www.mondialrelay.fr/espaces/particulier/v1/login.aspx" target="_blank">cette page</a> pour envoyer votre colis.<br />';
 		echo 'Les tarifs entre compte pro et compte particulier sont légèrement différents.<br />';
-		echo 'Un compte pro permet d\'éditer les étiquettes directement depuis votre interface WP e-Commerce.<br />';
+		echo 'Un compte pro permet d\'éditer les étiquettes directement depuis votre interface WP e-Commerce.<br /></p>';
 		
 }
 function wpcb_ENLEVEMENT_callback($args){  
