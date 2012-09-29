@@ -23,6 +23,7 @@ $logfile=$wpcb_cb_options['logfile'];
 if ($wpcb_dev_options['mode_debugatos']){
 	$log.='$pathfile'.$pathfile."\n";
 	$log.='$path_bin_response'.$path_bin_response."\n";
+	wp_mail($purch_log_email,'Automatic Response was called',$log);
 }
 // Initialisation du chemin du fichier de log :
 if (isset($_POST['DATA'])){
