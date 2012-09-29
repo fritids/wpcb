@@ -4,7 +4,7 @@
 Plugin Name: WPCB
 Plugin URI: http://wpcb.fr
 Description: Plugin de paiement par CB, paypal, ... et de calcul de frais de port (WP e-Commerce requis)
-Version: 2.4.7
+Version: 2.4.8
 Author: 6WWW
 Author URI: http://6www.net
 */
@@ -528,6 +528,18 @@ function wpcb_displaycheque_callback() {
     echo '<textarea type="textarea" id="displaycheque" name="wpcb_cheque[displaycheque]" rows="7" cols="50">'.$options['displaycheque'] .'</textarea>';  
 }
 
+add_filter('wpsc_transaction_result_message','wpsc_transaction_result_message_cheque_callback');
+add_filter('wpsc_transaction_result_message_html','wpsc_transaction_result_message_cheque_callback');
+
+function wpsc_transaction_result_message_cheque_callback($message){
+	global $wpdb, $purchase_log;
+	if ($purchase_log['gateway']=='cheque'){
+	$options = get_option( 'wpcb_cheque'); 
+		$message.='<br/><br/>'.$options['displaycheque'];
+	}
+	return $message;
+}
+
 /** 
 * Virement options
 */  
@@ -549,6 +561,21 @@ function wpcb_displayvirement_callback() {
     if(isset($options['displayvirement'])){$displayvirement = $options['displayvirement'];}
     echo '<textarea type="textarea" id="displayvirement" name="wpcb_virement[displayvirement]" rows="7" cols="50">'.$options['displayvirement'] .'</textarea>';  
 }
+
+
+add_filter('wpsc_transaction_result_message','wpsc_transaction_result_message_virement_callback');
+add_filter('wpsc_transaction_result_message_html','wpsc_transaction_result_message_virement_callback');
+
+function wpsc_transaction_result_message_virement_callback($message){
+	global $wpdb, $purchase_log;
+	if ($purchase_log['gateway']=='virement'){
+	$options = get_option( 'wpcb_virement'); 
+		$message.='<br/><br/>'.$options['displayvirement'];
+	}
+	return $message;
+}
+
+
 
 /** 
 * Paypalpaypal options
@@ -1061,14 +1088,20 @@ function shortcode_wpcb_handler( $atts, $content=null, $code="" ) {
 			//Va afficher sur la page ou se trouve le shortcode les parametres.
 			$parm_pretty=str_replace(' ','<br/>',$parm);
 			echo '<p>You see this because you are in debug mode :</p><pre>'.$parm_pretty.'<br/>path_bin_request='.$path_bin_request.'</pre>';
-			echo'<p>End of debug mode</p>';
+			if(function_exists('exec')) {
+				echo "exec function is enabled -> Ok";
+			}
+			else {
+				echo "Error : exec is not enabledon php server";
+			}
+			echo '<p>End of debug mode</p>';
 		}
 		$result=exec("$path_bin_request $parm");
 		$tableau=explode ("!","$result");
 		$code=$tableau[1];
 		$error=$tableau[2];
 		if (($code=="") && ($error=="")){
-			$message="<p>".__('Error calling the atos api : exec request not found','wpcb')."  $path_bin_request</p>";
+			$message.="<p>".__('Error calling the atos api : exec request not found','wpcb')."  $path_bin_request</p>";
 			$message.= "<p>".__('Thank you for reporting this error to:','wpcb')." ".$purch_log_email."</p>";
 		}
 		elseif ($code != 0){
@@ -1269,7 +1302,8 @@ function get_Signature($field,$key) {
 		}
 
 
-add_action('init','check_ipn');
+add_action('init','check_ipn');
+
 function check_ipn(){
 	global $wpdb, $purchase_log, $wpsc_cart;
 	$wpcb_atos = get_option ( 'wpcb_atos' );
@@ -1456,18 +1490,27 @@ function check_ipn(){
 			}
 	}
 	}// Fin du atos
-	elseif ($_GET['ipn']=='systempaycyberplus'){
-				$message='';
-				 foreach($_POST as $key => $value){
-					$message.= $key.'->'.$value."\n";
-				}
+	elseif ($_GET['ipn']=='systempaycyberplus'){
+
+				$message='';
+
+				 foreach($_POST as $key => $value){
+
+					$message.= $key.'->'.$value."\n";
+
+				}
+
 				mail($purch_log_email,'ipn systempay cyberplus',$message);
-				$wpcb_systempaycyberplus = get_option('wpcb_systempaycyberplus');
-				$control = Check_Signature(uncharm($_POST),$wpcb_systempaycyberplus['certificat']);
+				$wpcb_systempaycyberplus = get_option('wpcb_systempaycyberplus');
+
+				$control = Check_Signature(uncharm($_POST),$wpcb_systempaycyberplus['certificat']);
+
 				if($control == 'true'){
-					$sessionid=$_POST['vads_order_id'];
+					$sessionid=$_POST['vads_order_id'];
+
 					if($_POST['vads_result'] == "00"){
-						switch ($_POST['vads_auth_mode']){
+						switch ($_POST['vads_auth_mode']){
+
 							case "FULL":
 								$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '3' WHERE `sessionid`=".$sessionid);
 								$purchase_log = $wpdb->get_row("SELECT * FROM `".WPSC_TABLE_PURCHASE_LOGS."` WHERE `sessionid`= ".$sessionid." LIMIT 1",ARRAY_A) ; // Ne pas enlever car global !
@@ -1477,20 +1520,30 @@ function check_ipn(){
 								transaction_results($sessionid,false);					
 							break;
 							case "MARK":
-							break;
-						}
-					}
+							break;
+
+						}
+
+					}
+
 					else{	//failed
 						$wpdb->query("UPDATE `".WPSC_TABLE_PURCHASE_LOGS."` SET `processed`= '5' WHERE `sessionid`=".$sessionid);		
 						$wpsc_cart->empty_cart();
 						//http://matale.fr/?cbListener=systempay_cyberplus&mode=test
-						}
-				}
-				else {
-				mail($purch_log_email,'ipn systempay cyberplus signature non valide',$message);
-				}
-				if($transauthorised==false){
-
+						}
+
+				}
+
+				else {
+
+				mail($purch_log_email,'ipn systempay cyberplus signature non valide',$message);
+
+				}
+
+				if($transauthorised==false){
+
+
+
 				}			
 }// Fin du ipn=systempaycyberplus
 elseif ($_GET['ipn']=='paypal'){
@@ -1680,7 +1733,8 @@ function wpcb_facture_prefixe_callback(){
 
 $wpcb_misc = get_option( 'wpcb_misc');
 if ($wpcb_misc['display_number_sales']){
-add_action('wpsc_product_addons','show_number_of_sales');}
+add_action('wpsc_product_addons','show_number_of_sales');
+}
 function show_number_of_sales($productid){
 	$wpcb_misc = get_option( 'wpcb_misc');
 	global $wpdb;
@@ -1717,7 +1771,8 @@ function show_number_of_sales($productid){
 
 if ($wpcb_misc['display_countdown']){
 add_action('wpsc_product_addons','display_countdown');
-add_action('init','remove_ventes_terminees');}
+add_action('init','remove_ventes_terminees');
+}
 
 function display_countdown($productid){
 	$wpcb_misc = get_option( 'wpcb_misc');
@@ -1768,7 +1823,8 @@ function remove_ventes_terminees(){
  	endwhile;
 }
 
-add_action('init','ShowHelp');
+add_action('init','ShowHelp');
+
 function ShowHelp(){
 	if ($_GET['action']=='ReglerLesOptionsAvantTout'){
 		echo '<pre>Sauvegarder les options suivant les indications <a href="'.admin_url('/plugins.php?page=wpcb&tab=dev').'">ici</a></pre>';
@@ -1778,7 +1834,8 @@ function ShowHelp(){
 $wpcb_general = get_option( 'wpcb_general');
 if ($wpcb_general['AddSalesCheckbox']){
 	add_action('wpsc_confirm_checkout','AddSaleToGoogleSpreadsheet');
-}
+}
+
 
 function AddSaleToGoogleSpreadsheet($purchase_log_id){
 	// This is triggered when a sales is completed and also when the state is change to Completed in the admin
@@ -2015,7 +2072,7 @@ else {
     return $title;
     
 }
-add_filter('the_title', 'wpcb_display_payment_icon_page_title', 10, 2);
+//add_filter('the_title', 'wpcb_display_payment_icon_page_title', 10, 2);
 
 
 add_action('wpsc_purchase_logs_list_table_after','display_download_csv_for_coliposte');
